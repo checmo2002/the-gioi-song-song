@@ -42,7 +42,8 @@ python3 -m http.server 8000
 2. **Chỉ sửa file thuộc việc của mình.** Hai agent không sửa cùng một file cùng lúc. Trưởng nhóm phân file khi chia việc.
 3. **Không thêm thư viện** nếu vài dòng code tự viết được. Thêm thư viện phải ghi lý do trong PR.
 4. **Không đổi thứ tự** file trong `index.html` trừ khi việc yêu cầu, vì CSS và JS phụ thuộc thứ tự.
-5. **Chạy `python3 tests/smoke.py` và `python3 tests/hinh-anh.py` trước khi mở PR.** Cả hai phải ĐẠT.
+5. **Chạy `python3 tests/smoke.py` trước khi mở PR.** Kiểm tra hình ảnh (`tests/hinh-anh.py`) tính theo kết quả **trên GitHub**:
+   ảnh chuẩn chụp trên máy GitHub, máy khác vẽ font khác nên chạy ở máy mình sẽ luôn lệch. PR chỉ được gộp khi GitHub báo ĐẠT.
    Chỉ thay ảnh chuẩn khi thay đổi giao diện **đã được chủ dự án duyệt**, và ghi rõ trong PR. Ảnh chuẩn phải chụp trên máy GitHub
    (máy khác vẽ font khác): đẩy lên nhánh của PR một commit `git commit --allow-empty -m "[cap-nhat-anh] lý do"`,
    GitHub sẽ chụp lại và tự commit ảnh chuẩn mới vào nhánh. Sau đó kéo về (`git pull`).
