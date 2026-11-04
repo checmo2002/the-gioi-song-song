@@ -3,8 +3,8 @@
 (function(){
  var SO={sanh:2,chan:3,dien:3,tho:3,lang:3,ho:1,nha:0},LE={dien:1,tho:1,chan:1},ds={},
   // ai hay xuất hiện ở đâu (hình trong img/nv/npc/)
-  AI={sanh:['thanhnien','hocsinh','phunutim','cuuchienbinh'],chan:['ongaonau','bacu','chibaba','phunutim'],dien:['ongaonau','bacu','chibaba','gaiaodai'],
-      tho:['gaiaodai','thanhnien','phunutim','bacu'],lang:['cuuchienbinh','hocsinh','bacu','chibaba'],ho:['ongaonau','bacu']};
+  AI={sanh:['thanhnien','hocsinh','phunutim','cuuchienbinh','coaodai'],chan:['ongaonau','bacu','chibaba','suthay','phunutim'],dien:['suthay','ongaonau','bacu','chibaba','coaodai'],
+      tho:['nutu','coaodai','thanhnien','phunutim','bacu'],lang:['cuuchienbinh','hocsinh','bacu','chibaba'],ho:['ongaonau','bacu']};
  function diem(W,gan,r){for(var n=0;n<40;n++){
    var x=gan?gan[0]+(Math.random()-.5)*r:.08+Math.random()*.84,y=gan?gan[1]+Math.random()*r*.4:.1+Math.random()*.85,p=W.pt(x,y);
    if(Math.abs(p[0]-x)<.01&&Math.abs(p[1]-y)<.01)return p}   // chỉ nhận điểm vốn đi được, không lấy điểm bị ép vào mép

@@ -1,12 +1,14 @@
-"""Render hình NPC (img/nv/npc/) từ nhanvat8.blend. Chạy trong Blender (Scripting) với file đó đang mở.
+"""Render hình NPC (img/nv/npc/) từ nhan-vat.blend của Song Song (dựng bằng tools/dung-nhan-vat.py).
+Chạy ngầm: blender -b <thư mục>/nhan-vat.blend --python tools/render-npc.py -- <thư mục ra> [Ten …]
 Mỗi nhân vật 5 tư thế × 8 hướng, ô 128×192 (render 256×384 rồi thu nhỏ), khớp với img/nv/nam-*.webp.
 Ra PNG ở OUT; đổi sang WebP: Pillow, quality 82. Không lưu đè file .blend (camera/đèn tạm, nên đóng không lưu)."""
 import bpy, math, os
 import numpy as np
-OUT = r'C:\Users\Admin\Desktop\bandolietsi-3d\npc-render'
-CH = ['GaiAoDai','OngAoNau','PhuNuTim','BaCu','CuuChienBinh','HocSinh','ChiBaBa','ThanhNien']
-POSE = {'dung':('Idle',[0]), 'di':('Walk',[0,3,6,9,12,15,18,21]), 'chap':('Pray',[40]),
-        'lay':('Bow',[0,8,16,24,32,40]), 'ngoi':('Kneel',[60])}   # hàng = hướng d (0 nhìn xuống màn hình, 2 sang phải…)
+import sys
+A = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
+OUT = A[0] if A else r'E:\5.2\TheGioiSongSong\nhan-vat\sprite'
+CH = A[1:] or ['OngAoNau','BaCu','ChiBaBa','PhuNuTim','CoAoDai','CuuChienBinh','ThanhNien','HocSinh','SuThay','NuTu']
+POSE = {'dung':('Idle',[0]), 'di':('Walk',8), 'chap':('Pray',[0]), 'lay':('Bow',6), 'ngoi':('Kneel',[0])}   # số = rải đều theo độ dài động tác   # hàng = hướng d (0 nhìn xuống màn hình, 2 sang phải…)
 S = bpy.context.scene
 os.makedirs(OUT, exist_ok=True)
 cam = bpy.data.objects.new('NPC_Cam', bpy.data.cameras.new('NPC_Cam')); S.collection.objects.link(cam)
@@ -24,12 +26,15 @@ def place(d):   # động tác ghi đè hướng xoay của xương nên xoay ca
     sun.rotation_euler = (math.radians(40), 0, math.radians(-30)+th)
 def sheet(n, key):
     act, frames = POSE[key]
+    if isinstance(frames, int):
+        a0, a1 = bpy.data.actions[act+'_'+n].frame_range; st = (a1-a0)/frames
+        frames = [round(a0 + i*st) for i in range(frames)]
     for o in S.objects:
         if o.type in ('MESH','ARMATURE'): o.hide_render = o.name not in (n, 'Rig'+n)
     rig = bpy.data.objects['Rig'+n]; ad = rig.animation_data
     ad.action = bpy.data.actions[act+'_'+n]
     if hasattr(ad,'action_slot') and len(ad.action.slots): ad.action_slot = ad.action.slots[0]
-    rig.location = (0, -0.15 if key == 'ngoi' else 0, 0)   # quỳ: chân duỗi ra sau, căn tâm cho vừa khung
+    rig.location = (0, 0, 0)
     W, H = 128, 192; big = np.zeros((H*8, W*len(frames), 4), np.float32); tmp = os.path.join(OUT, '_tmp.png')
     for d in range(8):
         place(d)
