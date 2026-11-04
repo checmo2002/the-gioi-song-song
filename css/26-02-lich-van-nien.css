@@ -1,0 +1,99 @@
+/* Lịch vạn niên: tờ lịch giấy cùng chất liệu với Song Song (giấy ngà, vàng hổ phách, quầng sáng), mở ngay khi vào trang */
+.cal-btn{display:inline-flex;align-items:center;gap:8px;flex-shrink:0;border:1px solid rgba(43,36,28,.14);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 12px 5px 5px;font:500 13px var(--f-body);cursor:pointer;min-height:40px;transition:background .25s,transform .2s}
+.cal-btn:hover{background:var(--paper-2);transform:translateY(-1px)}
+.cal-btn i{position:relative;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--card);border:1px solid rgba(184,134,47,.45);color:var(--ink);font-style:normal;font-size:13px;font-weight:600;overflow:hidden;padding-top:5px}
+.cal-btn i::before{content:"";position:absolute;inset:0 0 auto;height:7px;background:var(--ember)}
+.cb-t{display:grid;gap:1px;text-align:left;line-height:1.15;white-space:nowrap}.cb-t b{font-size:13px;font-weight:600;color:var(--ink)}.cb-t small{font-size:11.5px;color:#8A6A2A;font-weight:500}
+
+.lvn{border:0;padding:0;background:transparent;width:min(980px,calc(100vw - 24px));max-height:calc(100dvh - 24px);color:var(--ink);font-family:var(--f-body);overflow:visible}
+.lvn::backdrop{background:radial-gradient(ellipse at 50% 30%,rgba(255,246,222,.35),rgba(26,20,14,.62) 70%);backdrop-filter:blur(8px)}
+.lvn[open]::backdrop{animation:lvnFade .6s ease both}
+@keyframes lvnFade{from{opacity:0}}
+.lvn-box{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:0;background:var(--card);border-radius:22px;overflow:hidden;box-shadow:0 40px 90px rgba(26,20,14,.45),0 0 0 1px rgba(184,134,47,.18);max-height:calc(100dvh - 24px);perspective:1400px}
+.lvn[open] .lvn-box{animation:lvnIn .8s var(--ease,ease) both}
+@keyframes lvnIn{from{opacity:0;transform:translateY(26px) scale(.97)}}
+/* tờ lịch */
+.lvn-sheet{position:relative;overflow:hidden auto;background:linear-gradient(180deg,#FFFDF8 0,#FBF4E6 100%);border-right:1px solid rgba(184,134,47,.22);display:grid;align-content:start}
+.lvn-bind{position:relative;height:46px;background:linear-gradient(180deg,#C8963A,#A97A28);display:flex;justify-content:center;gap:120px;align-items:flex-end;box-shadow:inset 0 -6px 10px rgba(0,0,0,.12)}
+.lvn-bind i{width:16px;height:30px;border-radius:9px;background:linear-gradient(90deg,#8A8174,#E9E2D4 45%,#9C9284);transform:translateY(12px);box-shadow:0 2px 3px rgba(0,0,0,.25);z-index:2}
+.lvn-page{position:relative;padding:26px 26px 24px;display:grid;gap:14px;transform-origin:50% 0;background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(184,134,47,.05) 27px 28px)}
+.lvn-page.flip{animation:pageFlip .7s var(--ease,ease) both}
+@keyframes pageFlip{0%{transform:rotateX(-78deg);opacity:0;filter:brightness(.85)}60%{opacity:1}100%{transform:none;filter:none}}
+.lvn-glow{position:absolute;left:50%;top:40px;width:340px;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,246,214,.95) 0,rgba(255,232,180,.45) 30%,rgba(255,232,180,0) 68%);pointer-events:none;animation:glowBreath 9s ease-in-out infinite}
+.lvn-motes{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lvn-motes i{position:absolute;bottom:-10px;width:4px;height:4px;border-radius:50%;background:#E3B65A;opacity:0;animation:mote 9s linear infinite;box-shadow:0 0 8px #F2C94C}
+@keyframes mote{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-520px) translateX(24px);opacity:0}}
+.lvn-top{position:relative;display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+.lvn-top b{color:var(--ember);font-weight:600}
+.lvn-day{position:relative;font-family:var(--f-display);font-weight:200;font-size:clamp(110px,15vw,168px);line-height:.88;letter-spacing:-.06em;text-align:center;font-variant-numeric:tabular-nums;color:var(--ink)}
+.lvn-day.su{color:var(--lacquer)}
+.lvn-page.flip .lvn-day{animation:dayIn .9s .15s var(--ease,ease) both}
+@keyframes dayIn{from{opacity:0;transform:scale(.9);filter:blur(6px)}}
+.lvn-wd{position:relative;text-align:center;font-size:19px;font-weight:500;margin-top:-2px}
+.lvn-lunar{position:relative;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;background:rgba(255,253,248,.75);border:1px solid rgba(184,134,47,.28);border-radius:16px;padding:14px 18px;backdrop-filter:blur(4px)}
+.lvn-moon{grid-row:span 3;width:54px;height:54px;filter:drop-shadow(0 0 10px rgba(242,201,76,.55))}
+.lvn-page.flip .lvn-moon{animation:moonIn 1.1s .3s var(--ease,ease) both}
+@keyframes moonIn{from{opacity:0;transform:rotate(-40deg) scale(.6)}}
+.lvn-lunar small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.lvn-lunar b{font-size:23px;font-weight:500;letter-spacing:-.02em;line-height:1.15}
+.lvn-lunar span{font-size:14px;color:var(--ink-soft)}
+.lvn-fest{position:relative;justify-self:center;background:var(--lacquer);color:#FFF7EE;font-weight:600;font-size:14px;border-radius:999px;padding:6px 16px;text-align:center;box-shadow:0 6px 18px rgba(154,59,43,.3)}
+.lvn-page.flip .lvn-fest{animation:festIn .6s .45s var(--ease,ease) both}
+@keyframes festIn{from{opacity:0;transform:translateY(8px) scale(.9)}}
+.lvn-meta{position:relative;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:15px;margin:0;padding-top:12px;border-top:1px dashed rgba(184,134,47,.35)}
+.lvn-meta dt{color:var(--ink-soft)}.lvn-meta dd{margin:0;font-weight:500}
+/* lịch tháng */
+.lvn-side{padding:20px 24px;display:grid;gap:12px;align-content:start;overflow:auto;background:var(--card)}
+.lvn-head{display:flex;align-items:center;gap:8px}
+.lvn-head h3{flex:1;font-size:26px;font-weight:300;letter-spacing:-.03em;white-space:nowrap}
+.lvn-nav,.lvn-x{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper);font-size:22px;line-height:1;cursor:pointer;color:var(--ink);transition:background .2s,transform .2s}
+.lvn-nav:hover{background:var(--paper-2);transform:scale(1.06)}
+.lvn-x{background:var(--paper-2);border-color:transparent}.lvn-x:hover{transform:rotate(90deg)}
+.lvn-today{border:1px solid rgba(184,134,47,.45);background:var(--ember-soft);border-radius:999px;padding:0 14px;height:44px;font:500 14px var(--f-body);cursor:pointer;color:var(--ink);white-space:nowrap}
+.lvn-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.lvn-grid.sl-n{animation:slN .45s var(--ease,ease) both}.lvn-grid.sl-p{animation:slP .45s var(--ease,ease) both}
+@keyframes slN{from{opacity:0;transform:translateX(28px)}}@keyframes slP{from{opacity:0;transform:translateX(-28px)}}
+.lvn-grid .wd{font-size:12px;text-align:center;color:var(--ink-soft);font-weight:600;padding:4px 0;letter-spacing:.04em}
+.lvn-grid .wd.su{color:var(--lacquer)}
+.lvn-grid button{border:1px solid transparent;background:none;border-radius:12px;min-height:48px;display:grid;align-content:center;justify-items:center;cursor:pointer;color:var(--ink);font-family:var(--f-body);position:relative;padding:4px 0;transition:background .2s,transform .2s,border-color .2s}
+.lvn-grid button:hover{background:var(--paper);transform:translateY(-2px)}
+.lvn-grid button b{font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.2}
+.lvn-grid button small{font-size:12px;color:var(--ink-soft);line-height:1.2;display:inline-flex;align-items:center;gap:3px}
+.lvn-grid button small svg{width:10px;height:10px}
+.lvn-grid button.su b{color:var(--lacquer)}
+.lvn-grid button.out{opacity:.35}
+.lvn-grid button.m1 small,.lvn-grid button.m15 small{color:var(--ember);font-weight:700}
+.lvn-grid button.fest::after{content:"";position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--lacquer)}
+.lvn-grid button.now{border-color:rgba(184,134,47,.7);background:var(--ember-soft)}
+.lvn-grid button.now::before{content:"";position:absolute;inset:-1px;border-radius:12px;border:1px solid var(--ember);animation:nowRing 2.6s ease-out infinite}
+@keyframes nowRing{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.18)}}
+.lvn-grid button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);box-shadow:0 8px 18px rgba(43,36,28,.25)}
+.lvn-grid button[aria-pressed="true"] b,.lvn-grid button[aria-pressed="true"] small{color:#FFF7EE}
+.lvn-key{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink-soft)}
+.lvn-key span{display:inline-flex;align-items:center;gap:6px}
+.lvn-key i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.lvn h4{margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.lvn-next{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.lvn-next li{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:8px 14px;font-size:15px;background:var(--paper);animation:nxIn .5s var(--ease,ease) both}
+.lvn-next li:nth-child(2){animation-delay:.08s}.lvn-next li:nth-child(3){animation-delay:.16s}
+@keyframes nxIn{from{opacity:0;transform:translateY(8px)}}
+.lvn-next li b{font-weight:600}.lvn-next li small{display:block;color:var(--ink-soft);font-size:13px}
+.lvn-next li em{font-style:normal;color:var(--ember);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.lvn-go{justify-content:center;width:100%;min-height:50px;font-size:16px;border-radius:999px;position:relative;overflow:hidden}
+.lvn-go::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,246,222,.35) 50%,transparent 65%);transform:translateX(-100%);animation:goShine 4s 1.2s ease-in-out infinite}
+@keyframes goShine{0%,60%{transform:translateX(-100%)}90%,100%{transform:translateX(100%)}}
+@media (max-width:760px){
+  .lvn{width:100vw;max-width:100vw;max-height:100dvh;margin:auto 0 0}
+  .lvn-box{grid-template-columns:1fr;border-radius:22px 22px 0 0;max-height:94dvh;overflow:auto}
+  .lvn-sheet{overflow:visible;border-right:0;border-bottom:1px solid rgba(184,134,47,.22)}
+  .lvn-side{overflow:visible;padding:18px 14px 22px}
+  .lvn-bind{height:34px;gap:90px}.lvn-bind i{height:24px;transform:translateY(10px)}
+  .lvn-page{padding:20px 18px 18px;grid-template-columns:auto 1fr;gap:10px 16px;align-items:center}
+  .lvn-top,.lvn-lunar,.lvn-fest,.lvn-meta{grid-column:1/-1}
+  .lvn-day{font-size:92px;text-align:left}.lvn-wd{text-align:left;font-size:18px;margin:0}
+  .lvn-glow{left:30%;top:20px;width:260px}
+  .lvn-head h3{font-size:20px}.lvn-today{padding:0 10px}
+  .lvn-x{position:fixed;top:calc(6dvh + 46px);right:12px;z-index:3;background:rgba(255,253,248,.95);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+  .lvn-grid button{min-height:50px}.lvn-grid button b{font-size:17px}.lvn-grid button small{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){.lvn[open] .lvn-box,.lvn[open]::backdrop,.lvn-page.flip,.lvn-page.flip *,.lvn-grid,.lvn-next li,.lvn-go::after,.lvn-motes i,.lvn-glow,.lvn-grid button.now::before{animation:none!important}}
