@@ -1,11 +1,16 @@
 name: Cập nhật ảnh chuẩn
-# Chạy tay (Actions → Cập nhật ảnh chuẩn → Run workflow, chọn nhánh) khi thay đổi giao diện đã được duyệt.
-# Chụp lại ảnh chuẩn trên chính máy GitHub rồi commit vào nhánh đó.
-on: workflow_dispatch
+# Dùng khi thay đổi giao diện đã được duyệt. Chụp lại ảnh chuẩn trên chính máy GitHub rồi commit vào nhánh đó.
+# Cách gọi: Actions → Cập nhật ảnh chuẩn → Run workflow (chọn nhánh),
+# hoặc đẩy một commit có chữ [cap-nhat-anh] trong lời nhắn: git commit --allow-empty -m "[cap-nhat-anh]"
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [main]
 permissions:
   contents: write
 jobs:
   cap-nhat:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[cap-nhat-anh]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
