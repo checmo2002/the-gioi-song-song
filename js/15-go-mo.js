@@ -55,17 +55,17 @@
   q('.mo-rp').setAttribute('stroke-dasharray',(st.bead/108*C)+' 999');q('.mo-bd').textContent=st.bead;q('.mo-td').textContent=st.today;q('.mo-sk').textContent=st.streak;body.innerHTML=moSvg(st.skin);skins()}
  // tiếng mõ gỗ: vài mode cộng hưởng của thân rỗng (tổng hợp modal) + tiếng dùi chạm + tiếng "bụp" trầm
  var ac,F0={go:470,hong:440,son:455,vang:500};
+ // tiếng mõ nhỏ khi tụng kinh (chủ dự án chọn 04/11/2026): xung dùi rất ngắn kích các cộng hưởng của thân gỗ rỗng, tắt sau ~50ms
  function tock(){var vol=.8;try{if(localStorage.getItem('ss-sound')==='0')return;vol=+(localStorage.getItem('ss-vol')||.8)}catch(e){}
   try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();
-   var t=ac.currentTime+.005,out=ac.createGain(),f0=(F0[st.skin]||470)*(1+(Math.random()-.5)*.03);out.gain.value=vol;
-   var cmp=ac.createDynamicsCompressor();out.connect(cmp).connect(ac.destination);
-   [[1,1,.16],[1.52,.42,.085],[2.48,.22,.05],[3.9,.1,.03]].forEach(function(m){var o=ac.createOscillator(),g=ac.createGain();o.type='sine';
-    o.frequency.setValueAtTime(f0*m[0]*1.04,t);o.frequency.exponentialRampToValueAtTime(f0*m[0],t+.03);
-    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.55*m[1],t+.0015);g.gain.exponentialRampToValueAtTime(.0001,t+m[2]*4);
-    o.connect(g).connect(out);o.start(t);o.stop(t+m[2]*4+.02)});
-   var n=ac.createBuffer(1,Math.floor(ac.sampleRate*.012),ac.sampleRate),d=n.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
-   var src=ac.createBufferSource(),bp=ac.createBiquadFilter(),gn=ac.createGain();src.buffer=n;bp.type='bandpass';bp.frequency.value=f0*3.2;bp.Q.value=1.4;gn.gain.value=.5;src.connect(bp).connect(gn).connect(out);src.start(t);
-   var lo=ac.createOscillator(),lg=ac.createGain();lo.frequency.setValueAtTime(170,t);lo.frequency.exponentialRampToValueAtTime(90,t+.06);lg.gain.setValueAtTime(.3,t);lg.gain.exponentialRampToValueAtTime(.0001,t+.08);lo.connect(lg).connect(out);lo.start(t);lo.stop(t+.1)}catch(e){}}
+   var sr=ac.sampleRate,t=ac.currentTime+.005,f0=620*(F0[st.skin]||470)/470*(1+(Math.random()-.5)*.02);
+   var out=ac.createGain(),lp=ac.createBiquadFilter(),cmp=ac.createDynamicsCompressor();out.gain.value=2.4*vol;lp.type='lowpass';lp.frequency.value=4200;lp.Q.value=.5;out.connect(lp).connect(cmp).connect(ac.destination);
+   var len=Math.floor(sr*.004),nb=ac.createBuffer(1,len,sr),d=nb.getChannelData(0);
+   for(var i=0;i<len;i++){d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2)*.6+(i<8?1-i/8:0)}
+   var src=ac.createBufferSource();src.buffer=nb;
+   [[1,28,1],[1.6,18,.35],[3.1,12,.15]].forEach(function(m){var bp=ac.createBiquadFilter(),g=ac.createGain();bp.type='bandpass';bp.frequency.value=f0*m[0];bp.Q.value=m[1];g.gain.value=m[2];src.connect(bp).connect(g).connect(out)});
+   var hp=ac.createBiquadFilter(),hg=ac.createGain();hp.type='highpass';hp.frequency.value=1800;hg.gain.value=.1;src.connect(hp).connect(hg).connect(out);
+   src.start(t)}catch(e){}}
  function fx(txt){var w=document.createElement('i');w.className='mo-wave';stage.appendChild(w);setTimeout(function(){w.remove()},700);if(txt){var p=document.createElement('span');p.className='mo-plus';p.textContent=txt;p.style.marginLeft=(Math.random()*40-20)+'px';stage.appendChild(p);setTimeout(function(){p.remove()},900)}}
  var last=0,iv=0,steady=0,tipT=0;
  function say(t,cls){tip.textContent=t;tip.className='mo-tip'+(cls?' '+cls:'')}
