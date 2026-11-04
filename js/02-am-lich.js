@@ -136,7 +136,7 @@ return{jdFromDate:jdFromDate,jdToDate:jdToDate,toLunar:toLunar,canChiNgay:canChi
   for(var j=j0+1;j<j0+400&&out.length<3;j++){var s=LV.jdToDate(j),x=info(s[0],s[1],s[2]),l=x.l,name=x.f[0]||(l.d===1?'Mùng 1 tháng '+mName(l):l.d===15?'Rằm tháng '+mName(l):'');
    if(!name||seen[name])continue;if(out.length>=2&&!x.f.length)continue;seen[name]=1;out.push('<li><span><b>'+name+'</b><small>'+WD[(j+1)%7]+', '+s[0]+'/'+s[1]+'/'+s[2]+' · âm '+l.d+'/'+l.m+'</small></span><em>còn '+(j-j0)+' ngày</em></li>')}
   $('#lvnNext').innerHTML=out.join('')}
- function open(){t=vnToday();drawNext();drawGrid();showDay(sel[0],sel[1],sel[2]);if(!dlg.open)dlg.showModal()}
+ function open(){$('#lvnGo').textContent=document.documentElement.classList.contains('hall-on')?'Quay lại':'Vào Thế Giới Song Song';t=vnToday();drawNext();drawGrid();showDay(sel[0],sel[1],sel[2]);if(!dlg.open)dlg.showModal()}
  $('#lvnGrid').addEventListener('click',function(e){var b=e.target.closest('button[data-jd]');if(!b)return;var s=LV.jdToDate(+b.dataset.jd);sel=s;if(s[1]!==view[0]){view=[s[1],s[2]]}drawGrid();showDay(s[0],s[1],s[2])});
  document.querySelectorAll('#lvn [data-mo]').forEach(function(b){b.addEventListener('click',function(){var m=view[0]+(+b.dataset.mo),y=view[1];if(m<1){m=12;y--}if(m>12){m=1;y++}view=[m,y];drawGrid();var g=$('#lvnGrid');g.classList.remove('sl-n','sl-p');void g.offsetWidth;g.classList.add(+b.dataset.mo>0?'sl-n':'sl-p')})});
  $('#lvnToday').addEventListener('click',function(){t=vnToday();sel=t.slice();view=[t[1],t[2]];drawGrid();showDay(t[0],t[1],t[2])});

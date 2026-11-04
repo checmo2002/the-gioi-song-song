@@ -89,7 +89,7 @@
   if(room){room.peers().forEach(function(p){if(p.kind!=='viewer'||(p.isMe&&p.sameTab))return;var pr=p.presence||{};n++;
    if(pr.f!==faith()||pr.h!==1)return;here++;upsert(p.peer,pr,false);seen[p.peer]=1})}
   Object.keys(els).forEach(function(k){if(!seen[k]){els[k].remove();delete els[k]}});
-  var o=document.getElementById('hallOnline');if(o){o.querySelector('b').textContent=n;o.title=here+' người đang ở '+(faith()==='cg'?'Thánh đường':'Chính điện')+' · '+n+' người đang trực tuyến'}}
+  var o=document.getElementById('hallOnline');if(o){o.hidden=n<2;o.querySelector('b').textContent=n;o.title=here+' người đang ở '+(faith()==='cg'?'Thánh đường':'Chính điện')+' · '+n+' người đang trực tuyến'}}
  function send(){if(room&&!hall.classList.contains('world-on'))room.presence({x:+me.x.toFixed(3),y:+me.y.toFixed(3),c:me.c,e:me.e,f:faith(),h:hall.hidden?0:1,n:myName()}).catch(function(){})}
  floor.addEventListener('click',function(ev){var r=floor.getBoundingClientRect();me.x=Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width));me.y=Math.max(0,Math.min(1,(ev.clientY-r.top)/r.height));
   var pg=document.createElement('i');pg.className='floor-ping';pg.style.left=(ev.clientX-r.left)+'px';pg.style.top=(ev.clientY-r.top)+'px';floor.appendChild(pg);setTimeout(function(){pg.remove()},750);render();send()});

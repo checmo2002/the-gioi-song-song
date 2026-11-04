@@ -45,7 +45,7 @@
  var wst=document.getElementById('wStage'),wbg=wst&&wst.querySelector('.w-bg'),sc=(wst&&wst.parentNode)||hall;
  // ánh sáng nằm ngay trên ảnh cảnh, dưới nhân vật và nhãn; mưa phủ trên cùng
  if(wbg)wbg.after(sky);else sc.appendChild(sky);sc.appendChild(cv);sc.appendChild(fl);
- function pos(){var o=document.getElementById('hallOnline'),hr=hall.getBoundingClientRect();if(!o)return;var r=o.getBoundingClientRect();var top=(r.height?r.bottom:hr.top+100)-hr.top+6,L=r.width?r.left-hr.left:12;L=Math.max(12,Math.min(L,hr.width-pill.offsetWidth-12));pill.style.top=top+'px';pill.style.left=L+'px';pop.style.top=(top+40)+'px';pop.style.left=Math.max(12,Math.min(L,hr.width-Math.min(300,hr.width-24)-12))+'px'}
+ function pos(){var o=document.getElementById('hallOnline'),hr=hall.getBoundingClientRect();if(!o)return;var r=o.getBoundingClientRect();if(!r.height){var tp=hall.querySelector('.hall-top');r=tp?tp.getBoundingClientRect():r}var top=(r.height?r.bottom:hr.top+100)-hr.top+6,L=r.width?r.left-hr.left:12;L=Math.max(12,Math.min(L,hr.width-pill.offsetWidth-12));pill.style.top=top+'px';pill.style.left=L+'px';pop.style.top=(top+40)+'px';pop.style.left=Math.max(12,Math.min(L,hr.width-Math.min(300,hr.width-24)-12))+'px'}
  function lunar(d){try{var l=window.ssToLunar&&ssToLunar(d.getDate(),d.getMonth()+1,d.getFullYear());return l?l.d+'/'+l.m+(l.leap?' (nhuận)':''):''}catch(e){return ''}}
  function phase(h){return h<5?'dem':h<7?'sang':h<17?'ngay':h<19?'chieu':'dem'}
  var PH={dem:'Đêm',sang:'Bình minh',ngay:'Ban ngày',chieu:'Hoàng hôn'};
