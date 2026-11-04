@@ -38,7 +38,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `05-dai-sanh.js` | Mở đại sảnh sau cổng, khi vào lại trang, khi bấm logo |
 | `06-trang-muc.js` | Mỗi mục là một trang riêng, điều hướng |
 | `07-01-dung-chung.js` | Hàm dùng chung (`$`, `$$`, `fmt`, `toast`), chuyển giữa trang giới thiệu và bên trong |
-| `07-02-du-lieu-mau.js` | Dữ liệu mẫu: người đã khuất (`people`), vị trí (`GEO`), các khu (`ZONES`) |
+| `07-02-du-lieu-mau.js` | Lấy dữ liệu từ `SS_DATA`, các khu (`ZONES`), trạng thái người đang xem |
 | `07-03-ho-so-tim-kiem.js` | Tìm kiếm, hồ sơ, thắp hương, ký ức (lời nhắn), hành trình |
 | `07-04-cua-hang-ngoi-nha.js` | Cửa hàng, ví nén, quà đã nhận, điều khiển ngôi nhà |
 | `07-05-hieu-ung-ban-do.js` | Hiệu ứng hồ sơ, bản đồ mộ phần thật |
@@ -72,7 +72,8 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 
 ## Dữ liệu và trạng thái
 
-- Toàn bộ dữ liệu là **mẫu hư cấu**, viết thẳng trong JS (chủ yếu `07-02-du-lieu-mau.js`, `20-lang-rieng.js`).
+- Toàn bộ dữ liệu là **mẫu hư cấu**. Người đã khuất, vị trí mộ/quê, lời nhắn mẫu, vật phẩm cửa hàng nằm ở `data/du-lieu-mau.js` (`window.SS_DATA`, nội dung là JSON thuần). Làng mẫu họ Phạm vẫn nằm trong `20-lang-rieng.js`.
+- Khi có máy chủ: API trả về đúng dạng `SS_DATA` là thay được, giao diện không phải sửa.
 - Trạng thái người dùng lưu trong `localStorage`: `ss-auth`, `ss-me`, `ss-faith`, `ss-nv`, `ss-music`, `ss-sound`, `ss-vol`, `ss-zoom`, `ss-dai`, `ss-dai-ta`…
 - **Chưa có:** máy chủ, cơ sở dữ liệu, đăng nhập thật, thanh toán thật.
 
