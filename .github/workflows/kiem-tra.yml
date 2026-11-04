@@ -4,15 +4,28 @@ on:
   push:
     branches: [main]
 jobs:
-  smoke:
+  kiem-tra:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install playwright && playwright install --with-deps chromium
-      - run: |
+      # cố định phiên bản trình duyệt để ảnh chụp giống ảnh chuẩn
+      - run: pip install playwright==1.63.0 pillow && playwright install --with-deps chromium
+      - name: Kiểm tra nhanh
+        run: |
           python3 -m http.server 8000 &
           sleep 2
           python3 tests/smoke.py http://localhost:8000/
+      - name: Kiểm tra hình ảnh
+        run: |
+          python3 -m http.server 8001 &
+          sleep 2
+          python3 tests/hinh-anh.py http://localhost:8001/
+      - name: Lưu ảnh lệch
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anh-lech
+          path: tests/ket-qua/

@@ -13,8 +13,9 @@ Mở http://localhost:8000
 ## Kiểm tra
 
 ```
-pip install playwright && playwright install chromium
+pip install playwright==1.63.0 pillow && playwright install chromium
 python3 tests/smoke.py
+python3 tests/hinh-anh.py
 ```
 
 ## Tài liệu

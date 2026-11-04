@@ -8,7 +8,7 @@ Trưởng nhóm chuyển mỗi mục thành một GitHub Issue trước khi giao
 2. ~~Tách `js/04-the-gioi-nui.js`~~ — xong: 108 KB dữ liệu cảnh ra `js/04-00-du-lieu-canh.js`, phần chạy còn 27 KB ở `js/04-01-the-gioi-nui.js`.
 3. ~~Tách `css/27-dai-sanh.css` và `css/26-trang-ca-nhan.css`~~ — xong: thành `css/27-01…09-*.css` và `css/26-01…05-*.css`. Lưu ý: hai file gốc là các lớp sửa chồng lên nhau theo thời gian, nên một khu (ví dụ thế giới núi) có thể có kiểu ở vài file; thứ tự nạp vẫn quyết định.
 4. ~~Đưa dữ liệu mẫu ra file riêng~~ — xong: `data/du-lieu-mau.js` (JSON thuần trong `window.SS_DATA`, nạp đồng bộ để không đổi thứ tự khởi động). Còn lại: làng mẫu họ Phạm trong `20-lang-rieng.js`.
-5. **Kiểm tra hình ảnh tự động:** chụp các màn chính, so với ảnh chuẩn để phát hiện vỡ giao diện.
+5. ~~Kiểm tra hình ảnh tự động~~ — xong: `tests/hinh-anh.py` chụp 6 màn (cổng, thế giới, người thân, tiểu sử, cửa hàng, gia đình) ở 1366px và 390px, so với `tests/anh-chuan/`, chạy trên GitHub mỗi PR.
 6. **Sắp xếp lại bố cục cho dễ dùng** (ưu tiên của chủ dự án): rà từng màn, đề xuất bố cục mới bằng ảnh, chờ duyệt rồi mới làm.
 
 ## Đợt 2 — Đưa lên mạng thật (thêm agent vận hành)

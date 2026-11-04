@@ -23,6 +23,7 @@ js/NN-*.js      Mỗi file một tính năng, đa số là IIFE độc lập. Th
 data/           Dữ liệu mẫu (JSON thuần trong window.SS_DATA), nạp ngay trước js/07-*
 img/            Ảnh render isometric (lang/), nhân vật (nv/), đồ trong nhà (ho/)
 tests/smoke.py  Kiểm tra nhanh, bắt buộc ĐẠT trước khi gộp
+tests/hinh-anh.py  So ảnh chụp 6 màn × 2 cỡ với tests/anh-chuan/, bắt buộc ĐẠT
 docs/           Tầm nhìn, bản đồ tính năng, chuẩn đồ hoạ, danh sách việc
 ```
 
@@ -41,7 +42,8 @@ python3 -m http.server 8000
 2. **Chỉ sửa file thuộc việc của mình.** Hai agent không sửa cùng một file cùng lúc. Trưởng nhóm phân file khi chia việc.
 3. **Không thêm thư viện** nếu vài dòng code tự viết được. Thêm thư viện phải ghi lý do trong PR.
 4. **Không đổi thứ tự** file trong `index.html` trừ khi việc yêu cầu, vì CSS và JS phụ thuộc thứ tự.
-5. **Chạy `python3 tests/smoke.py` trước khi mở PR.** Kết quả phải ĐẠT ở cả máy tính lẫn điện thoại.
+5. **Chạy `python3 tests/smoke.py` và `python3 tests/hinh-anh.py` trước khi mở PR.** Cả hai phải ĐẠT.
+   Chỉ chạy `tests/hinh-anh.py --cap-nhat` (thay ảnh chuẩn) khi thay đổi giao diện **đã được chủ dự án duyệt**, và ghi rõ trong PR.
 6. **Mọi thay đổi giao diện phải kèm ảnh chụp** trước/sau (máy tính 1366px và điện thoại 390px).
 7. **Giữ đồ hoạ thống nhất** theo `docs/do-hoa.md`. Không tự đổi phong cách.
 8. **Dữ liệu hiện là dữ liệu mẫu hư cấu**, lưu trong `localStorage` (khoá bắt đầu bằng `ss-`). Không bao giờ dùng tên, ảnh, giấy tờ của người thật làm dữ liệu mẫu.
