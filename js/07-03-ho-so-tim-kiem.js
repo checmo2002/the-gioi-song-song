@@ -49,10 +49,7 @@ function select(id,fly){
 }
 
 /* ---------------- Ký ức ---------------- */
-const notes={khiem:[
- ['Chú ơi, năm nay cháu đưa con trai vào thăm chú. Thằng bé hỏi chú có biết đi xe đạp không, cháu bảo chú biết thổi sáo.','Phạm Hữu Nam, cháu','25/07/2026'],
- ['Khiêm à, tao vẫn nhớ hôm mày chia nửa nắm cơm cho tao. Tao sống đến giờ là sống cả phần mày.','Lương Văn Bảy, đồng đội','02/09/2025'],
- ['Cháu không quen chú, nhưng hôm nay đi ngang Thành cổ, cháu thắp cho chú một nén hương.','Một người ở Huế','14/04/2026']]};
+const notes=SS_DATA.notes;
 function renderWall(){const n=notes[current]||[];$('#wall').innerHTML=n.length?n.map(([t,a,d])=>`<div class="note"><p>${esc(t)}</p><footer>${esc(a)} · ${d}</footer></div>`).join(''):'<p style="color:var(--ink-soft)">Chưa có lời nhắn nào. Hãy là người đầu tiên.</p>'}
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 $('#msgForm').addEventListener('submit',e=>{e.preventDefault();const t=new Date();(notes[current]||(notes[current]=[])).unshift([$('#mText').value,$('#mName').value,t.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'})]);$('#mText').value='';renderWall();toast('Đã gửi lời nhắn tới '+byId[current].name)});

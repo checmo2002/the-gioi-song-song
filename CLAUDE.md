@@ -20,6 +20,7 @@ Người dùng chọn lối **Phật giáo** hoặc **Công giáo**, bước và
 index.html      Khung trang: toàn bộ HTML, nạp CSS và JS theo đúng thứ tự
 css/NN-*.css    Giao diện, mỗi file một khu. Thứ tự số = thứ tự nạp (quan trọng vì CSS đè nhau)
 js/NN-*.js      Mỗi file một tính năng, đa số là IIFE độc lập. Thứ tự số = thứ tự chạy
+data/           Dữ liệu mẫu (JSON thuần trong window.SS_DATA), nạp ngay trước js/07-*
 img/            Ảnh render isometric (lang/), nhân vật (nv/), đồ trong nhà (ho/)
 tests/smoke.py  Kiểm tra nhanh, bắt buộc ĐẠT trước khi gộp
 docs/           Tầm nhìn, bản đồ tính năng, chuẩn đồ hoạ, danh sách việc

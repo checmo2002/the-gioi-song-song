@@ -16,20 +16,7 @@ const IC={
  binhsen:'<path d="M18 26h12l-2 16H20z"/><path d="M24 26V12M24 12c-4 0-6-4-6-7 3 0 6 3 6 7zM24 12c4 0 6-4 6-7-3 0-6 3-6 7zM24 18c-5 0-9-2-10-6 4 0 8 2 10 6z"/>',
  custom:'<circle cx="24" cy="24" r="16" stroke-dasharray="3 3"/><path d="M24 16v16M16 24h16"/>'
 };
-const goods=[
- {id:'aodai',k:'ao',n:'Áo dài lụa',p:80,t:'Lụa tơ tằm, may đo theo màu gia đình chọn.'},
- {id:'quanphuc',k:'ao',n:'Bộ quân phục mới',p:60,t:'Quân phục kèm mũ cối, dành tặng các anh hùng liệt sĩ.'},
- {id:'aolen',k:'ao',n:'Áo len mẹ đan',p:40,t:'Áo len cổ tròn, ấm cho những mùa đông miền Bắc.'},
- {id:'xemay',k:'xe',n:'Xe máy cổ',p:180,t:'Kiểu xe số những năm 1970, sơn xanh ngọc.'},
- {id:'xedap',k:'xe',n:'Xe đạp thồ',p:70,t:'Khung sắt chắc, có giá chở hàng phía sau.'},
- {id:'oto',k:'xe',n:'Ô tô gia đình',p:320,t:'Bảy chỗ, đủ cho cả nhà cùng đi chơi Tết.'},
- {id:'truongky',k:'noi',n:'Bộ trường kỷ',p:150,t:'Gỗ gụ chạm hoa sen, đặt giữa gian chính.'},
- {id:'sap',k:'noi',n:'Sập gụ',p:200,t:'Chiếc sập ngồi uống trà mỗi chiều.'},
- {id:'tuche',k:'noi',n:'Tủ chè',p:120,t:'Tủ chè khảm trai để bày ấm chén.'},
- {id:'dao',k:'trang',n:'Cây đào Nhật Tân',p:50,t:'Đào bích nở đúng dịp Tết, trồng trong sân.'},
- {id:'denlong',k:'trang',n:'Đèn lồng Hội An',p:20,t:'Treo dọc lối đi, sáng ấm khi trời tối.'},
- {id:'binhsen',k:'trang',n:'Bình hoa sen',p:30,t:'Sen Tây Hồ cắm bình gốm men lam.'}
-];
+const goods=SS_DATA.goods;
 let balance=500,shopK='all';
 $('#recipient').innerHTML=people.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
 function renderGoods(){
