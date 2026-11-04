@@ -31,5 +31,5 @@ Trưởng nhóm chuyển mỗi mục thành một GitHub Issue trước khi giao
 15b. **Camera xoay vòng** (chủ dự án muốn có): mỗi cảnh hiện là một ảnh render một góc, nên muốn xoay phải render thêm góc nhìn (ví dụ 4 góc × 7 cảnh) kèm lưới đi được cho từng góc. Làm cùng đợt render lại.
 16. Hoàn thiện đại sảnh chân núi và lối lên đỉnh núi thờ.
 17. Video giới thiệu và hoạt cảnh mở cửa hai lối.
-17b. Hình riêng cho NPC (sư thầy áo nâu, Phật tử áo lam, giáo dân, cụ già, trẻ em): hiện NPC dùng chung hình nhân vật người chơi. Render sprite mới theo `docs/do-hoa.md`.
+17b. ~~Hình riêng cho NPC~~ — xong: 8 kiểu người (ông áo nâu, bà cụ, chị bà ba, phụ nữ áo tím, cô áo dài trắng, cựu chiến binh, thanh niên, học sinh) render từ `nhanvat8.blend` bằng `tools/render-npc.py`. Còn thiếu: sư thầy, giáo dân/nữ tu cho nhà thờ.
 18. Nhân vật AI người đã khuất: thiết kế trước (dữ liệu, an toàn, giọng nói, chi phí), chủ dự án duyệt rồi mới làm.

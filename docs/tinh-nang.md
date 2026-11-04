@@ -67,7 +67,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `22-nhan-ban-do.js` | Xếp nhãn trên bản đồ, tránh chồng chéo |
 | `23-dai-tuong-niem-liet-si.js` | Đài tưởng niệm liệt sĩ: nhang tri ân, lời tri ân |
 | `24-bay-to.js` | Một nút "Bày tỏ", bấm mới mở 4 cách bày tỏ (chắp tay, thương nhớ, dâng hoa, cầu an) |
-| `25-npc.js` | NPC người viếng: 1–3 người mỗi cảnh đi lại, chắp tay, vái lạy, ngồi. Chỉ chạy trên máy người xem, không tên, không tính vào số người trực tuyến, đứng yên khi bật giảm chuyển động |
+| `25-npc.js` | NPC người viếng: 1–3 người mỗi cảnh (8 kiểu người trong `img/nv/npc/`, chọn theo cảnh) đi lại, chắp tay, vái lạy, quỳ. Chỉ chạy trên máy người xem, không tên, không tính vào số người trực tuyến, đứng yên khi bật giảm chuyển động |
 
 > Các file `07-NN-*.js` dùng chung tên cấp ngoài cùng (`people`, `current`, `select`, `buy`…) qua phạm vi toàn cục của trang.
 > Vì vậy phải giữ đúng thứ tự nạp, và file khác không được khai báo trùng các tên này ở cấp ngoài cùng.

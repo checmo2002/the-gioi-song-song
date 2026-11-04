@@ -22,6 +22,7 @@ Hai vòng tròn lồng nhau, phần giao nhau tô vàng `#B8862F`. Bản SVG có
 ## Quy trình làm asset
 
 - Dựng bằng **Blender** (có Blender MCP), có thể dùng **Meshy AI** làm mẫu thô.
+- NPC: `img/nv/npc/<kiểu>-<tư thế>.webp`, render bằng `tools/render-npc.py` (chạy trong Blender với `nhanvat8.blend`).
 - Xuất **WebP**, đặt đúng thư mục: `img/lang/` (cảnh), `img/nv/` (nhân vật, mỗi tư thế một ảnh: đứng, đi, chắp tay, lạy, ngồi), `img/ho/` (đồ trong nhà).
 - Mỗi cảnh cần thêm dữ liệu lưới đi được trong `js/04-00-du-lieu-canh.js` (cùng tên cảnh với ảnh).
 - Ảnh cảnh nên dưới 400 KB để điện thoại tải nhanh.
