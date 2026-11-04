@@ -1,0 +1,89 @@
+/* ===== Nút phóng / thu góc nhìn ===== */
+.zm{position:absolute;z-index:5;right:10px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;padding:4px;border-radius:16px;background:rgba(32,20,13,.72);border:1px solid rgba(212,162,76,.3);backdrop-filter:blur(6px)}
+.hall:not(.world-on) .zm{display:none}
+.zm button{width:40px;height:40px;border:0;border-radius:12px;background:rgba(255,255,255,.06);color:#FBF1DC;cursor:pointer;display:grid;place-items:center}
+.zm button:hover{background:rgba(255,255,255,.14)}.zm button:active{transform:scale(.9)}
+.zm button:disabled{opacity:.35;cursor:default}
+.zm svg{width:20px;height:20px}
+.zm small{font-size:9px;text-align:center;color:#E9D7B0;opacity:.8;line-height:1}
+.zm-tip{position:absolute;z-index:6;left:50%;top:84px;transform:translateX(-50%);padding:6px 14px;border-radius:999px;background:rgba(20,12,8,.85);color:#FBF1DC;font-size:13px;pointer-events:none;opacity:0;transition:opacity .3s}
+.zm-tip.on{opacity:1}
+
+/* ===== Nghi thức dâng hương / thắp nến ===== */
+.hg{position:fixed;inset:0;z-index:385;display:grid;place-items:center;padding:12px;background:rgba(14,8,4,.62);backdrop-filter:blur(3px);animation:moFade .3s both}
+.hg[hidden]{display:none}
+.hg-card{position:relative;width:min(420px,100%);max-height:calc(100dvh - 24px);overflow:auto;border-radius:22px;color:#FBF1DC;background:radial-gradient(120% 80% at 50% 30%,#4A2C18,#1E120A 72%);border:1px solid rgba(212,162,76,.45);box-shadow:0 30px 80px rgba(0,0,0,.5);animation:moIn .35s cubic-bezier(.2,.9,.3,1.2) both}
+.hg.cg .hg-card{background:radial-gradient(120% 80% at 50% 30%,#2A3550,#0F1422 72%);border-color:rgba(170,190,240,.4)}
+.hg-x{position:absolute;top:10px;right:10px;z-index:3;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:inherit;font-size:22px;cursor:pointer}
+.hg-hd{padding:16px 56px 0 18px}
+.hg-hd small{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#E9C27A}.hg.cg .hg-hd small{color:#BFD0FF}
+.hg-hd b{display:block;font-family:var(--f-display);font-weight:500;font-size:21px;margin-top:2px}
+.hg-steps{display:flex;gap:5px;padding:10px 18px 0}
+.hg-steps i{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.12);transition:background .3s}
+.hg-steps i.on{background:#FFD27A}.hg.cg .hg-steps i.on{background:#BFD0FF}
+.hg-stage{position:relative;margin:8px auto 0;width:100%;max-width:360px;aspect-ratio:360/400;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
+.hg-stage svg{width:100%;height:100%;display:block}
+.hg-tip{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;text-align:center;font-size:15px;font-weight:600;color:#FFE3A8}
+.hg.cg .hg-tip{color:#DCE6FF}
+.hg-tip small{font-weight:400;opacity:.75;font-size:12px}
+.hg-tip svg{width:22px;height:22px;flex:none;animation:hudBob 1.6s ease-in-out infinite}
+.hg-sub{text-align:center;font-size:12px;opacity:.7;margin-top:-4px;padding:0 18px}
+.hg-pick{display:flex;gap:8px;justify-content:center;padding:4px 18px 0}
+.hg-pick button{flex:1;max-width:110px;min-height:68px;border-radius:16px;border:1px solid rgba(255,210,122,.35);background:rgba(255,255,255,.06);color:inherit;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.hg-pick button b{font-size:20px}.hg-pick button small{font-size:11px;opacity:.75}
+.hg-pick button:hover{background:rgba(255,210,122,.16)}
+.hg-pick .dot{width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.3)}
+.hg-foot{display:flex;gap:8px;justify-content:center;padding:12px 18px 16px}
+.hg-foot button{min-height:42px;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:inherit;font:inherit;font-size:13px;cursor:pointer}
+.hg-foot .pri{border:0;font-weight:600;color:#fff;background:linear-gradient(180deg,#E2A548,#A8661A);font-size:15px;padding:0 22px}
+.hg.cg .hg-foot .pri{background:linear-gradient(180deg,#8FA6D6,#4E6698)}
+.hg-pray{margin:4px 18px 0;padding:14px;border-radius:16px;background:rgba(255,255,255,.06);font-size:15px;line-height:1.6;font-style:italic;text-align:center;animation:moIn .5s both}
+.hg-tn{display:block;width:calc(100% - 36px);margin:10px 18px 0;min-height:70px;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);color:inherit;font:inherit;font-size:14px;resize:vertical}
+.hg-tn::placeholder{color:rgba(255,255,255,.45)}
+.hg-old{margin:8px 18px 0;font-size:12px;opacity:.7}
+.hg-gio{margin:8px 18px 0;padding:8px 12px;border-radius:12px;background:rgba(255,210,122,.15);color:#FFE3A8;font-size:13px;text-align:center}
+.hg .fl{transform-box:fill-box;transform-origin:50% 100%;animation:hgFl .18s ease-in-out infinite alternate}
+.hg .wind .fl,.hg .fl.wild{animation:hgWild .22s ease-in-out infinite alternate}
+.hg .smk path{fill:none;stroke:rgba(235,230,220,.55);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:6 10;animation:hgSmk 2.4s linear infinite}
+.hg .wl{stroke:rgba(200,215,255,.5);stroke-width:2;stroke-linecap:round;fill:none;stroke-dasharray:30 200;animation:hgWind 1.4s linear infinite}
+.hg .ring{transition:stroke-dashoffset .05s linear}
+.hg .pulse{animation:hgPulse 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes hgFl{from{transform:scale(1,1)}to{transform:scale(.88,1.12)}}
+@keyframes hgWild{from{transform:skewX(-22deg) scale(.8,.9)}to{transform:skewX(22deg) scale(1.05,1.15)}}
+@keyframes hgSmk{to{stroke-dashoffset:-64}}
+@keyframes hgWind{from{stroke-dashoffset:230}to{stroke-dashoffset:0}}
+@keyframes hgPulse{50%{opacity:.35;transform:scale(1.25)}}
+/* nhang/nến cháy trong cảnh */
+.lit-ov{position:absolute;z-index:2;aspect-ratio:20/48;transform:translate(-50%,-100%);pointer-events:none}
+.lit-ov svg{width:100%;height:100%;overflow:visible}
+.lit-ov .smk path{fill:none;stroke:rgba(240,236,228,.6);stroke-width:1.6;stroke-linecap:round;stroke-dasharray:5 8;animation:hgSmk 2.6s linear infinite}
+.lit-ov .em{animation:hgPulse 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@media (prefers-reduced-motion:reduce){.hg *,.lit-ov *{animation-duration:.01s!important;animation-iteration-count:1!important}}
+
+/* ===== Giờ, ngày, thời tiết ===== */
+.wx-pill{position:absolute;z-index:6;left:12px;display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:0 12px 0 6px;border-radius:999px;border:1px solid rgba(212,162,76,.35);background:rgba(32,20,13,.72);color:#FBF1DC;font:inherit;font-size:12.5px;cursor:pointer;backdrop-filter:blur(6px);animation:hudPop .5s both;font-variant-numeric:tabular-nums}
+.hall:not(.world-on) .wx-pill{display:none}
+.wx-pill svg{width:22px;height:22px;flex:none}
+.wx-pill b{font-size:14px;font-weight:600}
+.wx-pill .sep{width:1px;height:14px;background:rgba(255,255,255,.25)}
+.wx-pill small{opacity:.8}
+.wx-pop{position:absolute;z-index:7;left:12px;width:min(300px,calc(100% - 24px));padding:14px;border-radius:18px;background:rgba(26,16,10,.94);border:1px solid rgba(212,162,76,.35);color:#FBF1DC;box-shadow:0 20px 50px rgba(0,0,0,.45);animation:moIn .3s both}
+.wx-pop[hidden]{display:none}
+.wx-pop .big{display:flex;align-items:center;gap:12px}.wx-pop .big svg{width:54px;height:54px}
+.wx-pop .big b{display:block;font-size:30px;font-weight:600;line-height:1}.wx-pop .big span{font-size:13px;opacity:.85}
+.wx-pop dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:12px 0 0;font-size:13px}.wx-pop dt{opacity:.65}.wx-pop dd{margin:0}
+.wx-pop label{display:block;margin-top:12px;font-size:12px;opacity:.75}
+.wx-pop select{width:100%;margin-top:4px;min-height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#2A1A10;color:inherit;font:inherit;padding:0 8px}
+.wx-pop .src{margin-top:10px;font-size:11px;opacity:.6}
+/* lớp ánh sáng theo giờ + thời tiết, phủ lên cảnh, dưới HUD */
+.wx-sky{position:absolute;inset:0;z-index:0;pointer-events:none;transition:background 2s,opacity 2s}
+.wx-cv{position:absolute;inset:0;z-index:2;pointer-events:none;width:100%;height:100%}
+.wx-flash{position:absolute;inset:0;z-index:2;pointer-events:none;background:#fff;opacity:0}
+.wx-flash.on{animation:wxFlash .5s ease-out}
+@keyframes wxFlash{0%{opacity:0}10%{opacity:.55}30%{opacity:.1}45%{opacity:.4}100%{opacity:0}}
+.hall:not(.world-on) .wx-sky,.hall:not(.world-on) .wx-cv{display:none}
+@media (prefers-reduced-motion:reduce){.wx-flash{display:none}}
+
+/* hồ sơ gọn: chỉ hiện 2 mốc đời, bấm để xem thêm */
+#pChapters:not(.all)>*:nth-child(n+3){display:none}
+.lm-more{display:block;margin:6px auto 0;min-height:40px;padding:0 18px;border-radius:999px;border:1px solid var(--line,#d9cdb5);background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer}
