@@ -25,6 +25,17 @@ def so(a, b):
     d = ImageChops.difference(a, b).convert('L').point(lambda p: 255 if p > 32 else 0)
     return d.histogram()[255] / (a.size[0] * a.size[1]), d
 
+def chup_khi_dung_yen(pg, duong_dan):
+    """Chụp lại tới khi hai ảnh liền nhau gần như giống hệt (camera đã dừng trượt)."""
+    import io
+    truoc = Image.open(io.BytesIO(pg.screenshot()))
+    for _ in range(30):
+        pg.wait_for_timeout(500)
+        sau = Image.open(io.BytesIO(pg.screenshot()))
+        if so(truoc, sau)[0] < 0.0005: break
+        truoc = sau
+    sau.save(duong_dan)
+
 loi = []
 os.makedirs(KQ, exist_ok=True)
 with sync_playwright() as p:
@@ -58,7 +69,7 @@ with sync_playwright() as p:
             pg.evaluate("Promise.all([...document.images].map(i=>i.complete||new Promise(r=>{i.onload=i.onerror=r})))")
             f = f'{ten}-{w}.png'
             moi = os.path.join(KQ, f)
-            pg.screenshot(path=moi)
+            chup_khi_dung_yen(pg, moi)
             chuan = os.path.join(CHUAN, f)
             if CAP_NHAT or not os.path.exists(chuan):
                 os.replace(moi, chuan); print('cập nhật', f); continue
