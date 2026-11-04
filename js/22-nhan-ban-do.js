@@ -6,6 +6,8 @@
  function hit(a,b,pad){return a.left<b.right+pad&&a.right>b.left-pad&&a.top<b.bottom+pad&&a.bottom>b.top-pad}
  function run(){if(hall.hidden||!hall.classList.contains('world-on'))return;
   var els=[].slice.call(hall.querySelectorAll('.w-hot .wh'));if(!els.length)return;
+  // nhãn chính không ẩn được: đẩy vào trong khi chạm mép (đo lại từ vị trí gốc mỗi lượt)
+  els.forEach(function(el){if(el.classList.contains('main')){var lb=el.querySelector('.wh-lb')||el;lb.style.translate='';var r=lb.getBoundingClientRect(),dx=r.left<8?8-r.left:r.right>innerWidth-8?innerWidth-8-r.right:0;if(dx&&r.right>0&&r.left<innerWidth)lb.style.translate=dx+'px 0'}});
   var me=hall.querySelector('.wa.me'),mr=me&&me.getBoundingClientRect(),mx=mr?mr.left+mr.width/2:innerWidth/2,my=mr?mr.top+mr.height/2:innerHeight/2;
   var R=Math.max(220,(innerWidth+innerHeight)*.28);
   var hud=[];HUD.forEach(function(q){[].forEach.call(document.querySelectorAll(q),function(e){if(!e.offsetParent&&getComputedStyle(e).position!=='fixed')return;var r=e.getBoundingClientRect();if(r.width&&r.height)hud.push(r)})});

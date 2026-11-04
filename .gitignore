@@ -4,3 +4,4 @@ __pycache__/
 !tests/anh-chuan/*.png
 tests/ket-qua/
 .DS_Store
+dist/
