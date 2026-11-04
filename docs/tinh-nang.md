@@ -36,7 +36,19 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `04-the-gioi-nui.js` | Thế giới núi: chân núi → lên núi → chính điện, nhân vật, di chuyển *(file lớn, cần tách tiếp)* |
 | `05-dai-sanh.js` | Mở đại sảnh sau cổng, khi vào lại trang, khi bấm logo |
 | `06-trang-muc.js` | Mỗi mục là một trang riêng, điều hướng |
-| `07-loi-chinh.js` | Lõi cũ: dữ liệu mẫu, tìm kiếm, hồ sơ, ký ức, cửa hàng, ngôi nhà, bản đồ, đăng ký *(file lớn, cần tách tiếp)* |
+| `07-01-dung-chung.js` | Hàm dùng chung (`$`, `$$`, `fmt`, `toast`), chuyển giữa trang giới thiệu và bên trong |
+| `07-02-du-lieu-mau.js` | Dữ liệu mẫu: người đã khuất (`people`), vị trí (`GEO`), các khu (`ZONES`) |
+| `07-03-ho-so-tim-kiem.js` | Tìm kiếm, hồ sơ, thắp hương, ký ức (lời nhắn), hành trình |
+| `07-04-cua-hang-ngoi-nha.js` | Cửa hàng, ví nén, quà đã nhận, điều khiển ngôi nhà |
+| `07-05-hieu-ung-ban-do.js` | Hiệu ứng hồ sơ, bản đồ mộ phần thật |
+| `07-06-gioi-thieu.js` | Dải gradient, minh họa isometric trang giới thiệu |
+| `07-07-dang-ky.js` | Đăng ký / đăng nhập (bản trình diễn) |
+| `07-08-thien-gioi.js` | Nền thiên giới: biển mây, hạc bay, cánh hoa |
+| `07-09-vong-ky-uc.js` | Vòng ký ức ảnh/video quay quanh tâm |
+| `07-10-den-troi-menu.js` | Đèn trời sau lời mời, menu điện thoại |
+| `07-11-am-thanh.js` | Âm thanh thanh tịnh (Web Audio) |
+| `07-12-trang-ca-nhan.js` | Ảnh chân dung, trang cá nhân: gia phả, làng dòng họ, ví nén |
+| `07-13-khoi-tao.js` | Khởi tạo, chuyển động toàn trang |
 | `08-icon-bien-hinh.js` | Icon biến hình (morphicons, tải từ jsdelivr) |
 | `09-trang-nguoi-than.js` | Trang Người thân |
 | `10-thap-nhang.js` | Thắp nhang chỉ ở một nơi: chính điện / nhà thờ |
@@ -54,9 +66,12 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `22-nhan-ban-do.js` | Xếp nhãn trên bản đồ, tránh chồng chéo |
 | `23-dai-tuong-niem-liet-si.js` | Đài tưởng niệm liệt sĩ: nhang tri ân, lời tri ân |
 
+> Các file `07-NN-*.js` dùng chung tên cấp ngoài cùng (`people`, `current`, `select`, `buy`…) qua phạm vi toàn cục của trang.
+> Vì vậy phải giữ đúng thứ tự nạp, và file khác không được khai báo trùng các tên này ở cấp ngoài cùng.
+
 ## Dữ liệu và trạng thái
 
-- Toàn bộ dữ liệu là **mẫu hư cấu**, viết thẳng trong JS (chủ yếu `07-loi-chinh.js`, `20-lang-rieng.js`).
+- Toàn bộ dữ liệu là **mẫu hư cấu**, viết thẳng trong JS (chủ yếu `07-02-du-lieu-mau.js`, `20-lang-rieng.js`).
 - Trạng thái người dùng lưu trong `localStorage`: `ss-auth`, `ss-me`, `ss-faith`, `ss-nv`, `ss-music`, `ss-sound`, `ss-vol`, `ss-zoom`, `ss-dai`, `ss-dai-ta`…
 - **Chưa có:** máy chủ, cơ sở dữ liệu, đăng nhập thật, thanh toán thật.
 

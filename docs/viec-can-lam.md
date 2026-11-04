@@ -4,7 +4,7 @@ Trưởng nhóm chuyển mỗi mục thành một GitHub Issue trước khi giao
 
 ## Đợt 1 — Dọn nền móng (đội: trưởng nhóm, coder, tester)
 
-1. **Tách `js/07-loi-chinh.js`** (~118 KB) thành các file theo khu: dữ liệu mẫu, tìm kiếm, hồ sơ, ký ức, cửa hàng, ngôi nhà, bản đồ, đăng ký. Biến dùng chung chuyển thành một đối tượng toàn cục `SS`. Không đổi hành vi.
+1. ~~Tách `js/07-loi-chinh.js`~~ — xong: thành 13 file `js/07-NN-*.js`. Còn lại: gom tên dùng chung vào một đối tượng `SS` để bớt phụ thuộc thứ tự nạp (làm sau, khi có kiểm tra hình ảnh tự động ở việc 5).
 2. **Tách `js/04-the-gioi-nui.js`** (~136 KB) theo cùng cách: dựng cảnh, nhân vật, di chuyển, chính điện.
 3. **Tách `css/27-dai-sanh.css`** (~112 KB) và `css/26-trang-ca-nhan.css` (~61 KB) theo khu.
 4. **Đưa dữ liệu mẫu ra `data/*.json`** để sau này thay bằng API mà không đụng giao diện.
