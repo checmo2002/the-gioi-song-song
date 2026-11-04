@@ -30,7 +30,8 @@ os.makedirs(KQ, exist_ok=True)
 with sync_playwright() as p:
     b = p.chromium.launch()
     for w, h in CO:
-        pg = b.new_page(viewport={'width': w, 'height': h}, reduced_motion='reduce')
+        pg = b.new_page(viewport={'width': w, 'height': h}, reduced_motion='reduce',
+                        timezone_id='Asia/Ho_Chi_Minh', locale='vi-VN')  # máy nào cũng như ở Việt Nam
         js_loi = []
         pg.on('pageerror', lambda e: js_loi.append(str(e)))
         goc = url.split('/')[2]
