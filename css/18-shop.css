@@ -1,0 +1,16 @@
+/* ---------- Shop ---------- */
+.shop-bar{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin-bottom:24px}
+.wallet{display:flex;align-items:center;gap:10px;font-size:14px}
+.wallet b{font-family:var(--f-display);font-size:26px;font-variant-numeric:tabular-nums}
+.wallet select{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:7px 10px;max-width:220px}
+.goods{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.good{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.good .ic{aspect-ratio:4/3;max-width:100%;border-radius:10px;background:var(--paper-2);display:grid;place-items:center}
+.good .ic svg{width:64px;height:64px;color:var(--ink);stroke-width:1.4}
+.good h3{font-size:21px;font-weight:400}
+.good p{font-size:13px;color:var(--ink-soft);flex:1}
+.good .foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.price{font-variant-numeric:tabular-nums;font-weight:500;font-family:var(--f-body);color:var(--blue)}
+.price small{font-weight:400;color:var(--ink-soft)}
+.good.custom{border-style:dashed}
+.good.custom textarea{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:8px;min-height:64px;resize:vertical;font-size:13px}

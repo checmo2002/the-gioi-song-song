@@ -1,0 +1,23 @@
+/* ---------- Tưởng niệm / Thăm viếng ---------- */
+.nav-auth{display:flex;gap:8px;flex-shrink:0}
+.nav-auth .btn.ghost{color:#2B241C;border-color:rgba(43,36,28,.22);background:transparent}
+.nav-auth .btn.ghost:hover{background:rgba(43,36,28,.06)}
+@media (max-width:640px){.nav-auth .btn{padding:8px 11px;font-size:12.5px}.nav-auth .btn.ghost{display:none}}
+.auth{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px}
+.auth[hidden]{display:none}
+.auth-bg{position:absolute;inset:0;background:rgba(43,36,28,.42);backdrop-filter:blur(6px)}
+.auth-card{position:relative;width:min(420px,100%);max-height:calc(100% - 32px);overflow:auto;background:#FFFDF8;color:#2B241C;border:1px solid rgba(43,36,28,.12);border-radius:10px;padding:26px 24px 22px;box-shadow:0 30px 80px rgba(60,40,15,.3);animation:ppIn .25s ease-out}
+.auth-card::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#B8862F,#9A6E22,#B8862F,transparent)}
+.auth-x{position:absolute;right:12px;top:10px;background:none;border:0;color:#7A6E5E;font-size:24px;cursor:pointer;line-height:1}
+.auth-tabs{display:inline-flex;gap:2px;padding:3px;border:1px solid rgba(43,36,28,.12);border-radius:6px;margin-bottom:18px}
+.auth-tabs button{border:0;background:none;color:#7A6E5E;padding:7px 14px;border-radius:4px;cursor:pointer;font-weight:500}
+.auth-tabs button[aria-selected="true"]{background:#B8862F;color:#fff}
+.auth-form{display:flex;flex-direction:column;gap:8px}
+.auth-form h2{font-size:30px;font-weight:300;letter-spacing:-.035em}
+.auth-sub{color:#7A6E5E;font-size:13.5px;margin-bottom:8px}
+.auth-form label{font-family:var(--f-body);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#7A6E5E;margin-top:4px}
+.auth-form input{background:#FBF6EC;border:1px solid rgba(43,36,28,.14);border-radius:4px;padding:11px 12px;color:#2B241C}
+.auth-form input:focus{outline:none;border-color:#B8862F;box-shadow:0 0 0 3px rgba(184,134,47,.25)}
+.auth-form .btn{justify-content:center;margin-top:10px;padding:12px}
+.auth-alt{font-size:13px;color:#7A6E5E;text-align:center;margin-top:6px}
+.auth-alt button{background:none;border:0;color:#9A6E22;cursor:pointer;font-weight:500;text-decoration:underline;text-underline-offset:3px}

@@ -1,0 +1,4 @@
+__pycache__/
+*.png
+!img/**/*.png
+.DS_Store

@@ -1,0 +1,15 @@
+/* ---------- Hai lớp: giới thiệu / bên trong ---------- */
+body:not(.view-app) .app-only,body.view-app .intro-only{display:none!important}
+section[id]{scroll-margin-top:60px}
+.isteps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line)}
+.isteps{gap:0 36px}
+.isteps li{padding:26px 0 28px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.isteps span{font:600 11.0px var(--f-body);color:var(--blue-2);letter-spacing:.06em}
+.isteps h3{font-size:26px;font-weight:300;letter-spacing:-.03em}
+.isteps p{color:var(--ink-soft);max-width:34ch}
+@media (max-width:760px){.isteps{grid-template-columns:1fr}.isteps li{border-bottom:1px solid var(--line)}}
+.icta{margin-top:clamp(56px,8vw,96px);display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px}
+.icta p{font-size:clamp(26px,3.6vw,46px);font-weight:200;letter-spacing:-.04em;line-height:1.1;max-width:20ch}
+.view-fade{animation:viewIn .6s var(--ease,ease)}
+@keyframes viewIn{from{opacity:0;transform:translateY(14px)}}
+@media (prefers-reduced-motion:reduce){.view-fade{animation:none}}

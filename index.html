@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Thế Giới Song Song</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300;1,400&display=swap">
+<link rel="stylesheet" href="css/00-khung.css">
+<link rel="stylesheet" href="css/01-co-ban.css">
+<link rel="stylesheet" href="css/02-nav.css">
+<link rel="stylesheet" href="css/03-park.css">
+<link rel="stylesheet" href="css/04-la-ban-ban-do-lang.css">
+<link rel="stylesheet" href="css/05-ban-do-thuc-te.css">
+<link rel="stylesheet" href="css/06-hero.css">
+<link rel="stylesheet" href="css/07-bon-khong-gian-isometric.css">
+<link rel="stylesheet" href="css/08-faq.css">
+<link rel="stylesheet" href="css/09-footer.css">
+<link rel="stylesheet" href="css/10-tuong-niem-tham-vieng.css">
+<link rel="stylesheet" href="css/11-chuyen-dong-toan-trang.css">
+<link rel="stylesheet" href="css/12-vong-ky-uc.css">
+<link rel="stylesheet" href="css/13-hai-lop.css">
+<link rel="stylesheet" href="css/14-minh-hoa-ba-buoc.css">
+<link rel="stylesheet" href="css/15-loi-moi-voi-den-troi.css">
+<link rel="stylesheet" href="css/16-profile.css">
+<link rel="stylesheet" href="css/17-home-builder.css">
+<link rel="stylesheet" href="css/18-shop.css">
+<link rel="stylesheet" href="css/19-memory.css">
+<link rel="stylesheet" href="css/20-journey.css">
+<link rel="stylesheet" href="css/21-ho-so-living-memories.css">
+<link rel="stylesheet" href="css/22-dien-thoai.css">
+<link rel="stylesheet" href="css/23-man-cho.css">
+<link rel="stylesheet" href="css/24-he-chu.css">
+<link rel="stylesheet" href="css/25-am-thanh.css">
+<link rel="stylesheet" href="css/26-trang-ca-nhan.css">
+<link rel="stylesheet" href="css/27-dai-sanh.css">
+</head>
+<body>
+
+
+
+<div class="ld" id="loader" role="status" aria-label="Đang mở Thế Giới Song Song">
+  <div class="ld-half ld-top" aria-hidden="true"></div><div class="ld-half ld-bot" aria-hidden="true"></div>
+  <div class="ld-in">
+    <svg class="ld-logo" viewBox="0 0 120 80" aria-hidden="true">
+      <defs><clipPath id="ldClip"><circle cx="44" cy="40" r="30"/></clipPath><radialGradient id="ldG" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#FCE3A6"/><stop offset=".55" stop-color="#D4A24C"/><stop offset="1" stop-color="#9A6E22"/></radialGradient></defs>
+      <g class="ld-mid"><circle cx="76" cy="40" r="30" fill="url(#ldG)" clip-path="url(#ldClip)"/></g>
+      <circle class="ld-c ld-c1" cx="44" cy="40" r="30" pathLength="100"/>
+      <circle class="ld-c ld-c2" cx="76" cy="40" r="30" pathLength="100"/>
+    </svg>
+    <div class="ld-word" aria-hidden="true"><span>S</span><span>o</span><span>n</span><span>g</span><span class="sp"> </span><span>S</span><span>o</span><span>n</span><span>g</span></div>
+    <p class="ld-sub">Thế giới của những người ta thương nhớ</p>
+  </div>
+  <div class="ld-foot"><span>Thắp sáng ký ức</span><span class="ld-pct" id="ldPct">000</span></div>
+  <div class="ld-bar" aria-hidden="true"><i id="ldBar"></i></div>
+</div>
+<script src="js/01-man-cho.js"></script>
+<!-- CỔNG VÀO: hai cánh cửa, chọn lối Phật giáo – Truyền thống hoặc Công giáo -->
+<div class="gate" id="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="g-world" aria-hidden="true">
+    <div class="g-half phat">
+      <svg viewBox="0 0 800 1000" preserveAspectRatio="xMinYMid slice">
+        <defs>
+          <linearGradient id="wSkyP" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#F6D9A6"/><stop offset=".45" stop-color="#FBE9C8"/><stop offset="1" stop-color="#F3D3A0"/></linearGradient>
+          <radialGradient id="wSunP"><stop offset="0" stop-color="#FFF6DC"/><stop offset=".35" stop-color="#FFE3A0" stop-opacity=".9"/><stop offset="1" stop-color="#FFE3A0" stop-opacity="0"/></radialGradient>
+          <filter id="wBlur"><feGaussianBlur stdDeviation="6"/></filter><filter id="wBlur2"><feGaussianBlur stdDeviation="14"/></filter>
+        </defs>
+        <rect width="800" height="1000" fill="url(#wSkyP)"/>
+        <circle class="w-sun" cx="470" cy="300" r="230" fill="url(#wSunP)"/>
+        <path d="M0 560 L90 470 L160 520 L250 400 L330 470 L420 360 L520 470 L600 420 L700 500 L800 450 V1000 H0Z" fill="#E2B67A" opacity=".45" filter="url(#wBlur)"/>
+        <path d="M0 640 L110 540 L190 600 L300 500 L380 590 L470 520 L560 610 L660 540 L800 620 V1000 H0Z" fill="#B98552" opacity=".38" filter="url(#wBlur)"/>
+        <g transform="translate(-110 -40)"><g class="w-isle" fill="#6E3F22">
+          <path d="M150 560 q90-30 180 0 q-20 40-90 70 q-70-30-90-70z" fill="#8A5A34" opacity=".75"/>
+          <rect x="226" y="470" width="28" height="90"/>
+          <path d="M196 480 q44-26 88 0 l12 6 h-112z"/><path d="M206 446 q34-20 68 0 l10 6 h-88z"/><path d="M216 414 q24-16 48 0 l8 6 h-64z"/><path d="M238 380 h4 l4 34 h-12z"/>
+        </g></g>
+        <g class="w-cloud" fill="#FFF8EA" filter="url(#wBlur2)"><ellipse cx="120" cy="700" rx="260" ry="60"/><ellipse cx="560" cy="760" rx="320" ry="70"/><ellipse cx="380" cy="640" rx="200" ry="40" opacity=".8"/></g>
+        <path d="M0 820 L130 740 L240 800 L360 720 L470 800 L600 730 L800 820 V1000 H0Z" fill="#7A4E2C" opacity=".28" filter="url(#wBlur)"/>
+        <g transform="translate(600 900)"><g class="w-lotus"><path d="M0 0c-10-26 0-46 0-46s10 20 0 46z" fill="#F2A8A0"/><path d="M0 0c-26-12-30-34-30-34s24 4 30 34z" fill="#EFB3A8"/><path d="M0 0c26-12 30-34 30-34s-24 4-30 34z" fill="#EFB3A8"/><ellipse cy="6" rx="46" ry="8" fill="#7FA382" opacity=".6"/></g></g>
+        <g transform="translate(160 950) scale(.7)"><g class="w-lotus"><path d="M0 0c-10-26 0-46 0-46s10 20 0 46z" fill="#F2A8A0"/><path d="M0 0c-26-12-30-34-30-34s24 4 30 34z" fill="#EFB3A8"/><path d="M0 0c26-12 30-34 30-34s-24 4-30 34z" fill="#EFB3A8"/><ellipse cy="6" rx="46" ry="8" fill="#7FA382" opacity=".6"/></g></g>
+      </svg>
+    </div>
+    <div class="g-half cg">
+      <svg viewBox="0 0 800 1000" preserveAspectRatio="xMaxYMid slice">
+        <defs>
+          <linearGradient id="wSkyC" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#C9D3EE"/><stop offset=".45" stop-color="#E7ECF8"/><stop offset="1" stop-color="#D2D9EE"/></linearGradient>
+          <linearGradient id="wRay" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".75"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+        </defs>
+        <rect width="800" height="1000" fill="url(#wSkyC)"/>
+        <g class="w-rays" fill="url(#wRay)"><polygon points="380,0 430,0 560,900 300,900"/><polygon points="300,0 330,0 200,800 80,800" opacity=".6"/><polygon points="480,0 510,0 760,820 620,820" opacity=".6"/></g>
+        <g fill="#FFFFFF" class="w-stars"><circle cx="90" cy="120" r="2"/><circle cx="700" cy="90" r="2.4"/><circle cx="610" cy="210" r="1.6"/><circle cx="160" cy="260" r="1.8"/><circle cx="740" cy="320" r="1.6"/></g>
+        <path d="M0 600 L120 520 L220 580 L340 480 L450 560 L560 500 L680 570 L800 520 V1000 H0Z" fill="#9AA7CC" opacity=".4" filter="url(#wBlur)"/>
+        <g transform="translate(130 -60)"><g class="w-isle" fill="#4A5274">
+          <path d="M440 600 q110-34 220 0 q-24 46-110 80 q-86-34-110-80z" fill="#6A7398" opacity=".8"/>
+          <rect x="480" y="470" width="140" height="130"/><path d="M480 470 l70-60 l70 60z"/>
+          <rect x="462" y="420" width="34" height="180"/><path d="M462 420 l17-80 l17 80z"/><rect x="604" y="420" width="34" height="180"/><path d="M604 420 l17-80 l17 80z"/>
+          <rect x="545" y="300" width="10" height="40"/><rect x="538" y="312" width="24" height="8"/>
+          <circle cx="550" cy="510" r="22" fill="#E9D7A8"/><circle cx="550" cy="510" r="22" fill="none" stroke="#C8CFE6" stroke-width="3"/>
+          <path d="M538 600 v-40 q12-16 24 0 v40z" fill="#E9D7A8" opacity=".8"/>
+        </g></g>
+        <g class="w-cloud" fill="#FFFFFF" filter="url(#wBlur2)"><ellipse cx="640" cy="690" rx="300" ry="64"/><ellipse cx="220" cy="760" rx="320" ry="70"/><ellipse cx="420" cy="650" rx="200" ry="40" opacity=".8"/></g>
+        <path d="M0 830 L140 750 L260 810 L380 740 L500 810 L640 750 L800 830 V1000 H0Z" fill="#5E688E" opacity=".25" filter="url(#wBlur)"/>
+      </svg>
+    </div>
+    <i class="g-seam"></i>
+  </div>
+  <div class="g-sky" aria-hidden="true"><i class="g-cloud c1"></i><i class="g-cloud c2"></i><i class="g-cloud c3"></i><span class="g-dust"></span></div>
+  <div class="g-head">
+    <svg class="g-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z" fill="#E3B65A"/><circle cx="12" cy="16" r="9" stroke="currentColor" stroke-width="1.6"/><circle cx="20" cy="16" r="9" stroke="currentColor" stroke-width="1.6"/></svg>
+    <h2 id="gateTitle">Mời bạn chọn lối vào</h2>
+    <p>Mỗi lối mở ra một không gian tưởng niệm theo đức tin của gia đình. Bạn có thể đổi lại bất cứ lúc nào.</p>
+  </div>
+  <div class="g-doors">
+    <button class="g-door phat" type="button" data-faith="phat" aria-label="Lối Phật giáo và thờ cúng truyền thống">
+      <span class="g-frame" aria-hidden="true"></span>
+      <span class="g-cap"><b>Phật giáo · Truyền thống</b><small>Thắp nhang · Âm lịch · Cúng giỗ</small></span>
+    </button>
+    <button class="g-door cg" type="button" data-faith="cg" aria-label="Lối Công giáo">
+      <span class="g-frame" aria-hidden="true"></span>
+      <span class="g-cap"><b>Công giáo</b><small>Thắp nến · Cầu nguyện · Lịch phụng vụ</small></span>
+    </button>
+  </div>
+  <button class="g-skip" type="button" data-faith="tt">Vào thẳng làng tưởng niệm →</button>
+  <div class="g-flash" aria-hidden="true"></div>
+</div>
+<div class="hall" id="hall" role="dialog" aria-modal="true" aria-label="Đại sảnh Song Song" hidden>
+  <div class="hall-scene"><i class="hall-glow" aria-hidden="true"></i>
+    <a class="hs hs-main" href="#thap-nhang" style="--px:50%;--py:64%;--cx:50%;--cy:60%"><i class="hs-dot" aria-hidden="true"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="t-phat"><path d="M9 21V10M12 21V8M15 21V10"/><path class="smk" d="M12 8c-1.5-1.5 1.5-2.5 0-4"/><path class="smk s2" d="M9 10c-1.2-1.2 1.2-2 0-3.4"/><path class="smk s3" d="M15 10c-1.2-1.2 1.2-2 0-3.4"/><path d="M5 21h14"/></g><g class="t-cg"><path d="M9 21h6M10 21V11h4v10"/><path class="flm" d="M12 3c1.6 2 2 3.3 2 4.3a2 2 0 0 1-4 0c0-1 .4-2.3 2-4.3z"/></g></svg></i><span class="hs-lb"><b class="t-phat">Thắp nhang tưởng niệm</b><b class="t-cg">Thắp nến cầu nguyện</b><small>Bàn thờ của gia đình</small></span></a>
+    
+  </div>
+  <div class="hs-col l"><span class="hs-cap">Người thân</span><a class="hc" href="#ho-so"><i class="hs-dot" aria-hidden="true"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 18c1-2.6 3-3.6 5-3.6s4 1 5 3.6"/></svg></i><span class="hc-lb"><b class="t-phat">Hồ sơ người đã khuất</b><b class="t-cg">Hồ sơ người đã khuất</b><small>Tiểu sử, di ảnh</small></span></a><a class="hc" href="#ky-uc"><i class="hs-dot" aria-hidden="true"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4c-6 0-12 4-14 13l-2 4"/><path d="M6 17c5 0 9-2 11-7"/><path d="M9 12h6"/></svg></i><span class="hc-lb"><b class="t-phat">Lời nhắn & ký ức</b><b class="t-cg">Lời nhắn & ký ức</b><small>Viết cho người thương</small></span></a><a class="hc" href="#ngoi-nha"><i class="hs-dot" aria-hidden="true"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v11h14V10"/><path d="M10 21v-6h4v6"/></svg></i><span class="hc-lb"><b class="t-phat">Ngôi nhà kỷ niệm</b><b class="t-cg">Ngôi nhà kỷ niệm</b><small>Không gian riêng</small></span></a></div><div class="hs-col r"><span class="hs-cap">Khám phá</span><a class="hc" href="#cong-vien"><i class="hs-dot" aria-hidden="true"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V11l4-3 4 3v10M13 21v-7l3-2.5 3 2.5v7"/><path d="M8 21v-4h2v4"/></svg></i><span class="hc-lb"><b class="t-phat">Làng tưởng niệm</b><b class="t-cg">Làng tưởng niệm</b><small>Dạo cõi 3D</small></span></a><a class="hc" href="#ban-do"><i class="hs-dot" aria-hidden="true"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg></i><span class="hc-lb"><b class="t-phat">Bản đồ mộ phần</b><b class="t-cg">Bản đồ mộ phần</b><small>Tìm nơi an nghỉ</small></span></a><a class="hc" href="#cua-hang"><i class="hs-dot" aria-hidden="true"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="t-phat"><path d="M12 20c-4 0-7-2.5-7-6 2 0 4 1 5 2.4"/><path d="M12 20c4 0 7-2.5 7-6-2 0-4 1-5 2.4"/><path d="M12 19c-2-2-2.5-6 0-11 2.5 5 2 9 0 11z"/></g><g class="t-cg"><path d="M12 21V11"/><path d="M12 11c-3 0-5-2-5-5 2 0 4 1 5 3 1-2 3-3 5-3 0 3-2 5-5 5z"/><path d="M12 16c-2 0-3.5-1-4-2.5M12 16c2 0 3.5-1 4-2.5"/></g></svg></i><span class="hc-lb"><b class="t-phat">Dâng lễ vật</b><b class="t-cg">Dâng hoa & lễ vật</b><small>Hoa, đèn, lễ phẩm</small></span></a></div>
+  <div class="hall-floor" id="hallFloor" aria-label="Sàn đại sảnh: bấm để đi tới"></div>
+  <div class="hall-emo" role="group" aria-label="Bày tỏ"><button type="button" data-emo="pray" title="Chắp tay">🙏</button><button type="button" data-emo="heart" title="Thương nhớ">❤️</button><button type="button" data-emo="flower" title="Dâng hoa">🌸</button><button type="button" data-emo="light" title="Cầu an">✨</button></div>
+  <div class="world" id="world" hidden>
+    <div class="w-stage" id="wStage"><div class="w-bg"></div><div class="w-floor" id="wFloor"></div><div class="w-hot" id="wHot"></div></div>
+    <div class="w-signs"></div>
+    <div class="w-trans" id="wTrans" aria-hidden="true"><span>Đang lên núi…</span></div>
+    <div class="w-bar" role="group" aria-label="Hành động">
+      <button type="button" class="w-up" data-w="len">Lên núi thắp nhang</button>
+      <button type="button" class="w-down" data-w="xuong">‹ Xuống chân núi</button><button type="button" class="w-venui" data-w="venui">‹ Ra cổng làng</button><button type="button" class="w-ralang" data-w="ralang">‹ Ra làng</button>
+      <button type="button" data-w="chap">Chắp tay</button><button type="button" data-w="lay">Vái lạy</button><button type="button" data-w="ngoi">Ngồi</button><button type="button" data-w="doi" title="Đổi nhân vật">Đổi người</button>
+    </div>
+  </div>
+  <div class="hall-motes" aria-hidden="true"></div>
+  <div class="hall-splash" aria-hidden="true"><svg class="hl-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z" fill="#E2B04A"/><circle cx="12" cy="16" r="9" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="16" r="9" stroke="currentColor" stroke-width="2"/></svg><b>Song Song</b><span class="t-phat">Chào mừng về Chính điện</span><span class="t-cg">Chào mừng về Thánh đường</span></div>
+  <div class="hall-top">
+    <a class="hall-brand" href="#hall-top-noop" data-hall-logo aria-label="Song Song"><svg class="hl-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z" fill="#E2B04A"/><circle cx="12" cy="16" r="9" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="16" r="9" stroke="currentColor" stroke-width="2"/></svg><span class="hall-ttl"><span class="t-phat">Chính điện</span><span class="t-cg">Thánh đường</span><b>Song Song</b></span></a>
+    <div class="hall-act"><a class="hnav" href="#nguoi-than"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.8-3.4 3.2-5.2 6-5.2s5.2 1.8 6 5.2"/><path d="M16 4.6a3 3 0 0 1 0 5.8M18.5 14.6c1.4.8 2.2 2.6 2.5 5.4"/></svg><span>Người thân</span></a><button type="button" class="hnav" data-open-cal><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Lịch</span></button><a class="hnav" href="#ca-nhan"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 7c-3 0-5 2-5 5h10c0-3-2-5-5-5zM7 12v3M17 12v3M5 15h4v5H5zM15 15h4v5h-4zM10 17h4"/></svg><span>Gia đình</span></a><span class="hall-online" id="hallOnline" title="Người đang ở trong sảnh"><i></i><b>1</b><span> trực tuyến</span></span><button type="button" class="ss-mus-btn" data-music aria-pressed="true" aria-label="Bật/tắt nhạc nền"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w1" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="w2" d="M19 6a8.5 8.5 0 0 1 0 12"/></svg><span>Nhạc</span></button><button type="button" data-open-cal><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="12" cy="15" r="1.4"/></svg><span>Lịch vạn niên</span></button><a href="#ca-nhan"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Cá nhân</span></a><button type="button" data-open-gate><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg><span>Đổi lối</span></button></div>
+  </div>
+  <div class="hall-list" aria-label="Các nơi trong đại sảnh">
+    <button type="button" class="wl-toggle" aria-expanded="false">Các nơi trong chùa ▴</button><p class="hall-hint">Chọn một nơi để bước vào</p>
+    <div class="hall-grid">
+      <a class="hl-main" href="#thap-nhang"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="t-phat"><path d="M9 21V10M12 21V8M15 21V10"/><path class="smk" d="M12 8c-1.5-1.5 1.5-2.5 0-4"/><path class="smk s2" d="M9 10c-1.2-1.2 1.2-2 0-3.4"/><path class="smk s3" d="M15 10c-1.2-1.2 1.2-2 0-3.4"/><path d="M5 21h14"/></g><g class="t-cg"><path d="M9 21h6M10 21V11h4v10"/><path class="flm" d="M12 3c1.6 2 2 3.3 2 4.3a2 2 0 0 1-4 0c0-1 .4-2.3 2-4.3z"/></g></svg><b class="t-phat">Thắp nhang tưởng niệm</b><b class="t-cg">Thắp nến cầu nguyện</b><small>Bàn thờ của gia đình</small></a><a href="#ho-so"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 18c1-2.6 3-3.6 5-3.6s4 1 5 3.6"/></svg><b class="t-phat">Hồ sơ người đã khuất</b><b class="t-cg">Hồ sơ người đã khuất</b><small>Tiểu sử, di ảnh</small></a><a href="#ky-uc"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4c-6 0-12 4-14 13l-2 4"/><path d="M6 17c5 0 9-2 11-7"/><path d="M9 12h6"/></svg><b class="t-phat">Lời nhắn & ký ức</b><b class="t-cg">Lời nhắn & ký ức</b><small>Viết cho người thương</small></a><a href="#ngoi-nha"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v11h14V10"/><path d="M10 21v-6h4v6"/></svg><b class="t-phat">Ngôi nhà kỷ niệm</b><b class="t-cg">Ngôi nhà kỷ niệm</b><small>Không gian riêng</small></a><a href="#cong-vien"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V11l4-3 4 3v10M13 21v-7l3-2.5 3 2.5v7"/><path d="M8 21v-4h2v4"/></svg><b class="t-phat">Làng tưởng niệm</b><b class="t-cg">Làng tưởng niệm</b><small>Dạo cõi 3D</small></a><a href="#ban-do"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg><b class="t-phat">Bản đồ mộ phần</b><b class="t-cg">Bản đồ mộ phần</b><small>Tìm nơi an nghỉ</small></a><a href="#cua-hang"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="t-phat"><path d="M12 20c-4 0-7-2.5-7-6 2 0 4 1 5 2.4"/><path d="M12 20c4 0 7-2.5 7-6-2 0-4 1-5 2.4"/><path d="M12 19c-2-2-2.5-6 0-11 2.5 5 2 9 0 11z"/></g><g class="t-cg"><path d="M12 21V11"/><path d="M12 11c-3 0-5-2-5-5 2 0 4 1 5 3 1-2 3-3 5-3 0 3-2 5-5 5z"/><path d="M12 16c-2 0-3.5-1-4-2.5M12 16c2 0 3.5-1 4-2.5"/></g></svg><b class="t-phat">Dâng lễ vật</b><b class="t-cg">Dâng hoa & lễ vật</b><small>Hoa, đèn, lễ phẩm</small></a>
+    </div>
+    <nav class="hall-dock" aria-label="Tiện ích"><a href="#hanh-trinh"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7"/></svg>Hành trình</a><a href="#thiep"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Thiệp tưởng niệm</a><a href="#hoi-dap"><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.6M12 17h.01"/></svg>Hỏi đáp</a><button type="button" data-hall-close><svg class="ic " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V8l8-5 8 5v12"/><path d="M9 20v-6h6v6"/></svg>Trang giới thiệu</button></nav>
+  </div>
+</div>
+<button type="button" class="ss-mus-fab ss-mus-btn" data-music aria-pressed="true" aria-label="Bật/tắt nhạc nền" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w1" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="w2" d="M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#dau-trang">
+      <svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z" fill="#B8862F"/><circle cx="12" cy="16" r="9" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="16" r="9" stroke="currentColor" stroke-width="2"/></svg>
+      <b>Song Song</b>
+    </a>
+    <nav aria-label="Điều hướng chính" id="mainNav" class="tabbar"><span class="tb-pool" aria-hidden="true"></span><span class="tb-light" aria-hidden="true"></span><a href="#dau-trang" class="tb" data-tab-key="chua"><span class="tb-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V11l7-5 7 5v10"/><path d="M2 11l10-7 10 7"/><path d="M10 21v-5h4v5"/></svg></span><span class="tb-t" data-chua-label>Chùa</span></a><a href="#nguoi-than" class="tb" data-tab-key="nt"><span class="tb-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.8-3.4 3.2-5.2 6-5.2s5.2 1.8 6 5.2"/><path d="M16 4.6a3 3 0 0 1 0 5.8M18.5 14.6c1.4.8 2.2 2.6 2.5 5.4"/></svg></span><span class="tb-t">Người thân</span></a><button type="button" class="tb" data-open-cal data-tab-key="lich"><span class="tb-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span><span class="tb-t">Lịch</span></button><a href="#ca-nhan" class="tb" data-tab-key="gd"><span class="tb-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 7c-3 0-5 2-5 5h10c0-3-2-5-5-5zM7 12v3M17 12v3M5 15h4v5H5zM15 15h4v5h-4zM10 17h4"/></svg></span><span class="tb-t">Gia đình</span></a></nav>
+    <button class="nav-menu" id="navMenu" aria-label="Mở menu" aria-expanded="false"><span></span><span></span></button>
+    <div class="nav-prog" aria-hidden="true"></div>
+    <button class="cal-btn" id="calBtn" type="button" aria-label="Mở lịch vạn niên"><i></i><span class="cb-t"><b></b><small></small></span></button>
+    <div class="nav-auth"><button class="btn ghost" data-auth="login">Đăng nhập</button><button class="btn" data-auth="signup">Đăng ký</button></div>
+  </div>
+</header>
+<dialog class="lvn" id="lvn" aria-labelledby="lvnTitle">
+  <div class="lvn-box">
+    <section class="lvn-sheet" aria-live="polite">
+      <div class="lvn-bind" aria-hidden="true"><i></i><i></i></div>
+      <div class="lvn-page" id="lvnPage">
+      <div class="lvn-glow" aria-hidden="true"></div>
+      <div class="lvn-motes" aria-hidden="true"><i style="left:12%;animation-delay:0s"></i><i style="left:28%;animation-delay:2.4s"></i><i style="left:47%;animation-delay:5s"></i><i style="left:63%;animation-delay:1.2s"></i><i style="left:78%;animation-delay:3.6s"></i><i style="left:90%;animation-delay:6.4s"></i></div>
+      <div class="lvn-top"><span id="lvnMY"></span><b id="lvnYearCC"></b></div>
+      <div class="lvn-day" id="lvnDay"></div>
+      <div class="lvn-wd" id="lvnWd"></div>
+      <div class="lvn-lunar"><svg class="lvn-moon" id="lvnMoon" viewBox="-30 -30 60 60" aria-hidden="true"></svg><small>Âm lịch</small><b id="lvnLunar"></b><span id="lvnLunarY"></span></div>
+      <div class="lvn-fest" id="lvnFest" hidden></div>
+      <dl class="lvn-meta">
+        <dt>Ngày</dt><dd id="lvnCCd"></dd>
+        <dt>Tháng</dt><dd id="lvnCCm"></dd>
+        <dt>Tiết khí</dt><dd id="lvnTK"></dd>
+        <dt>Giờ tốt</dt><dd id="lvnHD"></dd>
+      </dl>
+      </div>
+    </section>
+    <section class="lvn-side">
+      <div class="lvn-head">
+        <button class="lvn-nav" type="button" data-mo="-1" aria-label="Tháng trước">‹</button>
+        <h3 id="lvnTitle">Lịch vạn niên</h3>
+        <button class="lvn-nav" type="button" data-mo="1" aria-label="Tháng sau">›</button>
+        <button class="lvn-today" type="button" id="lvnToday">Hôm nay</button>
+        <button class="lvn-x" type="button" id="lvnX" aria-label="Đóng lịch">×</button>
+      </div>
+      <div class="lvn-grid" id="lvnGrid" role="grid"></div>
+      <div class="lvn-key"><span><i style="background:var(--ember)"></i>Mùng 1, Rằm</span><span><i style="background:var(--lacquer)"></i>Ngày lễ, tưởng niệm</span></div>
+      <h4>Sắp tới</h4>
+      <ul class="lvn-next" id="lvnNext"></ul>
+      <button class="btn ember lvn-go" type="button" id="lvnGo">Vào Thế Giới Song Song</button>
+    </section>
+  </div>
+</dialog>
+
+<div class="pgbar" id="pgbar" hidden><div class="wrap"><button type="button" class="pg-back" data-open-hall><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span>Đại sảnh</span></button><span class="pg-sep" aria-hidden="true">/</span><h1 class="pg-title" id="pgTitle">Giới thiệu</h1></div></div>
+<!-- MỞ ĐẦU -->
+<section class="hero intro-only" id="dau-trang">
+
+  <div class="hero-glow" aria-hidden="true"><div class="halo"></div><div class="rays"></div><div class="core"></div></div>
+  <canvas class="hero-sky" aria-hidden="true"></canvas>
+  <div class="wrap hero-in">
+    <div class="hero-mark"><svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z" fill="#B8862F"/><circle cx="12" cy="16" r="9" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="16" r="9" stroke="currentColor" stroke-width="2"/></svg><span>Song Song</span></div>
+    <h1 class="hero-title">Nơi ký ức <span>không bao giờ tắt</span></h1>
+    <div class="hero-meta">
+      <div><small>Thegioisongsong.vn</small>Làng tưởng niệm trực tuyến</div>
+      <div><small>Tổng quan:</small><p>Một ngôi làng trên mây cho người đã khuất, anh hùng liệt sĩ và thương binh. Gia đình dựng nhà, dâng quà, lưu giữ ký ức và chăm sóc mộ phần thật.</p></div>
+      <div><small>Không gian:</small><ul><li>Làng tưởng niệm</li><li>Làng riêng của gia đình</li><li>Cửa hàng vật phẩm</li><li>Không gian ký ức</li><li>Bản đồ mộ phần</li><li>Chăm sóc mộ</li></ul></div>
+      <div><small>©2026</small>Bản mẫu</div>
+    </div>
+    <div class="hero-cta"><button class="btn" data-auth="signup">Đăng ký</button><button class="btn ghost" data-auth="login">Đăng nhập</button><a class="btn ghost" href="#cong-vien">Vào làng tưởng niệm</a></div>
+  </div>
+  <canvas class="ecg" data-hero="1" style="--bh:clamp(170px,19vw,260px)" aria-hidden="true"></canvas>
+</section>
+
+<!-- KHU THẮP NHANG: lịch âm hôm nay + bàn thờ ảo -->
+<section class="block hub intro-only" id="thap-nhang">
+  <div class="wrap">
+    <div class="hub-cal" id="hubCal">
+      <button class="hub-cal-head" type="button" id="hubCalBtn" aria-expanded="false" aria-controls="hubCalMore">
+        <span class="hc-d" id="hcD"></span>
+        <span class="hc-main"><b id="hcSolar"></b><span id="hcLunar"></span></span>
+        <span class="hc-next" id="hcNext"></span>
+        <span class="hc-car" aria-hidden="true">▾</span>
+      </button>
+      <div class="hub-cal-more" id="hubCalMore" hidden>
+        <dl><div><dt>Ngày</dt><dd id="hcCCd"></dd></div><div><dt>Tháng</dt><dd id="hcCCm"></dd></div><div><dt>Năm</dt><dd id="hcCCy"></dd></div><div><dt>Tiết khí</dt><dd id="hcTK"></dd></div><div class="w"><dt>Giờ tốt</dt><dd id="hcHD"></dd></div></dl>
+        <button class="btn ghost" type="button" id="hcOpen">Mở lịch vạn niên</button>
+      </div>
+    </div>
+
+    <div class="hub-grid">
+      <div class="altar" id="altar">
+        <div class="altar-glow" aria-hidden="true"></div>
+        <div class="altar-msg" id="altarMsg" aria-live="polite"></div>
+        <svg class="urn" viewBox="0 0 240 230" aria-hidden="true">
+          <defs>
+            <linearGradient id="urnG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#E7C27A"/><stop offset=".55" stop-color="#B8862F"/><stop offset="1" stop-color="#7E5A1C"/></linearGradient>
+            <linearGradient id="ashG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#EDE3D2"/><stop offset="1" stop-color="#CFC2AC"/></linearGradient>
+          </defs>
+          <g class="sticks">
+            <g class="stick" style="--d:0s"><rect x="94" y="40" width="3" height="104" rx="1.5" fill="#8A3B2B" transform="rotate(-9 95 144)"/></g>
+            <g class="stick" style="--d:.15s"><rect x="118.5" y="30" width="3" height="114" rx="1.5" fill="#8A3B2B"/></g>
+            <g class="stick" style="--d:.3s"><rect x="143" y="40" width="3" height="104" rx="1.5" fill="#8A3B2B" transform="rotate(9 144 144)"/></g>
+          </g>
+          <g class="embers"><circle cx="78.5" cy="42" r="3.4"/><circle cx="120" cy="31" r="3.4"/><circle cx="161.5" cy="42" r="3.4"/></g>
+          <g class="smoke"><path d="M78 38c-8-12 8-20 0-32s8-18 0-30"/><path d="M120 27c8-12-8-20 0-32s-8-18 0-30"/><path d="M162 38c-8-12 8-20 0-32s8-18 0-30"/></g>
+          <ellipse cx="120" cy="146" rx="78" ry="13" fill="url(#ashG)"/>
+          <path d="M42 146c0 40 30 64 78 64s78-24 78-64z" fill="url(#urnG)"/>
+          <ellipse cx="120" cy="146" rx="78" ry="13" fill="none" stroke="#F4DFA8" stroke-width="2"/>
+          <path d="M96 178h48M104 188h32" stroke="#F4DFA8" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+          <path d="M70 206l-8 18h20l4-12M170 206l8 18h-20l-4-12" fill="#7E5A1C"/>
+        </svg>
+        <svg class="candle" viewBox="0 0 240 230" aria-hidden="true">
+          <defs><radialGradient id="cHalo"><stop offset="0" stop-color="#FFE7B0" stop-opacity=".75"/><stop offset="1" stop-color="#FFE7B0" stop-opacity="0"/></radialGradient>
+          <linearGradient id="cWax" x1="0" x2="1"><stop offset="0" stop-color="#E9E2D0"/><stop offset=".5" stop-color="#FFFDF6"/><stop offset="1" stop-color="#D8CFBA"/></linearGradient>
+          <linearGradient id="cBrass" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#E7C27A"/><stop offset="1" stop-color="#7E5A1C"/></linearGradient></defs>
+          <g opacity=".35"><rect x="113" y="0" width="14" height="120" rx="2" fill="#C9B48A"/><rect x="84" y="28" width="72" height="13" rx="2" fill="#C9B48A"/></g>
+          <circle class="halo" cx="120" cy="66" r="70" fill="url(#cHalo)"/>
+          <path class="flame f1" d="M120 46c-9 13-10 22 0 28 10-6 9-15 0-28z" fill="#FFB648"/><path class="flame f1" d="M120 56c-4 7-4 11 0 14 4-3 4-7 0-14z" fill="#FFF6D8"/>
+          <path class="flame f2" d="M76 82c-7 10-8 17 0 22 8-5 7-12 0-22z" fill="#FFB648"/>
+          <path class="flame f3" d="M164 82c-7 10-8 17 0 22 8-5 7-12 0-22z" fill="#FFB648"/>
+          <rect x="108" y="76" width="24" height="96" rx="3" fill="url(#cWax)"/><rect x="66" y="106" width="20" height="66" rx="3" fill="url(#cWax)"/><rect x="154" y="106" width="20" height="66" rx="3" fill="url(#cWax)"/>
+          <path d="M119 76v-4M75 106v-3M163 106v-3" stroke="#3A2A1A" stroke-width="2"/>
+          <path d="M52 172h136l-10 14H62z" fill="url(#cBrass)"/><rect x="112" y="186" width="16" height="22" fill="url(#cBrass)"/><path d="M84 222q36-16 72 0z" fill="url(#cBrass)"/><rect x="80" y="218" width="80" height="6" rx="3" fill="#7E5A1C"/>
+        </svg>
+        <div class="prayer" id="prayer" role="status">Lạy Chúa, xin cho linh hồn <span id="prName">ông bà</span> được nghỉ ngơi đời đời, và được ánh sáng ngàn thu chiếu soi. Xin cho linh hồn được nghỉ yên. Amen.<small>Kinh cầu cho người đã qua đời</small></div>
+        <div class="altar-to" role="group" aria-label="Dâng lên">
+          <span id="hbTo">Dâng lên</span>
+          <div class="chips" id="altarTo">
+            <button class="chip" type="button" aria-pressed="true">Ông bà</button><button class="chip" type="button" aria-pressed="false">Cha mẹ</button><button class="chip" type="button" aria-pressed="false">Anh hùng liệt sĩ</button><button class="chip" type="button" aria-pressed="false">Người thân</button><button class="chip" type="button" aria-pressed="false" id="hbLast">Mọi vong linh</button>
+          </div>
+        </div>
+        <div class="altar-acts">
+          <button class="btn hub-light" type="button" id="hubLight"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"/></svg><span id="hbLightT">Thắp nén nhang</span></button>
+          <button class="btn ghost" type="button" id="hubBell"><svg class="ic-bell" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.27 21a2 2 0 0 0 3.46 0"/><path d="M3.26 15.33A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.67C19.41 13.96 18 12.5 18 8A6 6 0 0 0 6 8c0 4.5-1.41 5.96-2.74 7.33"/></svg><svg class="ic-book" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg><span id="hbBellT">Thỉnh chuông</span></button>
+        </div>
+      </div>
+
+      <div class="hub-side">
+        <span class="eyebrow" id="hbEye">Bàn thờ của bạn</span>
+        <h2 class="hub-title" id="hbTitle">Một nén nhang, <span>một lời nhớ</span></h2>
+        <p class="lede" id="hbLede">Thắp nhang, thỉnh chuông và giữ chuỗi ngày tưởng niệm cho người đã khuất, ngay trên điện thoại.</p>
+        <div class="hub-stats">
+          <div><b id="hsToday">0</b><span id="hbU1">nén hôm nay</span></div>
+          <div><b id="hsTotal">0</b><span id="hbU2">nén đã thắp</span></div>
+          <div><b id="hsStreak">0</b><span>ngày liên tiếp</span></div>
+        </div>
+        <div class="hub-49">
+          <div class="h49-top"><span id="hbGoal">Hành trình 49 ngày</span><b id="h49n">0/49</b></div>
+          <div class="h49-bar"><i id="h49bar"></i></div>
+          <small id="hbGoalS">Mỗi ngày thắp ít nhất một nén để đi tiếp. Lỡ một ngày, chuỗi bắt đầu lại.</small>
+        </div>
+        <p class="hub-note"><span id="hbNoteT">Số nén nhang được lưu trên máy của bạn.</span> · <button class="faith-switch" type="button" id="hbSwitch" data-open-gate>Đổi lối vào</button></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BỐN KHÔNG GIAN -->
+<section class="block spaces intro-only" id="khong-gian">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Hệ sinh thái</span><h2>Sáu không gian, một mạch ký ức</h2></div>
+      <p class="lede">Từ làng tưởng niệm đến mộ phần ngoài đời thật, mọi thứ nối với nhau quanh hồ sơ của người đã khuất.</p>
+    </div>
+    <div class="iso-grid" id="isoGrid"></div>
+  </div>
+</section>
+
+<!-- GIỚI THIỆU: BA BƯỚC + LỜI MỜI -->
+<section class="block intro-only intro-steps" id="bat-dau">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Bắt đầu</span><h2>Ba bước, vài phút</h2></div>
+      <p class="lede">Không cần cài đặt. Mở trên điện thoại hay máy tính đều được.</p>
+    </div>
+    <ol class="isteps">
+      <li><div class="smock sm1" aria-hidden="true">
+        <div class="pcard"><div class="pav"><svg viewBox="0 0 40 40"><circle cx="20" cy="15" r="7" fill="#9A6E22"/><path d="M6 40c1-9 7-14 14-14s13 5 14 14z" fill="#9A6E22"/></svg></div>
+          <div class="pmeta"><small>Liệt sĩ</small><b>Phạm Hữu Khiêm</b><span>1951 — 1972 · Nam Định</span></div></div>
+        <div class="pfield"><i style="width:72%"></i></div><div class="pfield"><i style="width:48%"></i></div>
+        <div class="pbtn">Đăng ký</div>
+        <svg class="pcur" viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-3 6z" fill="#fff" stroke="#2B241C" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        <span class="pfree">Miễn phí</span>
+      </div><span>01</span><h3>Đăng ký</h3><p>Mở tài khoản và hồ sơ người đã khuất, hoàn toàn miễn phí.</p></li>
+      <li><div class="smock sm2" aria-hidden="true">
+        <svg class="shouse" viewBox="0 0 160 120"><g fill="none" stroke="rgba(60,45,28,.35)" stroke-width="1"><path d="M10 82l70 35 70-35-70-35z"/><path d="M33 70.5l70-35M57 82.5l70-35M33 93.5l70-35M57 105.5l70-35M45 64l70 35M22 76l70 35M68 52l70 35"/></g>
+          <path d="M44 72l36 18 36-18v-22l-36 18-36-18z" fill="#5A3F17" stroke="rgba(60,45,28,.7)"/><path d="M80 90v-22l36-18v22z" fill="#8C6324" stroke="rgba(60,45,28,.7)"/>
+          <path d="M38 50l36-18 48 22-36 18z" fill="#B8862F" stroke="rgba(60,45,28,.75)"/><path d="M38 50l6 22 36 18v-22z" fill="#8C6324" stroke="rgba(60,45,28,.7)" opacity=".9"/>
+          <circle cx="132" cy="58" r="7" fill="#B8862F" stroke="#FFF8EA"/><circle cx="140" cy="64" r="5" fill="#8C6324" stroke="#FFF8EA"/><path d="M134 66v18" stroke="rgba(60,45,28,.7)"/></svg>
+        <div class="sfan"><span style="--r:-14deg;--g:linear-gradient(160deg,#b9b4a6,#5f5a4f)"></span><span style="--r:-2deg;--g:linear-gradient(170deg,#c9a676,#6b4e30)"></span><span style="--r:10deg;--g:linear-gradient(160deg,#3a3550,#c97a5e)"><em>▶</em></span><span class="sadd" style="--r:20deg">+</span></div>
+        <div class="sgift"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" fill="#B8862F" stroke="#FFF8EA"/><rect x="3" y="7" width="18" height="4" fill="#8C6324" stroke="#FFF8EA"/><path d="M12 7v13" stroke="#FFF8EA"/><path d="M12 7c-3-4-6-2-4 0M12 7c3-4 6-2 4 0" fill="none" stroke="#FFF8EA"/></svg></div>
+      </div><span>02</span><h3>Dựng và lưu giữ</h3><p>Dựng nhà trong làng riêng của gia đình, gửi quà, đưa ảnh và video vào vòng ký ức.</p></li>
+      <li><div class="smock sm3" aria-hidden="true">
+        <div class="smap"><svg class="spin" viewBox="0 0 24 32"><path d="M12 31C12 31 2 18.5 2 11.5a10 10 0 0 1 20 0C22 18.5 12 31 12 31z" fill="#B8862F" stroke="#FFF8EA"/><circle cx="12" cy="11.5" r="4" fill="#FFF8EA"/></svg><span class="sring"></span><svg class="sroute" viewBox="0 0 200 120"><path d="M14 104C40 92 52 70 80 72s46-26 70-34" fill="none" stroke="#9A6E22" stroke-width="2" stroke-dasharray="4 5"/><circle cx="14" cy="104" r="4" fill="#FFF8EA"/></svg></div>
+        <div class="scheck"><small>Chăm mộ · 25/07</small><span><b>✓</b>Lau bia</span><span><b>✓</b>Dâng hoa</span><span><b>✓</b>Thắp hương</span><div class="sba"><i></i><i></i></div></div>
+      </div><span>03</span><h3>Nối với mộ phần thật</h3><p>Đánh dấu vị trí mộ và đặt lịch chăm sóc, nhận ảnh sau mỗi lần.</p></li>
+    </ol>
+    <div class="icta"><canvas class="lanterns" aria-hidden="true"></canvas>
+      <p>Mỗi người đã khuất đều xứng đáng có một nơi để được nhớ đến.</p>
+      <div class="hero-cta"><button class="btn" data-auth="signup">Đăng ký</button><a class="btn ghost" href="#cong-vien">Vào làng tưởng niệm</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- 1. CÔNG VIÊN TƯỞNG NIỆM -->
+<!-- TRANG CÁ NHÂN -->
+<section class="block app-only me" id="ca-nhan">
+  <div class="wrap">
+    <div class="me-head">
+      <div class="me-id"><div class="me-av" id="meAv">N</div><div><span class="eyebrow">Trang cá nhân <em class="me-clan" id="meClan" hidden></em></span><h2 id="meName">Bạn</h2><p class="me-sub" id="meSub"></p></div></div>
+      <div class="me-wallet"><small>Ví nén</small><b><span data-bal>500</span> nén</b><button class="btn" data-topup>Nạp nén</button></div>
+    </div>
+    <div class="me-stats" id="meStats"></div>
+    <div class="tabs me-tabs" role="tablist" id="meTabs"><button role="tab" aria-selected="true" data-t="tree">Gia phả</button><button role="tab" aria-selected="false" data-t="village">Làng dòng họ</button><button role="tab" aria-selected="false" data-t="houses">Nhà tưởng niệm</button><button role="tab" aria-selected="false" data-t="info">Thông tin</button></div>
+    <div data-mp="tree">
+      <div class="me-tree">
+        <div class="tree-box"><div class="tree-bar"><span>Cây gia đình · bấm vào một người để xem, thêm con, vợ/chồng hoặc bố/mẹ</span><button class="btn ghost" id="meSample">Dùng gia phả mẫu</button></div>
+          <div class="tree-stage"><svg id="treeSvg" role="group" aria-label="Cây gia đình"></svg></div>
+          <p class="tree-empty" id="treeEmpty">Bắt đầu bằng việc thêm bố mẹ, ông bà hoặc người thân đã khuất. Thêm từ 2 người đã khuất sẽ lập thành dòng họ và mở làng dòng họ.</p></div>
+        <aside class="tree-side" id="treeSide"></aside>
+      </div>
+    </div>
+    <div data-mp="village" hidden><div id="meVillage"></div></div>
+    <div data-mp="houses" hidden><div class="me-houses" id="meHouses"></div></div>
+    <div data-mp="info" hidden>
+      <form class="me-form me-info" id="meInfo" novalidate>
+        <label>Họ và tên<input id="miName" required maxlength="60" autocomplete="name"></label>
+        <label>Số điện thoại hoặc email<input id="miContact" maxlength="80" autocomplete="username"></label>
+        <label>Quê quán<input id="miPlace" maxlength="80" placeholder="Ví dụ: Ý Yên, Nam Định"></label>
+        <button class="btn" type="submit">Lưu thông tin</button>
+      </form>
+    </div>
+  </div>
+<div class="wrap gd-wrap"><div class="gd-guest"><span class="gd-gic" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><h2>Lưu gia đình</h2><p>Đăng ký miễn phí · mở ở mọi máy</p><button type="button" class="btn" data-gd-signup>Đăng ký</button> <button type="button" class="btn ghost" data-gd-login>Đăng nhập</button></div><div class="gd-more"><div class="gd-list"><button type="button" data-open-gate style="--c:#8B5A2B;--i:0"><span class="gd-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-7h6v7"/></svg></span><span class="gd-l">Đổi lối</span></button><button type="button" data-music aria-pressed="true" style="--c:#3E6E8E;--i:1"><span class="gd-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></span><span class="gd-l">Nhạc nền</span></button><a href="#hoi-dap" style="--c:#4E7A3A;--i:2"><span class="gd-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.6 2.6 0 0 1 5 1c0 1.8-2.5 2.2-2.5 4M12 17.5h.01"/></svg></span><span class="gd-l">Hỏi đáp</span></a><a href="#dau-trang" data-intro style="--c:#7A4A8C;--i:3"><span class="gd-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg></span><span class="gd-l">Giới thiệu</span></a><button type="button" class="gd-out" data-logout style="--c:#8B3A1E;--i:4"><span class="gd-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></span><span class="gd-l">Đăng xuất</span></button><a href="#cua-hang" class="gd-shop" style="--c:#B8701A;--i:5"><span class="gd-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg></span><span class="gd-l">Cửa hàng</span><em>Sắp có</em></a></div></div></div></section>
+
+<section class="park app-only" id="cong-vien">
+  <div class="park-stage" id="parkStage">
+    
+    <div class="park-labels" id="parkLabels"></div>
+    <div class="joy" id="joy" hidden aria-label="Cần điều khiển"><div class="joy-knob" id="joyKnob"></div></div>
+    <div class="zone-banner" id="zoneBanner" hidden><small id="zbSub">Khu liệt sĩ</small><b id="zbName">Đồi Tri Ân</b></div>
+    <div class="park-tools">
+      <div class="pt-row">
+        <div class="pt-compass">
+      <div class="compass" id="compass" role="button" tabindex="0" aria-label="La bàn. Bấm để quay về hướng Bắc">
+        <div class="compass-rose" id="compassRose"><span class="cn">B</span><span class="ce">Đ</span><span class="cs">N</span><span class="cw">T</span><i></i></div>
+      </div>
+      <div class="compass-dir"><small>Đang nhìn về</small><b id="compassDir">Tây Bắc</b></div>
+        </div>
+        <div class="seg" id="parkMode"><button aria-pressed="true" data-m="orbit">Toàn cảnh</button><button aria-pressed="false" data-m="walk">Đi dạo</button></div>
+      </div>
+      <div class="seg seg-time" id="parkTime"><b class="rt-clock" title="Ánh sáng theo giờ Việt Nam (GMT+7)"></b></div>
+      <div class="park-hint" id="parkHint">Kéo để xoay · Bấm vào ngôi nhà để vào thăm</div>
+    </div>
+    <div class="park-prompt" id="parkPrompt" hidden>
+      <span class="eyebrow" id="ppCat">Liệt sĩ</span>
+      <b id="ppName">Phạm Hữu Khiêm</b>
+      <span class="pp-sub" id="ppSub">Bạn đang đứng trước ngôi nhà tưởng niệm</span>
+      <span class="pp-grave" id="ppGrave"></span>
+      <div class="row"><button class="btn ember" id="ppIncense">Thắp hương</button><button class="btn" id="ppVisit">Vào thăm</button><button class="btn ghost" id="ppHome">Ngôi nhà</button></div>
+      <small class="pp-key">Phím E để vào thăm</small>
+    </div>
+  </div>
+  <div class="park-panel min" id="parkPanel" tabindex="-1">
+    <button class="pp-tog" id="ppTog" type="button" aria-expanded="false" aria-label="Mở rộng hoặc thu gọn bảng tìm kiếm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+    <span class="eyebrow">Làng tưởng niệm</span>
+    <h1>Một ngôi làng trên mây cho <em>những người ta thương nhớ</em></h1>
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="q" type="search" placeholder="Tìm theo tên, quê quán…" autocomplete="off">
+    </label>
+    <div class="chips" id="cats">
+      <button class="chip" aria-pressed="true" data-c="all">Tất cả</button>
+      <button class="chip" aria-pressed="false" data-c="ls">Liệt sĩ</button>
+      <button class="chip" aria-pressed="false" data-c="tb">Thương binh</button>
+      <button class="chip" aria-pressed="false" data-c="dh">Dòng họ</button>
+      <button class="chip" aria-pressed="false" data-c="nt">Người thân</button>
+    </div>
+    <ul class="results" id="results"></ul>
+  </div>
+  <div class="park-card" id="parkCard">
+    <button class="pc-x" id="pcX" type="button" aria-label="Đóng thẻ">×</button>
+    <span class="eyebrow" id="pcCat">Liệt sĩ</span>
+    <h3 id="pcName">Phạm Hữu Khiêm</h3>
+    <div class="d" id="pcMeta">1951 – 1972 · Ý Yên, Nam Định</div>
+    <div class="row">
+      <a class="btn" href="#ho-so">Vào thăm</a>
+      <button class="btn ghost" id="pcIncense">Thắp hương</button>
+    </div>
+  </div>
+  <div class="stats">
+    <div><b id="stProfiles">8</b><span>không gian tưởng niệm trong 5 khu</span></div>
+    <div><b id="stIncense">4.512</b><span>nén hương đã thắp</span></div>
+    <div><b id="stGraves">3</b><span>mộ phần đã đánh dấu trên bản đồ</span></div>
+  </div>
+</section>
+
+<!-- BẢN ĐỒ THỰC TẾ -->
+<section class="block light app-only" id="ban-do">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Bản đồ thực tế</span><h2>Nơi người nằm lại, nơi người sinh ra</h2></div>
+      <p class="lede">Mỗi hồ sơ có thể gắn với vị trí mộ phần và quê quán thật. Gia đình quyết định có hiển thị vị trí hay không. Bấm vào một điểm để xem chi tiết và mở chỉ đường.</p>
+    </div>
+    <div class="vmap">
+      <div class="vmap-stage">
+        <svg viewBox="0 0 630.6 660" id="vmapSvg" role="img" aria-label="Bản đồ Việt Nam với vị trí mộ phần và quê quán">
+          <rect width="630.6" height="660" class="sea"/>
+          <path class="nb" d="M-10.0 -10.0L0.8 -10.0L8.1 -10.0L12.6 -10.0L16.8 -10.0L20.6 -10.0L26.4 -10.0L29.7 -10.0L45.4 -10.0L58.8 -10.0L72.1 -10.0L84.5 -10.0L95.7 -10.0L111.9 -10.0L126.9 -10.0L130.8 -10.0L142.0 -10.0L145.2 -10.0L153.9 -10.0L156.6 -10.0L159.4 -10.0L164.3 -10.0L179.5 -10.0L196.8 -10.0L214.1 -10.0L230.6 -10.0L246.9 -10.0L263.4 -10.0L268.2 -10.0L273.8 -10.0L282.1 -10.0L292.2 -10.0L298.4 -10.0L309.6 -10.0L312.5 -10.0L318.6 -10.0L325.5 -10.0L335.1 -10.0L337.8 -10.0L340.6 -10.0L343.8 -10.0L354.0 -10.0L360.1 -10.0L363.0 -10.0L369.0 -10.0L374.3 -10.0L380.5 -10.0L389.9 -10.0L393.4 -10.0L397.4 -10.0L405.8 -10.0L409.3 -10.0L412.7 -10.0L409.1 -10.0L402.5 -10.0L397.8 -10.0L395.0 -10.0L392.1 -10.0L394.9 -10.0L397.5 -10.0L405.3 -10.0L409.3 -10.0L412.5 -10.0L415.6 -10.0L419.4 -10.0L429.9 -10.0L435.4 -10.0L438.9 -10.0L444.0 -10.0L452.7 -10.0L457.7 -10.0L472.0 -10.0L477.0 -10.0L479.6 -10.0L486.0 -10.0L488.9 -10.0L492.9 -10.0L495.6 -10.0L498.4 -10.0L508.2 -10.0L511.4 -10.0L517.9 -10.0L520.6 -10.0L526.9 -10.0L535.5 -10.0L543.5 -10.0L548.8 -10.0L555.2 -10.0L560.2 -10.0L568.5 -10.0L571.5 -10.0L574.5 -10.0L577.9 -10.0L582.9 -10.0L589.2 -10.0L592.3 -10.0L596.3 -10.0L599.2 -10.0L605.8 -10.0L619.1 -10.0L621.8 -10.0L625.8 -10.0L628.9 -10.0L631.6 -10.0L634.3 -10.0L638.2 -10.0L627.8 -10.0L624.2 -10.0L621.3 -10.0L610.3 -10.0L606.5 -10.0L601.8 -10.0L597.9 -10.0L588.3 -10.0L585.6 -10.0L578.4 -10.0L572.3 -10.0L568.0 -10.0L563.3 -10.0L553.6 -10.0L550.5 -10.0L560.3 -10.0L570.1 -10.0L578.6 -10.0L586.7 -10.0L595.3 -10.0L609.7 -10.0L617.2 -10.0L625.8 -10.0L636.7 -10.0L639.5 -10.0L636.7 -10.0L629.9 -10.0L633.2 -10.0L638.4 -10.0L636.3 -8.3L638.2 -10.0L635.3 -10.0L632.4 -8.4L631.6 -5.6L631.3 -3.0L630.5 -6.1L628.9 -8.5L625.8 -8.8L623.1 -9.3L626.7 -6.9L625.3 -3.5L622.2 -3.8L619.8 -2.5L618.2 0.5L617.5 3.4L616.4 0.3L615.9 2.8L613.3 3.7L611.4 5.8L610.5 3.1L608.5 1.6L606.1 3.4L604.3 1.5L602.6 3.7L602.0 7.0L602.4 10.0L598.8 14.0L595.7 13.6L593.0 13.2L590.5 11.9L591.2 15.1L593.8 15.3L597.0 15.3L598.9 18.4L596.1 17.0L594.9 19.4L592.7 20.9L591.7 18.2L588.9 18.6L592.3 19.3L590.1 22.2L590.2 25.3L589.1 28.0L588.1 30.4L585.5 30.5L582.6 30.5L580.2 28.9L577.3 28.7L579.9 29.7L577.6 31.2L575.7 33.4L573.4 34.7L572.5 31.8L570.9 33.9L567.8 35.3L565.4 36.4L562.4 38.1L561.5 35.4L558.9 33.9L556.8 32.5L558.8 30.7L556.3 31.8L553.1 32.8L550.0 32.1L547.7 30.8L549.6 32.8L551.4 34.5L554.2 33.4L552.0 35.7L550.7 38.3L553.4 38.5L552.7 41.3L549.5 40.5L546.9 40.4L544.0 39.3L546.3 37.7L543.3 36.5L540.2 36.5L542.3 34.5L542.8 31.8L540.5 34.1L537.3 35.1L534.5 36.0L532.2 37.6L530.9 39.9L528.6 38.3L525.8 37.3L527.8 39.3L527.8 42.4L526.9 44.9L524.2 43.9L521.1 44.4L520.6 41.2L520.7 38.7L522.8 37.2L519.7 36.3L517.0 37.3L514.5 38.6L512.3 40.5L514.6 41.8L513.2 43.9L511.2 45.5L513.6 45.8L515.9 47.4L513.0 48.9L510.5 48.4L510.3 45.9L508.5 43.9L505.2 44.1L502.6 44.7L499.8 45.7L497.2 46.5L494.4 47.3L491.6 46.8L489.7 48.4L487.1 48.2L486.1 45.5L484.4 42.8L483.1 38.6L480.6 37.6L478.9 35.2L477.5 32.4L477.5 29.7L478.2 26.6L477.1 29.5L477.5 26.6L476.3 29.9L476.1 27.2L475.2 24.7L478.2 23.7L481.4 22.5L484.6 22.8L481.4 21.8L477.8 23.3L474.9 24.5L470.9 24.4L473.1 27.2L472.7 29.9L470.3 30.7L466.7 32.1L461.9 31.6L464.6 32.8L467.1 32.4L470.0 35.3L472.7 37.0L470.6 38.4L468.2 37.3L471.1 39.0L473.5 41.1L475.4 43.4L476.5 47.1L474.7 50.5L476.1 53.2L475.7 56.0L476.3 58.5L473.8 59.4L472.3 61.8L470.0 60.5L467.7 57.3L465.3 54.2L463.5 51.8L462.7 48.8L460.5 45.5L459.9 48.5L462.4 51.0L465.3 55.6L467.3 58.2L469.2 60.8L466.2 60.7L464.2 62.5L463.5 65.1L461.2 66.1L458.3 65.4L458.5 62.8L458.0 59.9L456.8 62.1L454.5 64.0L454.4 66.6L454.5 69.1L453.2 71.2L450.9 73.4L448.3 70.7L445.5 69.9L443.6 72.1L440.0 74.0L438.6 77.0L432.2 74.8L431.1 71.9L433.8 70.2L430.9 70.3L429.9 67.8L430.6 65.3L429.1 67.8L429.5 70.5L430.2 73.0L430.9 75.5L429.9 78.1L426.3 79.6L423.5 78.6L423.1 75.7L418.5 76.1L415.8 75.8L416.9 72.6L414.9 74.6L412.7 72.3L411.2 74.5L413.1 76.5L412.0 79.2L409.1 80.9L408.7 78.0L405.9 77.9L402.9 76.7L406.1 79.0L406.5 82.0L403.3 83.8L401.8 86.3L399.6 85.0L398.2 87.1L395.6 87.4L393.9 85.5L390.7 86.3L388.1 90.0L386.7 87.3L384.2 86.7L383.0 89.0L380.2 89.1L378.1 86.7L376.9 89.5L379.5 89.1L376.6 91.0L373.7 91.7L371.1 92.4L367.9 92.1L365.5 94.0L363.9 96.6L364.4 94.0L366.2 91.9L362.8 92.7L362.1 95.9L362.9 98.8L356.8 99.3L354.7 97.5L357.1 96.3L354.7 94.8L355.1 92.1L352.5 91.0L353.5 93.4L351.0 94.3L352.4 96.5L354.0 98.5L353.5 101.5L351.1 103.4L348.8 104.4L346.8 106.7L344.4 108.6L344.1 111.1L345.2 113.5L349.5 114.3L352.2 114.6L354.0 117.9L351.7 115.8L350.2 117.9L350.3 120.6L352.0 122.5L354.0 124.6L356.5 125.2L358.9 128.9L357.6 131.5L356.0 133.5L354.0 135.8L351.5 136.9L349.2 137.9L346.4 137.1L343.2 138.1L340.8 136.7L338.1 136.7L335.8 138.2L335.8 135.3L334.0 133.3L334.4 130.8L336.7 132.7L339.0 131.2L337.0 128.9L334.4 128.3L331.8 127.5L332.4 124.8L329.7 122.7L331.2 120.6L329.1 118.8L329.1 115.7L327.0 114.3L325.4 110.9L326.1 108.2L327.2 105.7L325.7 103.1L327.0 100.9L329.4 99.8L329.5 97.1L329.4 93.8L332.3 93.8L335.5 93.5L336.0 90.5L334.0 88.8L331.5 89.6L330.6 85.8L329.7 88.3L327.2 88.7L324.8 87.2L325.8 84.7L323.3 85.0L323.6 82.0L321.6 80.3L321.8 77.6L318.9 80.0L320.3 82.5L321.9 84.7L320.8 87.7L318.6 89.0L316.3 89.9L313.1 89.8L310.6 90.5L306.6 91.3L303.7 91.0L301.6 89.4L304.1 88.4L305.3 85.9L303.8 83.6L300.5 83.4L297.8 83.6L296.2 81.4L294.7 78.7L296.9 77.5L294.5 76.5L292.3 75.3L293.8 77.3L291.8 78.9L293.7 81.3L291.5 82.5L288.8 82.0L289.4 78.8L286.6 79.0L287.0 76.5L284.3 78.4L283.4 75.5L285.4 73.2L283.0 72.2L280.1 72.9L279.8 70.2L278.7 73.4L279.8 75.7L280.4 78.4L280.8 80.9L281.9 83.2L279.3 84.2L276.9 85.6L278.5 83.1L277.9 80.5L274.4 80.1L274.0 82.8L272.6 85.5L270.2 87.7L271.1 84.7L270.6 82.2L268.2 85.0L265.6 85.7L262.7 85.9L262.3 88.6L260.3 90.7L259.4 86.7L256.3 84.4L254.2 82.1L251.6 81.7L248.8 83.3L245.8 83.8L242.9 84.5L240.5 82.8L237.8 83.2L234.7 80.5L232.4 79.4L229.6 79.4L226.7 76.9L223.9 75.9L223.5 73.0L222.7 70.6L219.9 71.3L217.8 69.3L214.6 69.0L212.3 67.7L210.5 69.5L210.2 66.3L209.9 63.8L209.2 60.9L209.1 56.1L206.8 55.0L205.1 52.1L205.4 49.5L206.5 45.0L209.4 45.3L211.3 42.8L212.8 40.2L213.7 37.8L212.0 34.9L209.8 33.2L207.3 32.8L204.4 31.4L196.7 33.8L193.6 33.4L192.4 30.1L189.6 29.0L184.5 29.0L182.4 30.9L179.8 30.9L176.0 29.0L173.8 27.2L170.6 25.9L167.9 25.8L166.6 22.6L164.3 20.2L162.7 17.3L160.0 16.4L158.4 13.9L155.5 14.8L154.4 17.4L151.8 17.6L148.5 18.7L145.4 20.4L143.1 21.8L140.7 23.2L138.4 24.6L139.5 29.8L137.4 32.2L135.6 34.5L133.1 35.5L130.5 35.6L125.6 37.4L121.6 40.3L117.2 38.8L116.6 35.8L112.6 36.1L110.1 37.0L108.6 39.3L107.9 42.8L107.1 45.2L106.1 47.7L103.9 45.7L101.7 44.0L99.8 41.6L97.1 39.3L94.5 36.3L91.9 37.3L90.2 40.0L90.2 42.8L88.5 44.7L86.5 43.2L84.9 41.0L84.7 38.5L82.5 36.7L79.5 39.1L78.0 41.8L75.7 43.0L74.3 45.2L72.8 47.8L71.1 49.7L67.5 49.6L65.2 48.5L63.8 46.0L62.0 43.6L57.4 41.2L54.4 40.3L51.3 40.2L49.8 37.6L47.2 38.2L45.9 40.8L45.2 43.4L40.5 48.2L39.7 50.9L37.1 51.0L34.6 51.7L31.4 50.1L28.9 50.5L26.3 51.5L22.5 49.1L19.7 48.4L17.5 50.1L17.1 52.6L15.6 56.6L13.1 57.2L13.4 60.3L13.9 62.8L15.0 66.9L16.0 69.8L18.5 71.1L20.0 74.2L20.4 78.0L21.3 80.4L22.7 82.6L21.1 84.8L21.1 87.4L20.2 93.0L20.0 95.9L22.7 97.0L23.8 99.4L22.0 101.2L19.9 102.6L17.5 100.4L14.6 101.0L13.1 98.4L7.0 99.1L4.4 100.6L1.8 100.3L0.4 98.2L0.2 95.4L0.4 92.7L-0.5 87.7L-1.7 85.2L-1.2 82.5L-2.8 80.2L-3.1 77.6L-6.0 78.2L-8.6 79.8L-10.0 83.0L-10.0 87.3L-10.0 89.9L-10.0 87.3L-10.0 90.7L-10.0 87.7L-10.0 84.7L-10.0 82.0L-10.0 79.2L-10.0 75.5L-10.0 71.0L-10.0 68.2L-10.0 65.3L-10.0 62.7L-10.0 59.8L-10.0 55.6L-10.0 52.8L-10.0 49.1L-10.0 45.9L-10.0 39.2L-10.0 35.5L-10.0 31.2L-10.0 28.2L-10.0 25.3L-10.0 22.2L-10.0 19.5L-10.0 16.1L-10.0 13.3L-10.0 10.1L-10.0 6.7L-10.0 3.8L-10.0 1.0L-10.0 -1.7L-10.0 -4.4L-10.0 -7.6ZM377.2 160.6L375.5 162.6L373.6 164.7L371.3 166.6L369.8 164.3L369.3 167.3L368.0 169.5L366.2 171.4L364.1 173.4L362.9 176.2L362.2 178.8L360.7 181.8L357.9 182.0L359.7 184.5L360.5 182.0L360.1 185.3L358.3 188.3L357.9 190.8L356.3 192.7L355.0 195.1L357.4 196.3L357.4 193.5L358.9 196.6L356.4 196.9L354.7 199.9L351.5 201.4L354.2 200.4L351.0 200.8L347.1 202.3L344.4 204.8L342.3 206.4L339.6 207.5L341.4 209.4L340.1 211.6L337.2 212.4L339.2 210.8L336.7 211.4L333.8 211.7L331.2 211.9L328.6 212.2L327.9 215.9L325.7 217.1L328.2 217.6L326.9 219.9L324.1 218.9L322.1 220.9L321.6 218.3L318.3 220.3L319.4 217.9L316.8 216.4L312.8 215.8L308.4 215.7L305.7 216.0L304.6 213.6L299.9 213.3L297.6 211.6L295.2 210.7L292.0 208.5L288.8 208.0L287.3 205.8L288.3 200.7L287.7 197.8L286.5 195.5L286.4 191.9L286.6 189.4L285.1 183.9L286.9 181.8L285.8 179.5L285.5 177.0L287.5 174.9L289.5 172.9L291.9 171.1L294.9 169.7L297.0 167.7L299.6 165.3L302.5 163.7L304.9 162.4L307.3 160.8L309.3 158.8L311.3 157.0L307.9 158.0L306.3 155.8L308.4 153.8L310.3 152.0L312.9 152.4L315.8 153.5L318.3 154.2L320.8 153.9L321.4 151.3L322.2 148.6L325.0 147.9L327.6 147.6L330.9 150.0L333.8 149.3L336.2 148.3L337.4 150.7L340.3 149.0L343.1 149.0L344.1 145.8L346.8 146.1L349.7 146.4L352.5 146.4L353.6 148.9L352.9 146.4L356.4 146.7L359.0 148.0L361.4 150.2L361.7 147.7L360.1 145.2L363.0 143.7L364.4 141.4L365.7 145.0L368.2 147.2L371.8 148.1L375.9 153.3L376.7 158.1L377.2 160.6Z"/><path class="nb" d="M35.4 52.1L36.4 54.5L37.9 56.9L41.8 60.0L44.5 62.6L46.7 65.1L49.4 67.1L49.1 69.7L52.3 71.0L54.8 74.8L54.9 78.8L55.7 81.7L58.5 81.5L60.6 79.7L61.1 75.2L62.8 78.6L66.8 78.6L67.6 82.7L67.5 85.7L65.2 88.2L63.5 91.0L66.1 90.0L64.7 92.5L64.6 95.1L62.0 97.1L64.5 98.5L65.0 101.3L66.7 103.9L69.2 105.7L70.7 108.2L71.8 110.8L73.6 113.3L75.9 114.4L78.7 114.8L81.5 116.1L84.1 116.3L86.6 115.8L88.3 118.1L91.5 118.7L93.7 120.7L96.4 121.3L97.4 118.8L98.4 116.2L99.9 114.0L105.0 112.3L108.1 111.7L109.9 109.6L112.4 110.2L115.1 110.8L117.3 112.1L120.1 114.6L122.3 116.9L125.1 117.5L126.6 119.9L130.8 121.6L128.5 126.6L125.8 127.3L121.8 129.7L124.3 131.6L129.8 131.4L131.9 133.3L134.1 135.2L132.7 138.1L134.2 140.2L137.5 139.2L142.5 141.0L144.5 144.4L144.2 147.1L142.0 148.6L139.8 150.4L137.0 152.6L139.1 154.1L137.8 156.9L135.2 158.4L132.8 160.1L131.6 163.3L129.0 163.8L125.0 162.6L122.7 160.9L119.0 161.8L116.9 160.2L113.7 160.5L111.1 161.9L108.5 160.8L108.3 164.0L110.4 165.6L111.2 168.2L109.6 170.5L106.7 172.2L104.6 173.9L102.1 175.3L104.0 177.2L106.7 179.0L113.3 180.7L115.4 182.9L118.2 184.3L120.7 185.8L123.0 188.3L126.2 188.9L128.5 191.7L130.9 193.3L133.7 194.9L137.0 196.6L141.3 196.9L143.6 198.7L147.7 199.8L150.4 200.1L152.4 202.4L150.4 204.7L149.5 208.2L149.6 210.9L151.7 212.7L152.1 215.2L154.4 216.9L157.1 218.0L157.9 220.7L160.1 222.0L161.9 219.9L164.3 221.1L165.8 224.7L167.4 227.0L169.2 229.3L169.0 232.5L170.9 235.2L172.7 238.2L174.0 241.1L176.4 242.3L178.7 244.1L181.2 247.4L185.3 252.2L191.7 257.7L194.2 257.3L196.4 258.7L197.5 262.9L199.7 265.3L200.3 267.8L202.7 269.2L205.1 280.7L206.6 283.5L209.1 284.5L209.1 287.1L210.4 290.2L212.7 291.3L214.8 289.2L216.2 286.7L217.8 289.4L218.7 292.3L220.7 294.0L222.3 296.1L225.0 296.2L227.5 297.8L228.1 300.4L230.6 301.9L233.6 304.6L236.7 305.6L239.6 305.0L240.1 307.6L238.0 310.6L235.4 311.8L232.1 313.7L228.8 316.2L231.3 318.9L232.1 321.6L234.7 324.0L237.2 328.1L239.8 327.8L241.9 329.6L244.4 331.4L245.5 334.3L247.7 336.1L248.3 339.8L246.9 341.8L245.4 344.1L243.6 346.0L240.5 346.6L240.5 349.3L244.1 352.2L242.2 355.3L242.2 358.2L241.2 362.2L239.7 364.2L237.6 365.8L234.7 364.1L232.6 365.8L231.4 368.1L229.2 369.9L226.8 371.7L224.2 370.6L222.1 373.4L220.0 375.1L216.7 375.7L214.1 374.1L212.4 371.6L209.0 369.9L207.0 368.2L205.1 365.9L202.6 366.2L201.2 368.5L197.6 370.0L193.6 368.6L192.6 371.2L190.4 373.3L187.7 373.1L184.3 373.5L184.7 376.4L185.0 379.0L187.5 381.0L188.5 383.4L190.3 385.9L188.2 388.2L187.2 391.4L184.5 390.9L181.7 391.3L176.4 387.6L174.8 384.5L171.9 384.0L169.0 382.6L166.6 381.4L164.3 382.7L161.2 383.9L158.7 383.3L156.9 381.6L153.7 377.2L153.2 374.2L155.7 373.7L157.9 372.1L160.7 371.3L162.6 369.7L165.1 366.5L165.2 361.6L165.5 358.5L165.1 355.6L165.9 353.1L166.6 350.6L168.6 348.9L166.3 346.2L164.3 344.3L163.3 341.8L165.5 338.7L167.6 337.2L166.1 335.2L165.5 332.5L168.7 331.0L169.7 328.0L170.8 324.7L170.8 320.7L168.0 318.0L165.5 317.3L162.9 317.1L160.4 312.7L160.1 309.8L162.2 308.2L157.2 306.1L150.3 304.2L147.8 302.3L147.2 298.6L145.7 296.3L142.9 294.2L141.8 291.9L139.9 289.3L137.1 287.5L136.4 285.1L137.0 281.7L136.7 276.1L137.1 273.3L136.3 270.3L136.3 267.0L138.8 261.1L139.1 258.4L139.2 254.0L138.1 251.1L135.9 248.5L132.8 245.7L126.2 242.4L123.8 240.0L122.7 237.7L121.2 235.2L118.7 233.7L117.5 231.4L115.8 227.6L112.9 224.8L110.3 219.4L108.3 216.0L105.8 214.7L103.6 216.1L101.1 215.2L98.6 214.1L96.0 213.9L93.4 212.7L90.3 211.4L87.4 211.1L84.5 210.3L81.1 210.9L78.6 212.8L80.4 215.8L78.3 217.2L75.7 218.0L74.8 220.5L72.6 222.6L72.1 226.5L70.0 228.6L67.5 227.5L63.5 229.1L60.6 231.1L58.5 232.7L56.7 234.7L53.7 234.4L54.4 231.4L52.6 229.2L49.2 229.2L46.6 228.2L44.8 226.4L40.7 224.3L38.2 221.9L36.6 219.6L33.7 219.5L27.1 226.5L23.3 225.5L21.4 228.1L20.4 230.7L16.7 232.2L14.5 233.9L13.7 236.3L10.9 238.2L8.4 238.7L6.6 240.7L1.8 244.3L0.4 246.7L-2.0 249.1L-5.2 248.3L-7.7 246.5L-10.0 245.5L-10.0 241.8L-9.2 239.0L-8.9 236.3L-7.8 233.4L-6.1 231.5L-4.5 229.7L-2.8 227.2L-2.1 223.8L-1.6 220.8L-2.7 218.4L-1.8 215.3L-4.5 213.4L-6.3 211.6L-5.2 208.9L-2.3 206.2L-1.3 203.7L0.8 202.3L0.4 199.5L0.9 196.8L0.9 193.8L2.2 191.2L3.3 188.7L4.5 186.0L1.9 183.4L1.2 179.0L0.4 175.6L-1.0 172.9L-0.3 169.9L2.0 168.2L2.0 165.6L-0.5 164.7L-3.0 165.4L-6.7 163.9L-10.0 163.5L-10.0 166.6L-10.0 163.1L-10.0 160.0L-10.0 157.5L-10.0 154.5L-10.0 150.8L-10.0 148.2L-10.0 145.4L-10.0 141.6L-10.0 138.0L-10.0 133.3L-10.0 135.9L-10.0 133.0L-10.0 129.6L-10.0 126.0L-10.0 123.1L-10.0 120.1L-10.0 117.5L-10.0 114.9L-10.0 111.7L-10.0 109.1L-10.0 106.3L-10.0 101.6L-10.0 96.8L-10.0 93.8L-7.5 91.7L-2.1 87.5L-1.2 91.0L1.1 93.2L0.4 95.7L0.8 98.6L2.3 100.9L6.2 99.4L11.3 98.3L14.4 98.9L16.7 100.4L18.8 102.1L21.4 102.3L22.1 99.7L23.1 97.3L20.6 96.3L20.2 93.0L20.3 89.0L20.6 85.9L22.8 84.4L21.4 82.1L20.4 79.5L21.3 75.7L19.6 73.2L18.2 70.7L15.6 69.3L14.1 65.2L14.1 62.0L12.3 58.8L13.9 56.9L16.1 54.9L17.1 51.8L18.8 48.8L21.4 48.2L23.8 51.7L26.5 50.8L29.7 50.2L33.7 50.7Z"/><path class="nb" d="M243.0 359.8L242.3 363.9L242.2 366.8L240.9 370.0L238.2 370.8L236.8 373.6L236.9 376.3L235.6 382.2L236.2 384.7L236.7 387.9L239.3 388.2L240.1 390.9L240.1 394.4L240.8 397.6L242.7 400.3L245.9 406.6L246.5 412.0L245.1 416.3L240.7 427.2L240.9 429.9L241.6 432.6L243.2 434.9L243.7 438.2L244.7 443.8L244.4 446.7L243.3 452.3L242.2 455.0L239.0 457.8L236.2 455.4L233.6 455.0L231.1 455.8L227.8 458.2L226.0 459.9L222.1 464.1L219.8 465.3L215.5 465.2L212.7 466.9L211.6 469.2L208.8 469.0L205.8 469.1L202.7 469.9L199.7 469.2L201.2 472.5L200.7 475.5L199.8 478.1L201.2 480.8L198.6 480.4L195.5 481.0L193.2 479.0L190.6 478.1L187.0 477.5L184.2 478.1L182.8 480.8L179.1 481.5L177.0 483.0L177.4 485.6L179.1 488.1L179.8 490.8L178.5 495.8L180.3 498.1L183.5 500.4L185.0 502.4L187.0 504.3L189.6 504.6L191.4 508.1L189.3 509.8L190.4 513.5L191.4 517.3L187.4 516.1L184.3 514.5L182.0 512.1L181.0 514.5L178.4 513.2L176.4 509.4L174.1 507.3L171.3 508.6L166.2 510.0L163.2 509.9L159.8 511.6L158.7 514.1L155.8 512.7L150.4 511.6L147.8 511.0L146.7 514.0L148.6 518.1L143.9 522.3L141.4 525.8L139.2 527.3L135.5 527.1L131.7 526.6L129.0 527.3L126.6 530.9L123.8 529.9L121.6 528.5L119.1 528.7L118.2 526.0L114.6 526.0L112.1 525.6L106.7 524.7L104.5 523.3L102.8 521.2L102.4 523.9L100.7 526.2L98.2 526.5L95.9 527.9L93.3 528.0L91.5 526.0L89.4 523.5L90.2 520.4L92.6 518.5L95.5 518.3L95.5 515.6L97.1 513.7L96.4 510.8L94.6 506.8L92.8 504.6L90.8 501.9L88.3 502.5L86.5 504.4L86.1 507.0L85.2 509.7L85.2 512.3L82.7 513.1L80.7 511.2L77.6 512.3L74.6 512.9L72.9 510.6L73.5 507.9L73.0 504.8L73.7 502.1L72.8 499.6L72.2 497.1L74.4 495.4L72.9 493.3L71.9 490.6L74.7 489.8L71.7 487.9L71.4 485.2L68.6 486.5L68.5 483.0L68.3 480.5L70.8 479.6L68.3 479.2L66.7 476.9L65.3 474.8L67.5 478.1L67.5 481.3L67.8 484.3L65.8 482.1L66.4 479.0L64.7 475.7L63.2 473.4L61.4 469.9L60.4 466.5L57.7 462.5L58.2 454.3L59.9 451.9L58.4 449.4L56.3 446.6L53.4 443.6L50.1 442.0L49.1 439.2L50.2 436.9L49.4 434.2L48.8 431.3L49.2 428.8L48.0 425.9L46.2 423.9L43.4 417.1L43.3 414.2L43.4 408.7L43.6 405.4L48.1 405.5L51.2 405.1L53.8 403.8L51.6 402.0L56.7 398.3L58.0 395.9L59.8 391.8L61.4 389.6L63.6 387.8L64.5 385.1L65.8 382.7L66.7 379.9L69.4 378.9L72.5 376.2L76.8 374.9L79.7 373.9L82.3 374.0L84.9 372.8L88.3 372.0L91.0 371.4L93.4 370.5L95.2 372.5L99.1 373.3L101.8 373.7L104.6 373.4L107.6 374.2L110.6 373.2L113.3 373.2L116.1 372.7L120.1 372.9L124.5 373.5L127.3 373.2L129.8 372.8L132.7 371.6L135.6 371.6L138.0 370.5L140.6 371.4L144.3 372.6L145.2 375.6L146.4 378.3L150.0 378.8L152.1 374.8L153.7 377.2L156.0 380.7L158.7 383.3L161.2 383.9L164.3 382.7L166.6 381.4L169.0 382.6L171.9 384.0L174.8 384.5L176.4 387.6L179.6 390.5L182.7 391.2L186.4 391.4L187.7 388.8L190.0 386.6L189.0 384.0L187.5 381.0L185.0 379.0L184.7 376.4L183.4 374.3L186.0 374.1L189.2 373.2L191.8 372.8L193.1 369.1L196.0 370.1L199.7 369.7L201.6 368.1L202.7 365.4L205.4 367.1L207.9 369.3L211.7 370.8L214.1 374.1L216.2 375.7L218.7 374.6L221.6 373.6L224.1 370.8L226.8 371.7L229.2 369.9L231.1 368.3L232.6 365.8L234.7 364.1L236.9 365.7L239.6 365.6L240.4 362.7L242.5 360.3Z"/><path class="nb" d="M65.8 482.1L65.7 479.3L62.5 473.7L60.6 471.9L60.6 469.3L59.6 466.4L55.0 461.9L54.1 459.4L52.7 464.4L50.2 462.7L44.8 460.6L42.2 460.4L40.9 457.1L43.7 455.7L43.7 453.0L42.7 455.3L41.8 452.5L39.5 450.9L40.9 453.7L37.2 452.5L35.0 450.4L33.7 447.6L31.7 445.3L33.0 447.6L30.4 446.4L29.0 444.0L28.7 446.8L26.7 444.6L25.0 441.8L22.4 440.0L19.3 439.7L17.7 441.6L14.6 441.9L11.9 442.4L9.4 443.0L4.8 442.3L1.9 441.6L-4.3 440.8L-8.1 442.0L-10.0 440.2L-10.0 437.1L-10.0 434.4L-10.0 431.7L-10.0 429.0L-10.0 426.3L-10.0 423.0L-9.7 420.0L-10.0 417.4L-10.0 414.5L-8.2 412.2L-8.5 409.7L-10.0 407.6L-10.0 404.7L-10.0 407.2L-10.0 410.3L-10.0 413.3L-10.0 416.3L-10.0 419.3L-10.0 421.9L-10.0 425.7L-10.0 428.8L-10.0 433.5L-10.0 436.4L-10.0 439.6L-10.0 442.6L-10.0 445.6L-10.0 448.9L-10.0 452.7L-10.0 456.8L-10.0 459.6L-10.0 463.3L-10.0 469.2L-10.0 472.9L-10.0 475.4L-10.0 478.4L-10.0 484.9L-10.0 487.8L-10.0 490.4L-10.0 493.0L-10.0 496.9L-10.0 500.2L-10.0 503.4L-10.0 506.4L-10.0 509.3L-10.0 511.9L-10.0 515.2L-10.0 519.6L-10.0 522.1L-10.0 525.5L-10.0 528.2L-10.0 531.0L-10.0 533.7L-10.0 536.5L-10.0 539.4L-10.0 542.9L-10.0 545.7L-10.0 548.4L-10.0 553.3L-10.0 556.4L-10.0 558.9L-10.0 562.2L-10.0 565.6L-10.0 569.3L-10.0 572.4L-10.0 575.2L-10.0 578.7L-10.0 575.9L-10.0 578.9L-10.0 581.7L-10.0 584.5L-10.0 587.5L-10.0 592.8L-10.0 602.5L-10.0 606.2L-10.0 609.2L-10.0 611.9L-10.0 609.3L-10.0 615.3L-10.0 623.2L-10.0 630.5L-10.0 635.0L-10.0 648.9L-10.0 654.6L-10.0 658.0L-10.0 655.0L-10.0 649.6L-10.0 646.9L-10.0 644.1L-10.0 639.7L-10.0 636.5L-10.0 639.2L-10.0 643.4L-10.0 646.7L-10.0 652.3L-10.0 655.5L-10.0 658.2L-10.0 661.1L-10.0 668.7L-7.8 670.0L-5.0 670.0L-0.3 670.0L3.0 670.0L5.8 670.0L2.4 670.0L5.6 670.0L8.4 670.0L11.0 670.0L13.8 670.0L17.9 670.0L22.0 670.0L27.2 670.0L31.5 670.0L28.2 670.0L25.6 670.0L22.5 670.0L19.7 670.0L16.6 670.0L13.8 670.0L7.4 670.0L4.5 670.0L1.9 670.0L-2.0 670.0L-4.6 670.0L-7.4 670.0L-4.6 670.0L-7.4 670.0L-10.0 670.0L-10.0 667.5L-10.0 664.7L-10.0 661.2L-10.0 658.2L-10.0 654.3L-10.0 651.1L-10.0 648.4L-10.0 645.0L-10.0 642.3L-10.0 639.2L-10.0 636.5L-10.0 633.6L-10.0 631.0L-10.0 628.3L-10.0 625.6L-10.0 622.6L-10.0 619.4L-10.0 616.1L-10.0 613.4L-10.0 616.2L-10.0 619.4L-10.0 622.1L-10.0 619.5L-10.0 616.7L-10.0 611.7L-10.0 606.6L-10.0 603.8L-10.0 601.1L-10.0 598.4L-10.0 594.9L-10.0 591.0L-10.0 588.2L-10.0 585.5L-10.0 582.3L-10.0 579.6L-10.0 576.8L-10.0 572.8L-10.0 567.2L-10.0 564.3L-10.0 561.5L-10.0 558.7L-10.0 556.1L-10.0 553.1L-10.0 550.3L-10.0 545.2L-10.0 541.5L-10.0 538.9L-10.0 536.3L-10.0 531.6L-10.0 528.0L-10.0 524.7L-10.0 521.4L-10.0 518.1L-10.0 515.4L-10.0 512.2L-10.0 509.6L-10.0 506.7L-10.0 504.0L-10.0 500.1L-10.0 496.8L-10.0 492.9L-10.0 490.0L-10.0 487.3L-10.0 484.1L-10.0 479.0L-10.0 475.4L-10.0 472.2L-10.0 469.0L-10.0 465.9L-10.0 463.1L-10.0 460.5L-10.0 457.7L-10.0 454.9L-10.0 451.8L-10.0 449.0L-10.0 445.9L-10.0 443.4L-10.0 440.3L-10.0 437.1L-10.0 434.2L-10.0 431.5L-10.0 428.2L-10.0 425.7L-10.0 422.8L-10.0 420.2L-10.0 416.5L-10.0 413.7L-10.0 410.9L-10.0 404.7L-10.0 401.4L-10.0 398.7L-10.0 394.9L-10.0 392.2L-10.0 389.1L-10.0 386.2L-10.0 383.5L-10.0 380.0L-10.0 377.2L-10.0 372.9L-10.0 367.3L-10.0 364.5L-10.0 359.1L-10.0 355.8L-10.0 352.6L-10.0 348.9L-10.0 346.0L-10.0 343.0L-10.0 340.3L-10.0 336.4L-10.0 333.7L-10.0 329.9L-10.0 323.9L-10.0 321.0L-10.0 314.6L-10.0 311.2L-10.0 308.1L-10.0 305.6L-10.0 302.9L-10.0 299.6L-10.0 297.0L-10.0 293.5L-10.0 290.4L-10.0 293.0L-10.0 296.6L-10.0 293.1L-10.0 290.2L-10.0 286.3L-10.0 283.2L-10.0 280.4L-10.0 277.6L-10.0 275.0L-10.0 272.3L-10.0 269.4L-10.0 266.8L-10.0 264.0L-10.0 260.0L-10.0 255.9L-10.0 253.1L-10.0 250.1L-10.0 247.6L-10.0 240.8L-10.0 238.0L-10.0 235.3L-10.0 232.8L-10.0 229.6L-10.0 226.5L-10.0 223.9L-10.0 219.2L-10.0 216.4L-10.0 213.6L-10.0 210.3L-10.0 207.2L-10.0 203.1L-10.0 199.9L-10.0 196.8L-10.0 193.9L-10.0 191.0L-10.0 187.2L-10.0 184.7L-10.0 180.4L-10.0 177.7L-10.0 174.5L-10.0 170.4L-10.0 167.8L-10.0 165.2L-10.0 162.5L-10.0 159.7L-10.0 156.4L-10.0 159.1L-10.0 155.8L-10.0 152.7L-10.0 149.5L-10.0 146.4L-10.0 143.3L-10.0 140.2L-10.0 135.8L-10.0 133.0L-10.0 135.6L-10.0 131.9L-10.0 135.3L-10.0 138.1L-10.0 135.5L-10.0 132.3L-10.0 138.0L-10.0 140.6L-10.0 143.7L-10.0 148.2L-10.0 150.8L-10.0 153.4L-10.0 156.2L-10.0 159.0L-10.0 161.9L-10.0 164.6L-10.0 167.4L-10.0 164.7L-7.7 163.6L-5.0 164.9L-1.8 165.3L0.9 164.6L2.2 167.1L0.6 169.3L-1.0 172.9L0.4 175.1L1.2 179.0L1.1 182.2L3.6 184.8L4.8 187.2L3.0 189.3L1.2 192.3L1.1 196.2L0.2 198.8L1.5 201.1L-0.2 203.3L-1.7 205.7L-4.8 207.6L-6.3 210.1L-4.9 213.1L-2.1 214.5L-2.8 218.2L-1.6 220.8L-2.1 223.8L-1.6 226.4L-4.1 228.6L-6.1 231.5L-7.8 233.4L-8.9 235.9L-9.2 239.0L-10.0 241.8L-10.0 245.1L-7.7 246.5L-5.2 248.3L-2.7 249.6L-0.9 247.4L1.1 245.3L6.0 240.9L7.7 238.6L10.3 239.2L13.0 236.8L14.5 234.4L16.7 232.2L20.3 231.5L21.4 228.1L22.1 225.7L24.9 225.9L32.9 220.3L36.6 219.6L38.2 221.9L40.7 224.3L42.6 225.9L45.6 227.4L47.8 228.9L52.6 229.2L54.4 231.4L53.7 234.0L56.2 235.5L57.1 233.0L60.6 231.1L62.8 229.9L66.8 227.6L69.3 228.4L71.5 227.2L71.7 224.3L73.5 222.3L75.0 219.1L77.5 217.5L80.2 216.8L78.7 214.7L79.3 212.0L84.1 210.3L86.6 211.0L89.4 211.3L92.6 212.0L96.0 213.9L98.6 214.1L101.1 215.2L103.6 216.1L105.8 214.7L108.3 216.0L110.3 219.4L111.9 223.4L115.3 227.0L117.5 231.4L118.7 233.7L121.2 235.2L122.7 237.7L123.8 240.0L126.2 242.4L132.1 245.5L134.6 246.9L136.4 249.6L139.1 253.1L139.1 256.0L138.9 260.3L136.3 267.0L136.3 270.3L137.0 272.8L136.7 275.6L137.5 279.4L136.6 283.4L136.4 286.1L137.8 288.1L140.6 289.8L142.1 293.1L144.3 295.0L146.4 296.7L147.2 300.4L148.3 303.1L155.3 306.0L161.6 307.3L160.1 309.8L160.4 312.7L161.9 316.0L165.5 317.3L168.0 318.0L170.8 320.7L170.8 324.7L169.8 327.1L169.5 329.7L167.3 331.9L164.8 333.0L166.8 335.2L166.6 337.9L164.0 340.4L163.2 343.5L165.2 345.4L167.4 347.8L166.6 350.6L165.9 353.1L165.1 355.6L165.4 358.2L165.2 361.6L165.8 364.3L164.0 368.2L162.3 370.6L160.0 371.7L157.5 372.0L153.7 374.2L151.3 376.8L147.9 379.5L145.2 376.0L145.3 373.3L142.8 372.2L139.9 371.6L137.3 370.4L135.1 371.7L131.7 371.2L129.2 373.3L126.6 373.1L120.1 372.9L117.2 372.0L114.7 372.4L112.1 372.9L109.4 373.7L106.7 373.3L104.2 373.7L101.4 373.5L96.7 372.7L95.1 370.8L92.1 371.8L89.7 371.2L86.7 373.1L83.8 373.5L79.7 373.9L76.8 374.9L73.7 375.5L69.9 378.5L67.4 379.7L65.8 381.9L64.7 384.5L64.2 387.2L61.4 389.6L59.8 391.8L58.8 394.7L57.8 397.2L52.8 400.3L52.4 402.9L50.5 405.3L45.1 405.3L42.9 406.8L43.6 411.8L43.4 417.0L45.5 422.6L48.0 425.9L49.6 428.2L48.7 430.9L49.4 434.2L50.2 436.9L49.1 439.2L49.8 441.8L52.3 442.8L56.3 446.6L57.8 448.8L60.0 450.5L58.9 452.8L57.4 460.9L59.6 465.6L61.0 467.9L63.2 473.4L64.7 475.7L66.4 479.0L65.8 482.1Z"/>
+          <path class="vn" d="M243.0 359.8L242.2 358.2L242.1 356.4L243.9 353.7L244.1 352.2L241.8 350.4L240.5 349.3L240.1 347.5L241.2 346.6L243.0 346.0L244.7 346.2L245.4 344.5L246.3 343.2L246.9 341.8L247.2 340.2L248.6 337.9L247.7 336.1L246.1 334.8L245.2 333.5L245.2 332.0L242.7 331.6L241.8 330.5L241.8 328.7L240.4 328.1L238.9 327.7L237.6 328.5L235.1 324.4L233.2 323.3L232.2 322.2L231.8 319.9L229.2 317.7L228.8 316.2L229.7 314.1L231.4 313.8L234.7 312.1L236.9 311.5L238.0 310.6L239.1 308.7L240.1 307.6L239.7 305.8L236.7 305.6L234.4 305.4L232.2 302.8L230.6 301.9L228.9 301.4L227.9 300.0L227.5 297.8L226.4 296.7L225.0 296.2L223.5 296.1L221.7 296.0L221.2 294.6L219.8 293.4L218.7 292.3L217.4 291.4L217.8 289.4L217.8 287.8L216.2 286.7L215.3 288.1L213.8 289.9L212.7 291.3L211.2 290.9L209.8 289.2L209.2 287.6L209.4 285.0L208.1 284.2L206.6 283.5L205.7 282.5L205.1 280.7L205.1 270.0L204.7 268.4L203.7 269.4L202.1 269.0L200.7 268.4L199.4 266.1L199.3 264.6L197.5 262.9L196.4 260.9L196.5 259.3L195.7 257.8L195.0 256.4L193.5 257.9L191.7 257.7L185.3 252.2L182.0 248.2L178.7 244.1L176.4 242.3L174.4 241.4L173.1 238.9L171.9 237.1L170.9 235.2L169.4 233.8L169.0 232.5L169.4 229.5L167.9 227.7L167.3 226.1L166.2 225.0L165.2 223.3L164.3 221.1L162.7 220.0L161.2 220.2L160.7 221.8L159.1 221.5L157.9 220.7L157.6 218.8L156.0 218.1L154.6 217.2L152.5 215.7L152.1 214.4L151.7 212.7L150.6 211.8L149.2 209.8L149.5 208.2L150.0 205.9L151.0 204.1L152.6 203.4L151.5 201.9L150.4 200.1L148.6 200.1L145.7 198.7L143.6 198.7L142.3 197.2L139.1 197.0L137.0 196.6L135.5 196.3L134.2 195.2L132.8 194.8L130.9 193.3L129.1 192.2L127.3 189.7L126.2 188.9L124.3 188.8L121.9 186.6L120.7 185.8L119.3 185.3L118.2 184.3L115.8 184.0L115.3 182.1L113.3 180.7L109.0 178.8L107.5 178.7L105.4 178.2L104.2 177.4L102.9 176.2L104.0 174.3L105.4 172.7L107.5 171.7L109.0 171.3L109.7 169.5L111.1 168.7L110.7 167.0L110.0 165.3L108.8 164.5L107.5 161.9L108.5 160.8L110.3 161.7L111.8 161.8L112.8 160.7L115.4 160.1L116.9 160.2L118.3 160.6L120.8 160.7L122.3 160.6L123.6 162.0L125.0 162.6L127.2 163.9L128.7 163.9L129.9 163.3L131.3 163.7L132.8 160.1L134.2 158.6L136.0 158.2L137.8 156.9L139.1 155.1L138.1 153.6L136.7 153.3L137.7 151.6L139.8 150.4L141.0 149.2L143.1 148.7L144.3 147.7L144.1 145.9L144.5 144.4L142.9 143.4L142.4 141.7L139.2 139.1L137.5 139.2L135.9 139.8L134.2 140.2L133.0 139.5L132.8 137.3L134.1 136.0L133.8 134.4L131.9 133.3L130.3 131.7L124.3 131.6L122.7 131.2L121.5 130.4L124.0 128.2L124.8 126.6L126.7 127.5L128.5 126.6L131.0 123.2L130.8 121.6L128.5 120.8L126.6 119.9L125.6 118.0L124.3 117.4L122.6 117.1L121.8 115.8L120.1 114.6L119.0 112.8L117.6 112.1L116.2 112.3L115.4 111.0L114.0 110.4L112.4 110.2L109.9 109.6L108.1 111.7L106.7 111.9L105.0 112.3L102.2 113.2L101.0 114.1L99.3 114.2L98.4 116.2L98.2 117.6L97.4 118.8L96.2 119.6L96.7 121.1L95.2 121.7L93.7 120.7L92.1 119.1L89.1 118.2L87.7 117.7L86.6 115.8L85.1 115.8L83.1 116.5L81.5 116.1L79.3 115.0L77.6 115.0L76.2 114.5L74.8 114.2L73.6 113.3L72.5 111.9L70.7 108.2L69.7 106.4L68.2 105.3L67.0 104.6L66.4 102.4L65.2 101.4L65.0 99.8L64.0 98.2L62.7 97.9L63.9 96.3L64.6 93.3L66.0 90.5L64.0 90.7L65.2 88.2L67.5 85.7L67.8 83.6L67.8 79.9L67.2 78.5L64.0 79.8L62.8 78.6L62.8 76.9L62.5 75.1L61.0 78.4L59.6 80.8L58.1 81.6L56.0 81.7L55.0 79.8L55.2 76.5L54.8 74.8L53.5 71.9L52.3 71.0L50.6 70.5L49.1 69.7L48.7 68.2L48.7 66.6L47.0 65.5L46.3 64.0L44.5 62.6L41.8 60.0L39.4 58.8L38.4 57.4L37.2 56.4L36.8 54.9L35.8 53.0L35.7 51.5L37.1 51.0L38.6 51.5L39.8 50.3L40.5 48.2L45.2 43.4L44.7 42.0L45.9 40.8L46.7 39.6L47.2 38.2L48.7 37.2L50.6 38.2L51.0 39.7L52.6 40.0L54.1 40.1L56.6 40.9L59.6 43.0L62.0 43.6L63.2 44.6L63.8 46.0L65.2 48.5L67.5 49.6L68.8 50.5L70.3 50.8L71.0 49.1L72.1 48.1L74.7 46.5L74.1 44.9L75.7 43.0L78.0 41.8L79.5 39.1L81.1 36.5L83.0 37.0L84.1 38.2L84.7 39.7L86.5 43.2L87.4 44.3L89.0 44.5L90.2 42.8L90.2 40.3L91.0 39.0L91.9 37.3L94.1 36.0L97.1 39.3L99.8 41.6L101.1 43.6L102.5 45.0L103.9 45.7L104.7 46.9L106.1 47.7L107.2 46.4L107.2 44.6L107.9 42.8L108.2 40.3L109.4 38.2L110.4 36.7L112.6 36.1L115.8 35.0L116.5 36.7L116.8 38.3L119.4 39.8L120.8 40.5L125.0 38.2L128.1 35.4L129.7 35.3L131.0 35.1L133.1 35.5L134.6 35.3L137.0 32.6L139.3 31.0L138.4 24.6L139.8 24.0L141.0 22.6L141.6 21.2L143.1 21.8L145.4 20.4L146.7 19.7L147.9 18.9L151.5 17.8L153.2 17.8L154.7 16.8L155.1 15.2L156.9 13.7L158.4 13.9L158.9 15.3L160.0 16.4L161.5 17.0L163.2 18.2L164.0 19.7L166.1 21.3L166.8 24.1L167.3 25.6L170.6 25.9L172.7 26.2L173.8 27.2L175.2 27.8L176.0 29.0L178.2 31.3L179.8 30.9L181.3 31.0L183.1 30.7L184.2 29.2L187.5 28.8L189.6 29.0L191.1 29.4L192.4 30.1L193.2 31.5L193.3 33.0L195.1 34.0L196.7 33.8L202.2 32.4L203.3 31.0L206.3 31.8L207.6 33.4L209.1 33.8L210.5 33.5L212.0 34.9L213.3 36.1L214.9 36.1L213.7 37.8L212.8 40.2L211.7 42.2L210.8 44.8L209.4 45.3L208.4 44.1L206.8 44.2L205.5 49.1L204.8 50.5L205.1 51.9L205.2 53.6L206.8 55.0L208.3 55.1L210.1 59.0L209.1 60.4L209.8 61.8L209.9 63.5L210.5 65.3L209.5 68.2L209.9 69.5L212.3 67.7L213.7 68.4L215.3 69.1L216.9 69.0L218.2 69.7L219.1 70.9L220.6 71.2L222.7 70.6L223.8 71.5L223.5 73.0L222.5 74.2L223.1 75.6L225.6 76.2L229.6 79.4L231.1 79.8L233.5 79.2L234.7 80.5L235.7 83.4L237.8 83.2L238.7 82.2L240.5 82.8L240.7 84.2L242.3 84.7L243.4 83.6L245.8 83.8L248.8 83.3L251.1 81.9L253.0 81.7L255.1 82.4L255.9 84.0L257.4 85.2L258.8 86.6L261.2 88.6L259.5 89.8L258.7 88.4L258.0 86.9L256.5 87.5L255.2 88.5L254.8 86.9L254.2 88.3L253.1 87.0L251.9 87.7L253.3 88.2L253.3 89.6L251.7 91.5L250.4 92.1L249.0 91.5L248.6 92.9L247.3 93.8L246.2 95.6L244.7 96.1L243.9 94.9L242.5 96.1L240.8 95.7L239.0 94.8L240.1 96.3L238.0 96.8L237.1 98.1L236.8 99.9L237.8 102.4L236.9 103.9L236.8 105.3L237.3 106.7L235.8 107.7L234.3 107.8L232.5 107.9L231.1 108.3L230.4 109.9L229.2 110.7L226.3 110.0L226.7 108.0L228.8 106.7L227.2 106.7L226.3 107.7L225.3 106.7L224.8 108.0L224.1 106.7L224.5 108.0L223.0 107.2L223.8 108.6L223.1 110.0L221.6 110.0L219.9 109.4L218.5 108.3L218.9 110.0L220.2 110.8L218.8 111.3L218.0 112.7L216.6 111.1L214.6 110.3L216.0 109.2L215.3 107.9L213.8 107.4L211.9 107.2L209.9 107.0L210.4 108.8L211.9 110.0L213.3 110.3L213.7 111.7L212.2 111.9L212.6 113.6L213.5 115.0L212.2 115.7L213.0 117.2L214.2 118.4L215.6 120.9L214.4 120.0L212.7 120.2L210.5 120.0L211.6 121.1L210.8 122.3L209.1 122.9L207.6 121.8L208.1 123.1L207.9 124.6L204.5 126.4L206.9 126.1L206.6 127.6L205.5 129.3L204.5 130.5L206.2 129.8L207.3 131.8L206.6 133.3L207.0 135.1L207.3 137.0L205.7 136.0L204.0 135.6L205.7 136.3L206.6 138.1L205.4 138.9L204.0 139.4L202.2 139.6L199.7 139.8L198.5 140.6L197.6 142.0L196.4 143.7L194.6 145.6L192.8 147.1L191.4 148.3L189.3 149.0L188.8 147.5L187.9 149.1L186.1 148.5L183.2 150.6L182.7 152.0L182.1 154.1L182.0 155.8L180.5 156.5L181.8 156.8L180.9 158.3L179.5 159.1L178.1 161.6L177.8 164.1L177.6 166.5L177.1 169.5L177.4 171.1L175.8 171.6L176.6 173.8L177.3 175.1L177.3 176.8L175.8 178.5L174.2 181.2L174.2 182.6L173.5 184.1L171.9 184.4L170.9 185.4L170.1 186.8L169.7 188.6L170.4 191.1L171.9 193.0L173.7 193.8L172.0 193.8L172.8 195.0L174.6 196.0L174.6 198.8L175.2 200.1L175.6 197.8L176.4 199.3L176.7 201.0L177.8 204.3L179.9 207.6L181.3 209.1L182.7 209.9L183.4 211.4L184.6 212.6L186.3 214.7L188.3 216.4L188.5 218.0L190.0 217.5L191.5 217.6L193.6 219.2L195.0 219.9L196.1 221.2L197.3 222.2L198.2 223.4L196.5 223.6L197.5 224.9L198.9 223.8L200.8 222.8L200.8 224.3L201.5 225.9L204.5 229.7L203.2 231.4L202.1 232.7L201.6 234.1L202.3 236.0L202.6 238.1L203.6 239.2L201.8 239.4L200.9 238.2L199.0 237.4L196.4 237.2L197.9 238.1L201.1 238.8L199.3 239.2L200.3 240.7L201.9 239.7L204.0 240.7L205.2 242.9L206.3 244.1L208.1 247.2L209.0 249.2L210.1 250.1L214.0 254.6L221.0 259.8L223.4 261.5L227.2 264.4L227.7 267.3L230.2 270.7L230.0 272.1L228.5 273.0L230.3 273.0L231.4 271.7L232.6 272.8L237.6 277.1L238.9 278.0L242.2 280.4L246.2 284.2L247.5 284.8L245.9 284.4L241.2 281.9L243.0 283.8L244.4 284.2L245.8 284.5L247.5 285.7L248.0 287.1L249.4 287.4L251.9 289.1L253.1 290.9L254.7 292.5L254.1 295.1L255.6 296.3L257.3 296.7L258.9 295.8L258.8 294.3L261.2 295.0L262.7 294.3L263.5 295.8L265.0 298.6L263.5 297.5L264.2 298.8L266.3 299.1L268.4 299.4L267.4 301.2L267.0 303.2L268.5 304.4L270.0 304.4L270.6 305.8L269.6 307.5L271.1 307.1L271.0 305.5L271.0 303.7L270.6 302.1L272.0 301.9L273.6 302.6L273.5 304.0L271.7 303.7L271.4 305.2L271.7 306.7L272.2 308.1L273.2 309.8L275.3 311.4L276.7 312.7L277.8 315.8L279.0 318.1L285.2 326.9L287.7 327.3L287.2 328.7L285.7 328.5L286.5 330.4L288.0 328.4L288.6 330.2L289.7 331.3L290.9 332.3L291.2 333.9L293.0 334.1L291.8 333.1L292.7 331.7L293.7 333.0L295.2 334.2L295.3 336.0L296.6 337.5L298.1 338.0L296.9 339.1L296.2 341.2L294.8 341.6L295.9 342.7L296.9 345.7L297.7 348.8L300.2 354.5L301.3 356.6L303.0 358.8L303.5 361.3L303.1 363.7L302.4 365.2L304.1 368.5L304.9 369.9L304.9 372.1L305.7 374.5L306.8 375.8L307.7 378.6L307.8 380.5L309.1 382.7L307.9 381.7L306.6 381.1L307.0 382.6L308.2 383.2L309.6 386.7L310.2 391.2L311.5 392.6L311.4 396.1L311.5 397.6L310.2 397.4L310.4 395.0L309.9 393.0L308.8 394.7L309.2 396.5L308.6 398.2L309.1 400.0L309.1 401.4L309.5 403.1L310.3 404.3L311.5 405.3L311.3 406.8L310.0 404.9L308.6 402.7L309.2 404.7L310.2 405.8L311.0 407.6L312.0 409.1L312.8 410.3L311.7 411.8L310.4 410.7L311.4 409.5L310.0 408.4L308.8 409.5L309.3 410.9L308.8 412.3L310.2 413.5L311.7 413.9L311.3 415.4L309.9 416.1L310.4 417.5L311.7 416.6L312.2 418.0L312.0 420.1L311.5 422.0L312.4 423.7L313.3 425.3L314.2 426.7L315.1 427.9L316.0 429.1L317.5 431.1L317.9 432.8L316.7 434.2L315.1 434.6L314.3 436.4L316.1 440.3L317.9 441.6L317.2 443.0L317.4 444.6L316.0 443.8L316.3 442.1L315.4 440.5L314.6 441.7L313.1 441.6L313.9 440.4L314.7 438.9L313.9 437.5L311.5 438.0L310.3 439.5L308.9 440.5L307.8 442.1L307.9 444.1L307.8 445.6L309.1 444.9L308.8 446.4L311.4 448.9L311.3 450.5L312.8 451.6L312.8 453.1L311.4 454.0L309.9 452.3L308.2 450.4L307.0 449.6L305.7 450.4L306.7 452.0L307.9 453.5L308.4 455.1L307.8 457.5L307.9 459.1L307.0 460.2L308.1 461.3L308.5 462.8L308.1 465.2L309.5 468.1L311.0 469.3L310.2 470.9L310.7 472.6L309.1 472.6L308.5 468.8L308.1 467.3L307.4 465.0L307.1 463.3L307.0 464.8L307.0 466.3L308.1 467.7L307.5 470.0L305.9 472.1L304.8 473.5L306.1 475.0L307.0 473.9L307.8 475.6L309.2 478.6L307.9 480.2L307.1 481.5L306.1 483.3L305.2 485.2L303.8 484.8L302.0 484.2L301.7 482.7L301.4 484.5L301.4 486.3L301.0 489.0L300.6 491.7L300.7 493.3L299.2 495.0L297.3 495.6L295.6 494.8L293.7 494.8L291.8 496.0L290.6 497.7L290.1 499.7L289.0 500.8L287.2 500.4L285.5 500.7L283.7 500.8L281.9 501.9L280.7 503.1L280.0 505.4L278.6 506.0L276.9 506.9L275.4 507.6L274.9 509.4L273.6 510.2L272.8 511.5L271.4 510.0L266.7 510.9L265.0 511.9L263.9 513.3L263.1 515.4L262.8 517.1L261.4 520.0L259.1 519.3L257.6 519.2L254.7 520.3L253.1 521.7L251.2 522.5L248.6 523.9L246.9 524.3L245.5 525.1L244.0 526.6L242.6 527.9L240.3 529.1L237.8 529.5L236.2 530.0L234.4 531.4L233.5 532.9L231.4 531.9L231.1 530.3L229.7 528.9L228.2 529.3L227.0 528.4L225.6 528.7L224.2 529.0L222.7 528.7L223.6 527.6L224.2 523.7L223.9 521.8L222.4 520.0L223.2 521.4L223.1 523.3L223.9 524.5L223.8 526.0L222.7 525.0L223.0 523.0L222.4 525.3L223.5 527.1L222.0 529.0L221.4 527.5L220.6 526.0L220.9 523.9L218.8 522.2L217.1 522.6L215.9 521.9L214.8 520.8L213.3 521.0L213.8 522.7L214.1 524.3L213.3 525.6L212.7 527.1L211.0 527.9L209.8 527.1L209.4 528.5L208.4 529.9L207.2 528.9L207.2 530.4L208.8 530.2L209.8 529.0L210.4 530.7L212.0 529.3L213.4 529.9L214.6 531.7L215.2 535.7L214.4 537.0L211.6 536.4L207.6 536.4L204.8 535.9L203.3 535.9L201.9 535.4L203.0 536.8L212.3 540.0L213.5 540.9L215.1 541.5L215.2 543.0L212.8 545.8L211.6 544.7L210.6 546.0L210.9 547.5L209.7 548.6L207.9 549.0L206.2 547.9L203.7 546.6L202.6 545.6L201.6 544.4L198.5 539.1L197.3 538.0L195.8 537.5L197.6 538.9L198.3 541.0L202.3 546.6L206.2 548.9L208.1 550.4L210.4 551.6L211.2 552.9L210.2 554.3L210.2 552.6L209.8 554.1L208.0 555.3L206.2 554.3L204.0 551.8L199.7 549.0L190.1 538.9L191.0 540.8L191.5 542.7L192.8 544.0L194.0 544.9L195.4 546.0L196.4 547.3L198.6 549.6L199.6 550.7L202.9 553.5L203.9 554.6L204.5 556.0L204.8 557.5L206.2 558.1L206.9 560.0L206.8 562.0L206.2 563.5L204.5 565.5L203.2 566.1L201.5 566.4L199.8 566.3L197.5 564.6L194.2 562.8L187.1 555.8L183.4 551.2L182.0 549.8L180.9 548.9L179.5 548.6L177.6 547.6L178.4 548.8L180.7 551.4L187.4 558.1L187.8 559.5L192.1 566.4L192.6 569.2L191.1 571.3L192.1 572.6L190.6 573.7L185.3 575.4L179.5 577.8L175.3 579.5L166.9 582.8L164.1 585.5L162.7 586.9L161.8 588.0L159.0 594.4L158.2 595.5L156.1 597.6L154.4 597.8L152.1 599.8L151.0 601.6L150.0 602.6L147.5 603.4L140.6 605.4L139.2 604.9L136.6 604.4L135.3 603.4L136.9 603.4L138.8 602.1L139.9 601.1L142.7 600.6L144.5 599.7L142.5 600.0L140.5 599.5L141.6 598.6L143.4 598.1L142.9 596.3L140.6 596.8L139.1 597.2L137.4 595.3L137.8 593.8L138.2 592.4L138.9 590.5L138.8 589.0L138.7 586.1L138.8 582.7L139.2 580.3L139.3 574.4L139.5 572.0L139.6 567.4L139.8 565.8L140.6 558.5L141.1 556.3L142.0 553.9L143.8 554.0L145.2 553.1L148.2 550.7L149.6 551.2L150.4 553.7L150.3 551.6L150.3 549.9L149.5 548.1L147.8 545.8L146.3 544.3L144.7 543.7L143.2 544.1L141.0 543.3L140.2 542.1L139.3 540.8L137.4 538.9L134.9 539.1L133.8 540.0L133.0 541.3L131.3 542.1L131.0 540.6L130.5 538.5L129.9 537.0L128.3 536.7L127.9 534.8L126.9 533.2L128.0 532.0L126.3 532.7L125.2 531.7L126.6 530.9L128.3 528.5L129.5 526.8L131.7 526.6L134.6 527.0L137.4 527.4L139.2 527.3L141.4 525.8L143.1 523.3L147.8 520.4L148.6 518.1L147.2 515.6L146.7 514.0L146.8 512.0L147.8 511.0L149.2 510.1L149.9 511.4L154.2 512.3L155.8 512.7L157.8 514.2L159.8 511.6L161.4 509.8L163.2 509.9L166.2 510.0L169.8 509.2L171.3 508.6L173.0 507.6L175.1 507.4L176.4 509.4L177.7 511.2L178.4 513.2L179.2 514.4L180.7 514.9L181.6 513.7L182.0 512.1L183.2 513.2L184.3 514.5L186.3 515.8L189.5 516.4L191.4 517.3L190.4 513.5L189.5 511.6L189.3 509.9L191.1 509.2L190.7 505.8L189.6 504.6L187.9 505.8L187.0 504.3L185.6 503.1L184.2 500.9L181.6 499.9L180.3 498.1L179.1 496.8L179.2 492.8L179.6 491.5L179.1 488.1L179.1 486.6L177.4 485.6L176.4 484.5L177.0 483.0L178.4 481.7L180.9 482.2L182.5 481.7L183.9 479.7L184.2 478.1L187.0 477.5L188.9 478.1L190.6 478.1L193.2 479.0L194.7 480.6L197.8 480.4L200.0 481.3L200.9 480.0L199.8 478.1L200.4 476.5L200.7 474.8L201.5 473.4L200.1 470.3L200.7 469.0L202.1 469.6L204.0 469.1L205.8 469.1L209.1 469.6L210.8 469.4L212.3 468.2L213.4 465.9L214.9 465.3L218.4 465.5L221.2 464.8L224.8 461.4L226.0 459.9L227.5 458.7L228.9 456.9L231.1 455.8L233.6 455.0L235.3 454.8L237.3 457.2L239.0 457.8L240.3 456.1L242.2 455.0L243.0 453.4L244.4 449.1L244.1 447.6L244.7 446.3L244.7 443.8L243.7 439.3L243.7 437.1L243.2 434.9L242.1 433.6L241.5 431.3L240.9 429.9L241.5 428.4L240.7 427.2L244.5 417.5L246.3 413.2L246.2 408.0L245.9 406.6L242.7 400.3L241.2 398.3L240.1 396.7L240.1 394.8L239.7 393.2L240.3 391.6L239.6 389.7L239.3 388.2L237.3 388.2L236.2 387.2L236.4 385.5L235.8 384.1L235.6 382.2L236.8 378.5L236.9 377.0L236.5 375.5L236.8 373.6L237.6 372.2L238.2 370.8L240.1 371.0L241.4 369.0L242.2 366.8L242.3 364.5L243.3 361.9L243.0 359.8ZM192.6 563.2L195.3 564.2L195.7 565.5L193.9 566.6L193.6 564.7L192.1 563.6L193.1 565.1L190.8 563.0L189.9 561.8L189.2 560.4L188.8 558.9L187.9 557.8L190.6 560.8L192.4 562.7ZM212.4 537.2L213.7 538.2L212.4 538.9L211.0 537.9L206.1 537.0L204.3 536.2L206.1 536.7L211.6 537.0ZM229.6 529.4L230.8 530.5L229.7 531.6L228.2 532.9L226.8 534.6L225.9 533.1L227.7 532.0L229.0 531.1L229.3 529.7ZM220.6 530.4L221.8 531.4L220.3 532.2L218.9 533.1L218.2 531.4L218.9 529.4L218.7 527.8L220.2 527.2L220.9 528.9L220.0 531.0ZM219.5 526.7L218.0 526.3L217.8 524.8L218.0 523.3L219.6 523.5L220.0 525.2L219.5 526.7ZM312.5 459.2L311.4 460.2L309.7 459.6L311.1 458.9L312.5 459.2ZM210.1 598.4L209.8 600.1L208.0 600.1L207.6 601.4L206.2 600.9L207.6 598.7L208.8 597.8L210.2 597.5ZM203.7 552.4L205.0 553.7L203.7 553.0L200.8 550.7L203.3 551.9ZM110.8 533.1L111.0 538.1L109.4 542.0L108.9 544.1L109.3 546.1L109.6 547.6L108.1 546.8L107.5 545.0L107.1 541.6L106.0 538.7L105.3 537.4L104.2 536.4L102.7 535.7L101.8 533.6L104.3 533.4L106.0 532.2L106.8 530.7L108.3 530.4L110.8 533.1ZM218.2 529.6L216.6 529.1L217.6 530.7L215.9 531.4L214.2 529.4L213.5 527.9L213.7 526.3L214.5 525.0L214.5 523.0L213.5 521.4L215.1 521.8L216.7 522.9L217.4 524.6L217.4 526.4L217.8 527.9L218.2 529.3ZM226.1 116.0L224.9 117.0L225.9 118.7L224.8 119.8L223.6 119.0L222.4 118.2L221.6 117.0L220.0 115.8L219.6 114.5L221.0 113.8L222.8 114.0L224.3 113.7L225.2 115.0L226.6 115.4ZM216.9 112.8L218.5 115.2L217.4 116.3L216.2 113.9L214.6 113.9L214.4 111.8L216.3 111.4L216.9 112.8ZM243.2 111.6L244.1 109.8L244.0 111.3L242.2 113.9L241.4 115.4L241.5 114.0L241.1 112.7L242.9 112.2ZM251.6 107.2L253.5 108.3L252.7 109.7L251.5 110.5L252.2 109.2L251.3 107.9ZM243.4 107.2L243.3 110.0L242.2 111.3L240.5 111.6L238.9 112.0L240.4 110.8L241.9 109.4L242.5 107.2ZM246.9 103.4L245.9 106.5L245.2 108.7L244.8 107.3L245.7 106.0L245.8 104.4L246.9 103.4ZM245.4 99.5L244.4 101.1L242.3 102.4L241.1 104.2L239.7 104.8L237.9 106.1L237.6 104.7L238.5 102.9L238.9 101.3L239.8 100.1L240.1 97.9L241.5 97.3L242.5 98.4L243.3 99.7L245.4 99.5ZM254.2 93.6L250.4 95.7L253.1 93.8ZM256.5 92.4L261.4 91.9L259.9 93.0L255.9 94.0L254.8 92.9L256.5 92.4ZM297.7 525.9L298.7 527.3L297.0 526.8ZM315.0 443.9L315.3 445.7L313.2 444.4L312.0 443.4L313.2 442.8L314.6 443.0Z"/>
+          <g id="vmapIslands"></g>
+          <g id="vmapCities"></g>
+          <g id="vmapMarks"></g>
+        </svg>
+      </div>
+      <div class="vmap-side">
+        <div class="seg2" id="vmapLayer"><button aria-pressed="true" data-l="g">Mộ phần</button><button aria-pressed="false" data-l="h">Quê quán</button></div>
+        <div class="vcard" id="vcard"></div>
+        <ul class="vlist2" id="vlist"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NGƯỜI THÂN: trung tâm -->
+<section class="block app-only nt-hub" id="nguoi-than">
+  <div class="wrap">
+    <div class="nt-head"><h2>Người thân</h2><a class="nt-add" href="#hanh-trinh" aria-label="Thêm người thân"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Thêm</span></a></div>
+    <div class="nt-grid" id="ntGrid"></div>
+  </div>
+</section>
+
+<!-- HỒ SƠ — phong cách "Living Memories" -->
+<section class="lm app-only" id="ho-so">
+  <div class="lm-col">
+    <div class="lm-top">
+      <span class="lm-brand">Thế Giới<i>/</i>Song Song</span>
+      <button class="lm-pill" id="lmVideo"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3v18l15-9z"/></svg>Xem video</button>
+    </div>
+    <div class="lm-hero">
+      <div class="lm-portrait" id="lmPortrait">
+        <label class="lm-up">Đổi ảnh chân dung<input type="file" accept="image/*" id="lmUpload"></label>
+        <svg viewBox="0 0 600 760" role="img" aria-label="Chân dung minh họa">
+          <defs>
+            <radialGradient id="spot" cx="50%" cy="34%" r="55%"><stop offset="0" stop-color="#FFF8EA"/><stop offset=".5" stop-color="#EAD9B8"/><stop offset="1" stop-color="#F6EEDF"/></radialGradient>
+            <linearGradient id="coat" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2d2f33"/><stop offset=".5" stop-color="#17181b"/><stop offset="1" stop-color="#0f1012"/></linearGradient>
+            <radialGradient id="face" cx="45%" cy="40%" r="65%"><stop offset="0" stop-color="#5a5550"/><stop offset=".7" stop-color="#2b2926"/><stop offset="1" stop-color="#1a1918"/></radialGradient>
+            <linearGradient id="fadeB" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="#F6EEDF" stop-opacity="0"/><stop offset="1" stop-color="#F6EEDF"/></linearGradient>
+            <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .06 0"/></filter>
+          </defs>
+          <rect width="600" height="760" fill="url(#spot)"/>
+          <path d="M40 760C55 610 150 545 300 535c150 10 245 75 260 225z" fill="url(#coat)" opacity=".82"/>
+          <path d="M40 760C55 610 150 545 300 535c150 10 245 75 260 225" fill="none" stroke="#8d9296" stroke-opacity=".25" stroke-width="3"/>
+          <path d="M240 540l60 70 60-70" fill="none" stroke="#3c3f44" stroke-width="10" stroke-linejoin="round"/>
+          <path d="M300 610v150" stroke="#0c0d0e" stroke-width="3"/>
+          <rect x="262" y="440" width="76" height="110" rx="30" fill="#24221f"/>
+          <ellipse cx="300" cy="330" rx="104" ry="132" fill="url(#face)"/>
+          <path d="M196 300c0-90 50-140 104-140s104 50 104 140c-10-46-40-80-104-82-64 2-94 36-104 82z" fill="#141414"/>
+          <path d="M404 300c6 60-14 120-56 150" fill="none" stroke="#9aa0a4" stroke-opacity=".22" stroke-width="4"/>
+          <rect width="600" height="760" filter="url(#grain)"/>
+          <rect width="600" height="760" fill="url(#fadeB)"/>
+        </svg>
+        <div class="lm-bars" aria-hidden="true"></div>
+        <span class="lm-cap">Chân dung “nếu còn sống hôm nay” · minh họa</span>
+      </div>
+      <figure class="lm-old" id="lmOld">
+        <svg viewBox="0 0 160 210" aria-hidden="true">
+          <defs><filter id="crack"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="5"/></filter>
+          <radialGradient id="oldbg" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#d6d2c9"/><stop offset="1" stop-color="#8f8b84"/></radialGradient></defs>
+          <rect x="2" y="2" width="156" height="206" fill="#e9e5db" filter="url(#crack)"/>
+          <rect x="12" y="12" width="136" height="176" fill="url(#oldbg)"/>
+          <path d="M22 188c4-40 26-58 58-60 32 2 54 20 58 60z" fill="#2b2a28"/>
+          <rect x="68" y="108" width="24" height="26" rx="8" fill="#5b5853"/>
+          <ellipse cx="80" cy="86" rx="28" ry="34" fill="#6e6a64"/>
+          <path d="M52 80c0-26 12-40 28-40s28 14 28 40c-6-12-14-20-28-20s-22 8-28 20z" fill="#1f1e1c"/>
+          <g class="helmet"><path d="M46 74c0-26 16-40 34-40s34 14 34 40z" fill="#4d5a3f"/><path d="M40 75h80" stroke="#3c4632" stroke-width="5" stroke-linecap="round"/><circle cx="80" cy="56" r="4" fill="#b9a24f"/></g>
+          <path d="M14 40l30 14 10 30M150 120l-26 8-8 22M100 14l-6 22" fill="none" stroke="#f3efe6" stroke-width="1.4" opacity=".8"/>
+        </svg>
+        <figcaption id="lmOldCap">Ảnh gốc · 1970</figcaption>
+      </figure>
+    </div>
+    <div class="lm-body">
+      <div class="lm-kicker"><span id="pTitle">Liệt sĩ</span> · <span class="lm-sample">hồ sơ mẫu, nhân vật hư cấu</span></div>
+      <h2 class="lm-name"><i>/</i><span id="pName">Phạm Hữu Khiêm</span></h2>
+      <div class="lm-dates" id="pDates">1951 — 1972</div>
+      <p class="lm-bio" id="pBio"></p>
+      <div class="lm-actions">
+        <button class="lm-ghost" id="lmListen"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3v18l15-9z"/></svg>Nghe gia đình kể</button>
+        <button class="lm-ghost lm-inc" id="incBtn">
+          <svg viewBox="0 0 30 30" width="22" height="22" aria-hidden="true"><g stroke="currentColor" stroke-width="1.6"><path d="M10 10v14M15 7v17M20 10v14"/></g><circle class="tip" cx="10" cy="9" r="1.6"/><circle class="tip" cx="15" cy="6" r="1.6"/><circle class="tip" cx="20" cy="9" r="1.6"/><path d="M6 24h18l-2 4H8z" fill="currentColor"/></svg>
+          Thắp hương · <b id="incCount">1.284</b>
+        </button>
+      </div>
+      <p class="lm-note" id="incNote"></p>
+      <dl class="lm-facts" id="pFacts"></dl>
+      <div class="lm-chapters" id="pChapters"></div>
+      <blockquote class="lm-letter" id="pLetter"></blockquote>
+      <div class="lm-links"><a href="#ngoi-nha">Vào ngôi nhà</a><a href="#cua-hang">Tặng vật phẩm</a><a href="#ky-uc" data-tab="msg">Viết lời nhắn</a></div>
+      <nav class="lm-pn" aria-label="Hồ sơ khác"><button id="lmPrev">« </button><button id="lmNext"> »</button></nav>
+    </div>
+  </div>
+</section>
+
+<!-- 2. NGÔI NHÀ MƠ ƯỚC -->
+<section class="block app-only" id="ngoi-nha">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Ngôi nhà mơ ước</span><h2>Dựng cho người một mái nhà như ý</h2></div>
+      <p class="lede">Chọn kiểu nhà, màu ngói, sân vườn. Quà gia đình gửi từ cửa hàng sẽ xuất hiện ngay trong sân. Xem ngôi nhà lúc bình minh, hoàng hôn hay khi đèn lồng thắp sáng về đêm.</p>
+    </div>
+    <div class="home">
+      <div class="home-stage" id="homeStage">
+        
+        <div class="home-tag" id="homeTag">Ngôi nhà của Phạm Hữu Khiêm</div>
+        <button class="home-in" id="homeIn" aria-pressed="false">Vào gian thờ</button>
+        <button class="home-inc" id="homeInc" hidden>Thắp hương</button>
+        <button class="home-shopbtn" id="homeShopBtn">Cửa hàng · <span data-bal>500</span> nén</button>
+        <div class="hshop" id="hshop" hidden>
+          <div class="hs-head"><b>Cửa hàng</b><button class="hs-x" id="hsClose" aria-label="Đóng cửa hàng">×</button></div>
+          <p class="hs-to" id="hsTo"></p>
+          <div class="hs-bal">Số dư <b><span data-bal>500</span> nén</b><button class="btn ghost" data-topup>Nạp nén</button></div>
+          <div class="chips" id="hsCats"><button class="chip" aria-pressed="true" data-k="all">Tất cả</button><button class="chip" aria-pressed="false" data-k="ao">Quần áo</button><button class="chip" aria-pressed="false" data-k="xe">Xe cộ</button><button class="chip" aria-pressed="false" data-k="noi">Nội thất</button><button class="chip" aria-pressed="false" data-k="trang">Trang trí</button></div>
+          <ul class="hs-list" id="hsList"></ul>
+        </div>
+        <div class="home-time" id="homeTime"><b class="rt-clock" title="Ánh sáng theo giờ Việt Nam (GMT+7)"></b></div>
+      </div>
+      <div class="home-ctrl">
+        <div class="ctrl">
+          <h4>Kiểu nhà</h4>
+          <div class="styles" id="hStyles">
+            <button aria-pressed="true" data-s="bagian"><svg viewBox="0 0 40 30" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13 20 4l18 9"/><path d="M5 13v13h30V13"/><path d="M12 26v-7M20 26v-7M28 26v-7"/></svg>Nhà ba gian</button>
+            <button aria-pressed="false" data-s="maithai"><svg viewBox="0 0 40 30" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14 20 2l12 12"/><path d="M10 14v12h20V14"/><path d="M18 26v-6h4v6"/></svg>Mái Thái</button>
+            <button aria-pressed="false" data-s="nhasan"><svg viewBox="0 0 40 30" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 12 20 3l14 9"/><path d="M8 12v8h24v-8"/><path d="M10 20v8M20 20v8M30 20v8"/></svg>Nhà sàn</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <h4>Màu ngói</h4>
+          <div class="swatches" id="hRoof">
+            <button aria-pressed="true" data-r="#9c3b28" style="background:#9c3b28" aria-label="Ngói đỏ"></button>
+            <button aria-pressed="false" data-r="#3f5a4e" style="background:#3f5a4e" aria-label="Ngói rêu"></button>
+            <button aria-pressed="false" data-r="#4a4f63" style="background:#4a4f63" aria-label="Ngói xám chì"></button>
+            <button aria-pressed="false" data-r="#b8925a" style="background:#b8925a" aria-label="Mái rạ"></button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <h4>Sân vườn</h4>
+          <div class="toggles" id="hGarden">
+            <label>Cây đào trước ngõ <input type="checkbox" id="g-dao" data-g="dao" checked></label>
+            <label>Ao sen <input type="checkbox" id="g-sen" data-g="sen" checked></label>
+            <label>Hàng cau <input type="checkbox" id="g-cau" data-g="cau"></label>
+            <label>Rào tre <input type="checkbox" id="g-rao" data-g="rao" checked></label>
+            <label>Đèn lồng lối đi <input type="checkbox" id="g-den" data-g="den" checked></label>
+          </div>
+        </div>
+        <div class="ctrl">
+          <h4>Quà đã nhận</h4>
+          <ul class="received" id="received"></ul>
+        </div>
+        <button class="btn" id="saveHome">Lưu ngôi nhà</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. CỬA HÀNG -->
+<section class="block light app-only" id="cua-hang">
+  <div class="wrap"><p class="shop-zone"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg><span>Khu riêng · đang phát triển</span></p>
+    <div class="sec-head">
+      <div><span class="eyebrow">Cửa hàng vật phẩm</span><h2>Gửi một món quà, thay cho lời hỏi han</h2></div>
+      <p class="lede">Vật phẩm số được tính bằng <b>nén</b>. Đồ nội thất, xe cộ và cây cảnh sẽ được đặt vào ngôi nhà của người nhận. Quần áo được cất vào tủ.</p>
+    </div>
+    <div class="shop-bar">
+      <div class="chips" id="shopCats">
+        <button class="chip" aria-pressed="true" data-k="all">Tất cả</button>
+        <button class="chip" aria-pressed="false" data-k="ao">Quần áo</button>
+        <button class="chip" aria-pressed="false" data-k="xe">Xe cộ</button>
+        <button class="chip" aria-pressed="false" data-k="noi">Nội thất</button>
+        <button class="chip" aria-pressed="false" data-k="trang">Trang trí</button>
+        <button class="chip" aria-pressed="false" data-k="yc">Theo yêu cầu</button>
+      </div>
+      <div class="wallet">
+        <label for="recipient" style="color:var(--ink-soft)">Gửi tới</label>
+        <select id="recipient"></select>
+        <span style="color:var(--ink-soft)">Số dư</span><b id="balance">500</b><span>nén</span>
+      </div>
+    </div>
+    <div class="goods" id="goods"></div>
+  </div>
+</section>
+
+<!-- 4. KHÔNG GIAN KÝ ỨC -->
+<section class="block app-only" id="ky-uc">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Không gian ký ức</span><h2>Những gì còn lại, giữ cho đời sau</h2></div>
+      <p class="lede">Ảnh, video, lời nhắn, câu chuyện và gia phả nhiều thế hệ. Mỗi người trong gia đình đều có thể góp thêm một mảnh ký ức.</p>
+    </div>
+    <div class="tabs" role="tablist" id="memTabs">
+      <button role="tab" aria-selected="true" data-p="photo">Vòng ký ức</button>
+      <button role="tab" aria-selected="false" data-p="msg">Lời nhắn</button>
+      <button role="tab" aria-selected="false" data-p="story">Câu chuyện</button>
+      <button role="tab" aria-selected="false" data-p="tree">Gia phả</button>
+    </div>
+    <div data-pane="photo">
+      <div class="ring" id="ring" tabindex="0" aria-label="Vòng ký ức. Kéo hoặc dùng phím mũi tên để xoay, bấm vào một kỷ vật để xem lớn.">
+        <div class="ring-center" aria-hidden="true"><svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z" fill="#B8862F"/><circle cx="12" cy="16" r="9" stroke="currentColor" stroke-width="1.6"/><circle cx="20" cy="16" r="9" stroke="currentColor" stroke-width="1.6"/></svg><b>Phạm Hữu Khiêm</b><small id="ringCount">14 kỷ vật</small></div>
+        <div class="ring-tiles" id="ringTiles"></div>
+        <div class="ring-bar"><span class="rc-n" id="rcN">—</span><span class="rc-t" id="rcT"></span><span class="rc-y" id="rcY"></span></div>
+        <label class="ring-up">+ Thêm ảnh gia đình<input type="file" accept="image/*" multiple id="ringUpload"></label>
+        <div class="ring-ctl"><button id="ringPrev" aria-label="Xoay ngược">‹</button><button id="ringNext" aria-label="Xoay xuôi">›</button></div>
+      </div>
+      <p class="ring-note">Ảnh và video minh họa · gia đình tải kỷ vật thật lên đây, sắp theo năm tháng</p>
+    </div>
+    <div data-pane="msg" hidden>
+      <div class="msgs">
+        <div class="wall" id="wall"></div>
+        <form class="msgform" id="msgForm">
+          <b style="font-family:var(--f-display);font-size:24px">Gửi lời nhắn</b>
+          <label for="mName">Tên của bạn</label>
+          <input id="mName" required placeholder="Ví dụ: Cháu Nam">
+          <label for="mText">Lời nhắn</label>
+          <textarea id="mText" required placeholder="Điều bạn muốn nói với người…"></textarea>
+          <button class="btn" type="submit">Gửi lời nhắn</button>
+        </form>
+      </div>
+    </div>
+    <div data-pane="story" hidden>
+      <div class="story" id="storyText"></div>
+    </div>
+    <div data-pane="tree" hidden>
+      <div class="tree">
+        <div class="gen"><span>Đời thứ nhất</span><div class="ppl"><div class="pp"><b>Cụ Phạm Hữu Lễ</b><small>1890 – 1951</small></div><div class="pp"><b>Cụ Đinh Thị Tơ</b><small>1894 – 1960</small></div></div></div>
+        <div class="gen"><span>Đời thứ hai</span><div class="ppl"><div class="pp"><b>Phạm Hữu Cần</b><small>Bố · 1922 – 1990</small></div><div class="pp"><b>Trần Thị Gái</b><small>Mẹ · 1925 – 2011</small></div></div></div>
+        <div class="gen"><span>Đời thứ ba</span><div class="ppl"><div class="pp"><b>Phạm Thị Hiền</b><small>1946</small></div><div class="pp"><b>Phạm Hữu Khôi</b><small>1948 – 2020</small></div><div class="pp hero"><b>Phạm Hữu Khiêm</b><small>Liệt sĩ · 1951 – 1972</small></div><div class="pp"><b>Phạm Thị Lụa</b><small>1954</small></div><div class="pp"><b>Phạm Hữu Tuấn</b><small>1957</small></div><div class="pp"><b>Phạm Thị Thơm</b><small>1960</small></div></div></div>
+        <div class="gen"><span>Đời thứ tư</span><div class="ppl"><div class="pp"><b>Phạm Hữu Nam</b><small>Con ông Khôi · người lập hồ sơ</small></div><div class="pp"><b>Phạm Thu Trang</b><small>Con ông Khôi</small></div><div class="pp"><b>Lê Minh Đức</b><small>Con bà Hiền</small></div><div class="pp"><b>+ 9 người</b><small>Xem toàn bộ</small></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HÀNH TRÌNH KHÁCH HÀNG -->
+<section class="block light app-only" id="hanh-trinh">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Bắt đầu thế nào</span><h2>Năm bước để mở một không gian tưởng niệm</h2></div>
+      <p class="lede">Đăng ký hoàn toàn miễn phí. Gia đình tự quyết định ai được nhìn thấy, khi nào liên kết với mộ phần thật và có cần người chăm sóc mộ hay không.</p>
+    </div>
+    <div class="journey">
+      <ol class="steps" id="steps" role="tablist">
+        <li><button role="tab" aria-selected="true" data-j="1"><b>Đăng ký</b><span>Mở tài khoản và hồ sơ người đã mất, hoàn toàn miễn phí</span></button></li>
+        <li><button role="tab" aria-selected="false" data-j="2"><b>Chọn không gian và quyền riêng tư</b><span>Công khai, chỉ gia đình, hoặc riêng tư</span></button></li>
+        <li><button role="tab" aria-selected="false" data-j="3"><b>Trang trí, tặng quà, lưu kỷ niệm</b><span>Làng riêng, vật phẩm số, ảnh và lời nhắn</span></button></li>
+        <li><button role="tab" aria-selected="false" data-j="4"><b>Liên kết vị trí mộ thực tế</b><span>Nếu có và được ban quản lý cho phép</span></button></li>
+        <li><button role="tab" aria-selected="false" data-j="5"><b>Đăng ký chăm sóc mộ</b><span>Theo dõi ảnh và lịch sử từng lần thực hiện</span></button></li>
+      </ol>
+      <div class="jpanel">
+        <div data-jp="1">
+          <span class="pill ok">Miễn phí</span>
+          <h3 style="margin-top:10px">Tưởng niệm một người thân</h3>
+          <p class="lede">Chỉ cần vài thông tin cơ bản. Tiểu sử, ảnh và câu chuyện có thể bổ sung dần.</p>
+          <form class="form" onsubmit="event.preventDefault();toast('Đã mở không gian tưởng niệm mẫu. Đây là bản trình diễn.')">
+            <label class="full">Họ và tên người đã mất<input id="f-name" value="Phạm Hữu Khiêm"></label>
+            <label>Năm sinh<input id="f-born" value="1951" inputmode="numeric"></label>
+            <label>Năm mất<input id="f-died" value="1972" inputmode="numeric"></label>
+            <label>Quê quán<input id="f-home" value="Ý Yên, Nam Định"></label>
+            <label>Loại hồ sơ<select id="f-type"><option>Liệt sĩ</option><option>Thương binh</option><option>Người thân</option></select></label>
+            <label class="full">Quan hệ của bạn với người đã mất<input id="f-rel" value="Cháu ruột"></label>
+            <div class="full"><button class="btn" type="submit">Tưởng niệm</button></div>
+          </form>
+        </div>
+        <div data-jp="2" hidden>
+          <h3>Không gian mặc định</h3>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="space" id="sp1" checked><b>Vườn trên mây</b><span>Đảo nổi giữa trời, hoa đào và đèn trời</span></label>
+            <label class="opt"><input type="radio" name="space" id="sp2"><b>Làng quê Bắc Bộ</b><span>Lũy tre, giếng nước, sân đình</span></label>
+            <label class="opt"><input type="radio" name="space" id="sp3"><b>Đồi thông</b><span>Yên tĩnh, sương sớm, lối đá</span></label>
+          </div>
+          <h3 style="margin-top:28px;font-size:24px">Ai được vào thăm?</h3>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="priv" id="pv1" checked><b>Công khai</b><span>Ai cũng có thể thắp hương và đọc tiểu sử</span></label>
+            <label class="opt"><input type="radio" name="priv" id="pv2"><b>Chỉ gia đình</b><span>Người được mời qua đường dẫn hoặc số điện thoại</span></label>
+            <label class="opt"><input type="radio" name="priv" id="pv3"><b>Riêng tư</b><span>Chỉ người lập hồ sơ</span></label>
+          </div>
+        </div>
+        <div data-jp="3" hidden>
+          <h3>Trang trí và lưu giữ</h3>
+          <p class="lede">Mọi thứ đã sẵn trong các không gian phía trên.</p>
+          <div class="quick">
+            <a href="#ngoi-nha"><b>Làng nhà tôi</b><span>Kiểu nhà, màu mái, sân vườn</span></a>
+            <a href="#cua-hang"><b>Cửa hàng</b><span>Quần áo, xe, nội thất, đồ trang trí</span></a>
+            <a href="#ky-uc"><b>Ký ức</b><span>Ảnh, video, lời nhắn, gia phả</span></a>
+          </div>
+        </div>
+        <div data-jp="4" hidden>
+          <h3>Liên kết với mộ phần</h3>
+          <p class="lede">Gia đình gửi thông tin vị trí mộ. Chúng tôi đối chiếu với ban quản lý nghĩa trang trước khi hiển thị.</p>
+          <div class="gravecard">
+            <div class="gravemap"><div class="pin"></div><span class="lbl">Khu B · Hàng 4 · Mộ số 17</span></div>
+            <div class="info">
+              <div><b>Nghĩa trang Liệt sĩ Quốc gia Đường 9</b><br><span style="color:var(--ink-soft);font-size:13px">Quảng Trị · dữ liệu mẫu</span></div>
+              <span class="pill ok">Đã xác minh</span>
+            </div>
+          </div>
+          <div class="toggles" style="margin-top:16px">
+            <label>Cho người ngoài gia đình xem vị trí mộ <input type="checkbox" id="showGrave" checked></label>
+          </div>
+        </div>
+        <div data-jp="5" hidden>
+          <h3>Chăm sóc mộ</h3>
+          <div class="care-head">
+            <div><b>Gói Bốn mùa</b> · 4 lần mỗi năm<br><span style="color:var(--ink-soft)">Tổ chăm sóc mộ tại Quảng Trị (đối tác)</span></div>
+            <div>Lần tới: <b>10/12/2026</b><br><span class="pill wait">Đã lên lịch</span></div>
+          </div>
+          <ol class="log">
+            <li><time>25/07/2026</time><div><h5>Trước ngày Thương binh Liệt sĩ 27/7 <span class="pill ok">Hoàn thành</span></h5><p>Lau bia, nhổ cỏ, dâng hoa cúc vàng và thắp hương thay gia đình.</p><div class="ba"><div style="--g:linear-gradient(135deg,#8f8a6e,#6b6650)"><span>Trước</span></div><div style="--g:linear-gradient(135deg,#d9d3bd,#e6c25a)"><span>Sau</span></div></div></div></li>
+            <li><time>05/04/2026</time><div><h5>Tiết Thanh minh <span class="pill ok">Hoàn thành</span></h5><p>Sửa lại vữa chân bia, trồng thêm cỏ lá gừng quanh mộ.</p></div></li>
+            <li><time>10/02/2026</time><div><h5>Trước Tết Bính Ngọ <span class="pill ok">Hoàn thành</span></h5><p>Quét vôi, dâng mâm ngũ quả, cắm cành đào nhỏ.</p></div></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HỎI ĐÁP -->
+<section class="block app-only" id="hoi-dap">
+  <div class="wrap faq">
+    <div><span class="eyebrow">Hỏi đáp</span><h2 style="font-size:clamp(38px,5.4vw,68px);margin-top:14px">Câu hỏi thường gặp</h2></div>
+    <div>
+      <details open><summary>Tạo hồ sơ tưởng niệm có mất phí không?</summary><p>Không. Đăng ký (mở tài khoản và hồ sơ), đăng ảnh và lời nhắn đều miễn phí. Vật phẩm số và dịch vụ chăm sóc mộ là phần có phí.</p></details>
+      <details><summary>Ai có thể nhìn thấy không gian tưởng niệm?</summary><p>Gia đình chọn một trong ba chế độ: công khai, chỉ gia đình (mời qua đường dẫn hoặc số điện thoại), hoặc riêng tư. Vị trí mộ phần có thể ẩn riêng.</p></details>
+      <details><summary>Làm sao liên kết hồ sơ với mộ phần thật?</summary><p>Gia đình gửi tên nghĩa trang, khu, hàng và số mộ. Chúng tôi đối chiếu với ban quản lý nghĩa trang trước khi đánh dấu “đã xác minh” trên bản đồ.</p></details>
+      <details><summary>Dịch vụ chăm sóc mộ hoạt động thế nào?</summary><p>Đối tác tại địa phương thực hiện theo lịch gia đình chọn: lau bia, nhổ cỏ, dâng hoa, thắp hương. Mỗi lần đều có ảnh trước và sau, lưu vào lịch sử chăm sóc.</p></details>
+      <details><summary>Tôi thấy hồ sơ liệt sĩ là người thân của mình, nhận thế nào?</summary><p>Bấm “Nhận hồ sơ” và gửi giấy tờ chứng minh quan hệ thân nhân. Sau khi xác minh, bạn được quyền bổ sung tiểu sử, ảnh và quản lý ngôi nhà tưởng niệm.</p></details>
+      <details><summary>Vật phẩm số có thật sự “gửi” được không?</summary><p>Đó là một hình thức tưởng nhớ. Món quà xuất hiện trong ngôi nhà 3D của người nhận và được lưu lại để cả gia đình cùng thấy.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- THIỆP TƯỞNG NIỆM -->
+<section class="block light card-maker" id="thiep">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Thiệp tưởng niệm</span><h2>Gửi một lời nhớ thương</h2></div>
+      <p class="lede">Chọn người nhận và lời muốn nói, Song Song tạo một tấm thiệp để bạn lưu hoặc gửi cho gia đình. Thiệp được tạo ngay trên máy, không lưu lại ở đâu.</p>
+    </div>
+    <div class="cm-grid">
+      <form class="cm-form" id="cmForm">
+        <label class="cm-l">Kính dâng</label>
+        <div class="chips" id="cmTo"><button class="chip" type="button" aria-pressed="true">Mẹ</button><button class="chip" type="button" aria-pressed="false">Ba</button><button class="chip" type="button" aria-pressed="false">Ông Bà</button><button class="chip" type="button" aria-pressed="false">Anh hùng liệt sĩ</button><button class="chip" type="button" aria-pressed="false">Người thân</button></div>
+        <label class="cm-l" for="cmName">Tên người đã khuất <span>(nếu muốn)</span></label>
+        <input class="cm-in" id="cmName" maxlength="40" placeholder="Ví dụ: Nguyễn Văn An">
+        <label class="cm-l">Lời nhắn</label>
+        <div class="chips" id="cmMsg"><button class="chip" type="button" aria-pressed="true">Con nhớ người nhiều lắm</button><button class="chip" type="button" aria-pressed="false">Cả nhà vẫn bình an</button><button class="chip" type="button" aria-pressed="false">Mãi biết ơn công lao</button><button class="chip" type="button" aria-pressed="false">Yên nghỉ nơi miền mây trắng</button></div>
+        <label class="cm-l" for="cmFrom">Người gửi</label>
+        <input class="cm-in" id="cmFrom" maxlength="40" placeholder="Ví dụ: Con gái Lan">
+        <button class="btn" type="submit">Tạo thiệp</button>
+      </form>
+      <div class="cm-prev">
+        <canvas id="cmCanvas" width="1080" height="1350" aria-label="Xem trước thiệp tưởng niệm"></canvas>
+        <div class="cm-acts"><button class="btn" type="button" id="cmSave" hidden>Tải ảnh thiệp</button><button class="btn ghost" type="button" id="cmShare" hidden>Chia sẻ</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<nav class="pgmore" id="pgmore" aria-label="Các nơi khác" hidden><div class="wrap"><h2>Đi tiếp tới</h2><div class="pgm-list" id="pgmList"></div><button type="button" class="pgm-hall" data-open-hall>Về đại sảnh</button></div></nav>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-cols">
+      <div class="fc-about"><a class="brand" href="#dau-trang"><svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z" fill="#B8862F"/><circle cx="12" cy="16" r="9" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="16" r="9" stroke="currentColor" stroke-width="2"/></svg><b>Song Song</b></a><p>Làng tưởng niệm trực tuyến cho người đã khuất, anh hùng liệt sĩ và thương binh.</p></div>
+      <nav aria-label="Khám phá"><h4>Khám phá</h4><a href="#cong-vien">Làng tưởng niệm</a><a href="#ban-do">Bản đồ mộ phần</a><a href="#ho-so">Hồ sơ</a><a href="#ngoi-nha">Ngôi nhà</a><a href="#cua-hang">Cửa hàng</a><a href="#ky-uc">Ký ức</a></nav>
+      <nav aria-label="Tiện ích"><h4>Tiện ích</h4><a href="#thap-nhang">Thắp nhang</a><button type="button" data-open-cal>Lịch vạn niên</button><a href="#thiep">Thiệp tưởng niệm</a><a href="#hanh-trinh">Hành trình</a><button type="button" data-open-gate>Đổi lối vào</button></nav>
+      <nav aria-label="Song Song"><h4>Song Song</h4><a href="#khong-gian">Các không gian</a><a href="#bat-dau">Bắt đầu</a><a href="#hoi-dap">Hỏi đáp</a></nav>
+    </div>
+    <div class="foot-word"><svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z" fill="#B8862F"/><circle cx="12" cy="16" r="9" stroke="currentColor" stroke-width="1.4"/><circle cx="20" cy="16" r="9" stroke="currentColor" stroke-width="1.4"/></svg>Song Song</div>
+    <div class="foot-row">
+      <div><a href="#cong-vien">Làng</a><a href="#ban-do">Bản đồ</a><a href="#cua-hang">Cửa hàng</a><a href="#hoi-dap">Hỏi đáp</a></div>
+      <span>Bản mẫu giao diện · nhân vật và hồ sơ là hư cấu · ©2026</span>
+    </div>
+  </div>
+</footer>
+<div class="msheet" id="msheet" hidden>
+  <nav class="msheet-links" aria-label="Menu">
+    <a href="#dau-trang"><span class="ms-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg></span>Giới thiệu</a><a href="#cong-vien"><span class="ms-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"/><path d="M7 16v6"/><path d="M13 19v3"/><path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5"/></svg></span>Làng tưởng niệm</a><a href="#ban-do"><span class="ms-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8c0 3.613-3.869 7.429-5.393 8.795a1 1 0 01-1.214 0C9.87 15.429 6 11.613 6 8a6 6 0 0112 0"/><path d="M4.474 15h-.197a1 1 0 00-.969.753l-1.097 4.35a1.5 1.5 0 001.444 1.898L20.344 22a1.5 1.5 0 001.446-1.897l-1.098-4.35a1 1 0 00-.969-.753h-.197"/><circle cx="12" cy="8" r="2"/></svg></span>Bản đồ mộ phần</a><a href="#ho-so"><span class="ms-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 13a3 3 0 1 0-6 0"/><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><circle cx="12" cy="8" r="2"/></svg></span>Hồ sơ</a><a href="#ngoi-nha"><span class="ms-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>Ngôi nhà</a><a href="#cua-hang"><span class="ms-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></svg></span>Cửa hàng</a><a href="#ky-uc"><span class="ms-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 11-1.296-1.296a2.4 2.4 0 0 0-3.408 0L11 16"/><path d="M4 8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2"/><circle cx="13" cy="7" r="1" fill="currentColor"/><rect x="8" y="2" width="14" height="14" rx="2"/></svg></span>Ký ức</a><a href="#hanh-trinh"><span class="ms-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg></span>Hành trình</a><a href="#hoi-dap"><span class="ms-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>Hỏi đáp</a>
+  </nav>
+  <div class="msheet-auth"><button class="btn ghost" data-auth="login">Đăng nhập</button><button class="btn" data-auth="signup">Đăng ký</button></div>
+</div>
+<div class="auth" id="auth" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="auth-bg" data-close></div>
+  <div class="auth-card">
+    <button class="auth-x" data-close aria-label="Đóng">×</button>
+    <div class="auth-req"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z" fill="#B8862F"/><circle cx="12" cy="16" r="9" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="16" r="9" stroke="currentColor" stroke-width="2"/></svg><b>Bước vào Thế Giới Song Song</b><span>Đăng nhập hoặc đăng ký tài khoản miễn phí để tiếp tục.</span></div>
+    <div class="auth-tabs" role="tablist"><button role="tab" data-tab="signup" aria-selected="true">Đăng ký</button><button role="tab" data-tab="login" aria-selected="false">Đăng nhập</button></div>
+    <form id="fSignup" class="auth-form">
+      <h2 id="authTitle">Đăng ký tài khoản</h2>
+      <p class="auth-sub">Mở tài khoản miễn phí để dựng không gian tưởng niệm, lưu giữ ký ức và mời gia đình cùng thăm viếng.</p>
+      <label for="aName">Họ và tên của bạn</label><input id="aName" required autocomplete="name">
+      <label for="aPhone">Số điện thoại hoặc email</label><input id="aPhone" required autocomplete="username">
+      <label for="aPass">Mật khẩu</label><input id="aPass" type="password" required minlength="6" autocomplete="new-password">
+      <div class="auth-opts"><label class="auth-chk"><input type="checkbox" id="aAuto" checked><span>Tự động đăng nhập</span></label><label class="auth-chk"><input type="checkbox" id="aRem" checked><span>Nhớ số điện thoại hoặc email</span></label></div>
+      <button class="btn" type="submit">Đăng ký</button>
+      <p class="auth-alt">Đã có tài khoản? <button type="button" data-tab="login">Đăng nhập</button></p>
+    </form>
+    <form id="fLogin" class="auth-form" hidden>
+      <h2>Đăng nhập</h2>
+      <p class="auth-sub">Đăng nhập để vào thăm, thắp hương và gửi lời nhắn tới người thân.</p>
+      <label for="lUser">Số điện thoại hoặc email</label><input id="lUser" required autocomplete="username">
+      <label for="lPass">Mật khẩu</label><input id="lPass" type="password" required autocomplete="current-password">
+      <div class="auth-opts"><label class="auth-chk"><input type="checkbox" id="lAuto" checked><span>Tự động đăng nhập</span></label><label class="auth-chk"><input type="checkbox" id="lRem" checked><span>Nhớ số điện thoại hoặc email</span></label></div>
+      <button class="btn" type="submit">Đăng nhập</button>
+      <p class="auth-alt">Chưa có tài khoản? <button type="button" data-tab="signup">Đăng ký</button></p>
+    </form>
+  </div>
+</div>
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Xem kỷ vật">
+  <div class="lb-bg" data-lbclose></div>
+  <div class="lb-in">
+    <div class="lb-media"><canvas id="lbCanvas"></canvas><button class="lb-play" id="lbPlay" hidden aria-label="Phát video"><svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><path d="M7 4v16l13-8z"/></svg></button></div>
+    <div class="lb-info"><span class="lb-n" id="lbN"></span><span class="lb-y" id="lbY"></span><h3 id="lbT"></h3><p id="lbD"></p><small id="lbBy"></small></div>
+    <button class="lb-nav lb-prev" id="lbPrev" aria-label="Kỷ vật trước">‹</button><button class="lb-nav lb-next" id="lbNext" aria-label="Kỷ vật sau">›</button>
+    <button class="lb-x" id="lbClose" data-lbclose aria-label="Đóng">×</button>
+  </div>
+</div>
+<div class="topup" id="topup" hidden role="dialog" aria-modal="true" aria-label="Nạp nén">
+  <div class="tp-bg" data-tpclose></div>
+  <div class="tp-card"><button class="auth-x" data-tpclose aria-label="Đóng">×</button><span class="eyebrow">Ví nén</span><h3>Nạp nén</h3><p>Nén dùng để dâng tặng vật phẩm trong nhà tưởng niệm.</p>
+    <div class="tp-packs"><button data-pack="100"><b>100 nén</b><span>10.000đ</span></button><button data-pack="500"><b>500 nén</b><span>45.000đ</span></button><button data-pack="1000"><b>1.000 nén</b><span>80.000đ</span></button></div>
+    <small>Bản trình diễn: chưa kết nối cổng thanh toán, không trừ tiền thật.</small></div>
+</div>
+<div class="snd" id="snd">
+  <button class="snd-btn" id="sndBtn" aria-pressed="false" aria-label="Bật âm thanh"><span class="snd-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+  <label class="snd-vol" for="sndVol"><span>Âm lượng</span><input type="range" id="sndVol" min="0" max="30" step="1" aria-label="Âm lượng"></label>
+  <span class="snd-tip" id="sndTip">Bật âm thanh để cảm nhận trọn vẹn</span>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="js/02-am-lich.js"></script>
+<script src="js/03-nhac-nen.js"></script>
+<script src="js/04-the-gioi-nui.js"></script>
+<script src="js/05-dai-sanh.js"></script>
+
+<script src="js/06-trang-muc.js"></script>
+<script src="js/07-loi-chinh.js"></script>
+
+<script type="module" src="js/08-icon-bien-hinh.js"></script>
+<script src="js/09-trang-nguoi-than.js"></script>
+<script src="js/10-thap-nhang.js"></script>
+<script src="js/11-lang-tuong-niem.js"></script>
+<script src="js/12-chon-loi.js"></script>
+<script src="js/13-hud.js"></script>
+<script src="js/14-phi-thang.js"></script>
+<script src="js/15-go-mo.js"></script>
+<script src="js/16-goc-nhin.js"></script>
+<script src="js/17-nghi-thuc.js"></script>
+<script src="js/18-thoi-gian-thuc.js"></script>
+<script src="js/19-mot-cho-thap-nhang.js"></script>
+<script src="js/20-lang-rieng.js"></script>
+<script src="js/21-ban-do-lang.js"></script>
+<script src="js/22-nhan-ban-do.js"></script>
+<script src="js/23-dai-tuong-niem-liet-si.js"></script>
+
+</body></html>

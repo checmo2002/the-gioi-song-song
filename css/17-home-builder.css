@@ -1,0 +1,25 @@
+/* ---------- Home builder ---------- */
+.home{display:grid;grid-template-columns:minmax(0,1fr) 320px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+@media (max-width:900px){.home{grid-template-columns:1fr}}
+.home-stage{position:relative;min-height:520px;background:#FBF6EC}
+.home-stage canvas{display:block;width:100%;height:100%;position:absolute;inset:0;touch-action:none}
+.home-tag{position:absolute;left:16px;top:16px;background:rgba(251,246,236,.72);border:1px solid rgba(43,36,28,.14);color:#2B241C;padding:6px 12px;border-radius:4px;font-size:13px;font-weight:500}
+.home-time{position:absolute;left:16px;bottom:16px;display:flex;gap:2px;background:rgba(251,246,236,.72);border:1px solid rgba(43,36,28,.14);padding:3px;border-radius:6px}
+.home-time button{border:0;background:transparent;padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;color:#6B5F50}
+.home-time button[aria-pressed="true"]{background:#B8862F;color:#fff}
+.home-ctrl{padding:22px;display:flex;flex-direction:column;gap:22px;border-left:1px solid var(--line);max-height:640px;overflow-y:auto}
+@media (max-width:900px){.home-ctrl{border-left:0;border-top:1px solid var(--line);max-height:none}}
+.ctrl h4{font-family:var(--f-body);margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.styles button{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:10px 6px;cursor:pointer;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.styles button svg{width:40px;height:30px;color:var(--ink)}
+.styles button[aria-pressed="true"]{border-color:var(--jade);box-shadow:inset 0 0 0 1px var(--jade)}
+.swatches{display:flex;gap:8px}
+.swatches button{width:30px;height:30px;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.swatches button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.toggles{display:flex;flex-direction:column;gap:6px}
+.toggles label{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;cursor:pointer;padding:6px 0;border-bottom:1px dashed var(--line)}
+.toggles input{accent-color:var(--jade);width:18px;height:18px}
+.received{list-style:none;margin:0;padding:0;font-size:13px;display:flex;flex-direction:column;gap:6px}
+.received li{display:flex;justify-content:space-between;gap:8px;color:var(--ink-soft)}
+.received li b{color:var(--ink);font-weight:500}

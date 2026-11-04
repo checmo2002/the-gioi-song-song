@@ -1,0 +1,79 @@
+/* ---------- Bản đồ thực tế ---------- */
+.vmap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.vmap{grid-template-columns:1fr}}
+.vmap-stage{background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.vmap-stage svg{display:block;width:100%;height:auto;max-height:720px}
+.vmap .sea{fill:color-mix(in srgb,var(--jade) 9%,var(--paper))}
+.vmap .nb{fill:var(--paper-2);stroke:var(--line);stroke-width:.8}
+.vmap .vn{fill:color-mix(in srgb,var(--jade) 26%,var(--card));stroke:var(--jade);stroke-width:1.1;stroke-linejoin:round}
+.vmap .city circle{fill:var(--ink-soft)}
+.vmap .city text,.vmap .isl text,.vmap .sea-l{font-size:11px;fill:var(--ink-soft);font-family:var(--f-body)}
+.vmap .isl circle{fill:var(--jade)}
+.vmap .sea-l{font-style:italic;letter-spacing:.2em;font-size:13px}
+.vmap .mk{cursor:pointer}
+.vmap .mk circle.o{fill:var(--card);stroke-width:3}
+.vmap .mk circle.i{stroke:none}
+.vmap .mk.on circle.o{stroke-width:4}
+.vmap .mk .pulse{fill:none;stroke-width:2;opacity:0}
+.vmap .mk.on .pulse{animation:mkp 1.8s ease-out infinite}
+@keyframes mkp{from{r:8;opacity:.8}to{r:26;opacity:0}}
+@media (prefers-reduced-motion:reduce){.vmap .mk.on .pulse{animation:none}}
+.vmap .mk text{font-size:11px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:3px}
+.vmap-side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.seg2{display:inline-flex;gap:2px;background:var(--paper-2);padding:4px;border-radius:999px;align-self:flex-start}
+.seg2 button{border:0;background:none;padding:7px 16px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;color:var(--ink-soft)}
+.seg2 button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.vcard{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.vcard h3{font-size:30px;font-weight:300}
+.vcard .coord{font-family:var(--f-body);font-variant-numeric:tabular-nums;font-size:13px;color:var(--ink-soft)}
+.vcard .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.vlist2{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;max-height:360px;overflow-y:auto}
+.vlist2 button{width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:10px 4px;cursor:pointer;display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:center}
+.vlist2 button[aria-current="true"]{background:var(--paper-2)}
+.vlist2 i{width:10px;height:10px;border-radius:50%}
+.vlist2 span{font-size:12px;color:var(--ink-soft)}
+
+
+.seg-time button{display:inline-flex;align-items:center;gap:6px}
+.seg-time svg{width:15px;height:15px}
+.rt-clock{display:inline-block;padding:7px 13px;font-weight:500;font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.home-time .rt-clock{background:rgba(251,246,236,.92);border-radius:10px;border:1px solid rgba(43,36,28,.12)}
+.joy{position:absolute;right:20px;bottom:24px;width:112px;height:112px;border-radius:50%;background:rgba(184,134,47,.16);border:1.5px solid rgba(154,110,34,.6);backdrop-filter:blur(4px);z-index:4;touch-action:none}
+.joy-knob{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;border-radius:50%;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.park.near .joy{bottom:200px}
+@media (max-width:900px){
+  .park-stage{height:clamp(420px,68svh,580px)}
+  .park-tools{top:10px;right:10px;gap:6px}
+  .park-tools .park-hint{display:none}
+  .seg{padding:3px}
+  .seg button{padding:7px 11px;font-size:12px}
+  .seg-time span{display:none}
+  .seg-time button{padding:7px 9px}
+  .park-nav{left:10px;top:10px;bottom:auto;right:auto;display:block}
+  .compass{width:48px;height:48px}
+  .compass-rose{width:40px;height:40px;font-size:9px}
+  .compass-rose .cn{transform:translateY(-13px)}.compass-rose .cs{transform:translateY(13px)}.compass-rose .ce{transform:translateX(13px)}.compass-rose .cw{transform:translateX(-13px)}
+  .compass-rose i{height:20px;margin:-10px -2.5px;width:5px}
+  .compass-dir{display:none}
+  .park-stage .minimap{display:block;position:absolute;left:0;top:58px;width:92px;height:92px;transition:width .25s,height .25s}
+  .park-stage .minimap.big{width:min(220px,60vw);height:min(220px,60vw)}
+  .park.near .park-stage .minimap{display:none}
+  .zlabel{padding:5px 10px 6px;border-radius:10px}
+  .zlabel b{font-size:15px}
+  .zlabel small{display:none}
+  .plabel{font-size:11px;padding:2px 7px}
+  .plabel i{display:none}
+  .zone-banner{top:auto;bottom:14px;padding:8px 16px}
+  .zone-banner b{font-size:20px}
+  .park.walking .zone-banner{top:auto;bottom:14px;left:10px;transform:none;text-align:left}
+  .park-prompt{left:10px;right:10px;bottom:10px;padding:14px 16px}
+  .park-prompt b{font-size:22px}
+  .park-prompt .btn{padding:8px 12px;font-size:13px}
+  .park-panel{padding:18px var(--gut);gap:12px}
+  .park-panel h1{font-size:28px}
+  .results{max-height:210px}
+  .park-card{display:none}
+  .home-stage{min-height:380px}
+  .home-ctrl{padding:18px}
+}
+@media (max-width:640px){.brand b{font-size:19px}.brand svg{width:22px;height:22px}.nav .wrap{gap:10px}.nav nav a{padding:6px 8px;font-size:13px}}

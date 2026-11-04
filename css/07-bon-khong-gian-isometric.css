@@ -1,0 +1,28 @@
+/* ---------- Bốn không gian (isometric) ---------- */
+.spaces{background:#FBF6EC;color:#2B241C}
+.iso-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid rgba(43,36,28,.12);border-left:1px solid rgba(43,36,28,.12)}
+@media (max-width:860px){.iso-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.iso-grid{grid-template-columns:1fr}}
+.iso{display:flex;flex-direction:column;gap:10px;padding:26px 24px 28px;border-right:1px solid rgba(43,36,28,.12);border-bottom:1px solid rgba(43,36,28,.12);text-decoration:none;color:inherit;transition:background .2s}
+.iso:hover{background:#F5ECDA}
+.iso{background:#FBF6EC}
+.iso svg{width:100%;height:auto;aspect-ratio:4/3;max-width:100%}
+.iso .n{font-family:var(--f-body);font-size:10.5px;color:#7A6E5E;letter-spacing:.06em}
+.iso h3{font-size:24px;font-weight:300;letter-spacing:-.03em}
+.iso p{font-size:13.5px;color:#7A6E5E;max-width:38ch}
+.iso .ln{stroke:rgba(60,45,28,.7);stroke-width:1;fill:none}
+.iso .ln2{stroke:rgba(60,45,28,.28);stroke-width:1;fill:none}
+.iso .fb{fill:#B8862F}.iso .fb2{fill:#8C6324}.iso .fb3{fill:#5A3F17}
+.iso .blk{fill:#FBF6EC}.iso:hover .blk{fill:#FBF6EC}.iso .faint{fill:rgba(184,134,47,.09)}.iso .wf{fill:#FFF8EA;stroke:rgba(60,45,28,.55);stroke-width:.8}.iso .glow{fill:rgba(184,134,47,.22)}
+.iso .route{fill:none;stroke:#9A6E22;stroke-width:1.6;stroke-dasharray:4 4;stroke-linecap:round}
+.iso .wl{stroke:rgba(255,255,255,.75);stroke-width:1.2;fill:none}
+.iso .chk{fill:none;stroke:#9A6E22;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.iso .dot{fill:#B8862F}
+.iso:hover .fb{fill:#C99A45}
+
+.hero-mark .logo circle:nth-of-type(1){animation:wL 1.6s cubic-bezier(.2,.7,.2,1) both}
+.hero-mark .logo circle:nth-of-type(2){animation:wR 1.6s cubic-bezier(.2,.7,.2,1) both}
+.hero-mark .logo path{animation:wM 1.6s ease-out both}
+@keyframes wL{from{transform:translateX(-5px)}}@keyframes wR{from{transform:translateX(5px)}}@keyframes wM{0%,45%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.hero-mark .logo *{animation:none}}
+.foot-word{display:flex;align-items:center;gap:.25em}.foot-word .logo{width:.62em;height:auto;flex-shrink:0}

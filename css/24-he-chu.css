@@ -1,0 +1,22 @@
+/* ---------- Hệ chữ thống nhất: một họ chữ Be Vietnam Pro ----------
+   Tiêu đề 300 · Tiêu đề phụ 400 · Nội dung 400 · Nhãn 600 chữ hoa giãn cách */
+body,button,input,select,textarea{font-family:var(--f-body)}
+h1,h2,.hero-title,.ld-word,.foot-word,.lm-name,.icta p{font-weight:300}
+h3{font-weight:400}
+.eyebrow,.hero-meta small,.hero-meta ul,.facts dt,.lm-facts dt,.ctrl h4,.gen>span,.log time,.vcard .coord,.stats span,.lm-kicker,.iso .n,.isteps span,.zlabel small,.zone-banner small,.compass-dir small,.park-hint,.plabel i,.pmeta small,.pfree,.scheck small,.rt-vid,.rt-y,.ring-center small,.ring-bar,.ring-note,.lb-n,.lb-info small,.auth-form label,.foot-row,.ld-sub,.ld-foot,.msheet-links a small,.price,.sample,.ld-pct{font-family:var(--f-body)}
+.eyebrow,.hero-meta small,.facts dt,.lm-facts dt,.ctrl h4,.gen>span,.lm-kicker,.iso .n,.isteps span,.zlabel small,.zone-banner small,.compass-dir small,.pmeta small,.pfree,.scheck small,.ring-center small,.ring-bar,.ring-note,.lb-n,.lb-info small,.auth-form label,.foot-row,.ld-sub,.ld-foot,.msheet-links a small,.hero-meta ul,.stats span,.sample{font-weight:600;letter-spacing:.08em}
+.stats span,.vcard .coord,.log time{text-transform:none;letter-spacing:.01em;font-weight:500}
+.price,.ld-pct,.stats b,.incense b,.lb-y{font-variant-numeric:tabular-nums}
+.price{font-weight:600}
+.lm-brand{font-weight:300;letter-spacing:-.01em}
+.lm-name{letter-spacing:-.035em}
+.lm-dates{font-weight:300}
+.lm-bio{font-weight:300;font-size:clamp(16.5px,2.2vw,19px);line-height:1.75}
+.lm .chap h3{font-weight:500}
+.lm .chap p{font-weight:300;font-size:15.5px}
+.lm .chap .y{font-weight:300;font-size:22px}
+.lm-letter{font-weight:300;font-style:italic}
+.lm-ghost,.lm-pill,.lm-links a,.lm-pn button{font-family:var(--f-body)}
+.lm-ghost{font-size:15px;font-weight:500}
+.note p,.story{font-weight:300}
+.chap .y{font-family:var(--f-body);font-weight:300}
