@@ -35,7 +35,7 @@
   if(cache&&cache.city===cfg.city&&Date.now()-cache.at<15*60e3){W=cache.w;paint();return}
   var ctl=window.AbortController?new AbortController():null;setTimeout(function(){ctl&&ctl.abort()},8000);
   try{fetch('https://api.open-meteo.com/v1/forecast?latitude='+c[1]+'&longitude='+c[2]+'&current=temperature_2m,weather_code,is_day,wind_speed_10m,relative_humidity_2m&timezone=auto',ctl?{signal:ctl.signal}:{})
-   .then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){var cu=j.current;W={k:fromWMO(cu.weather_code),t:Math.round(cu.temperature_2m),w:Math.round(cu.wind_speed_10m),hu:cu.relative_humidity_2m,real:true};cfg.cache={city:cfg.city,at:Date.now(),w:W};sv();paint()})
+   .then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){var cu=j.current;W={k:fromWMO(cu.weather_code),t:Math.round(cu.temperature_2m),w:Math.round(cu.wind_speed_10m),hu:Math.round(cu.relative_humidity_2m)||0,real:true};cfg.cache={city:cfg.city,at:Date.now(),w:W};sv();paint()})
    .catch(function(){W=climate();paint()})}catch(e){W=climate();paint()}}
  // ---------- HUD ----------
  var pill=document.createElement('button');pill.type='button';pill.className='wx-pill';pill.setAttribute('aria-haspopup','dialog');
