@@ -5,7 +5,7 @@ Trưởng nhóm chuyển mỗi mục thành một GitHub Issue trước khi giao
 ## Đợt 1 — Dọn nền móng (đội: trưởng nhóm, coder, tester)
 
 1. ~~Tách `js/07-loi-chinh.js`~~ — xong: thành 13 file `js/07-NN-*.js`. Còn lại: gom tên dùng chung vào một đối tượng `SS` để bớt phụ thuộc thứ tự nạp (làm sau, khi có kiểm tra hình ảnh tự động ở việc 5).
-2. **Tách `js/04-the-gioi-nui.js`** (~136 KB) theo cùng cách: dựng cảnh, nhân vật, di chuyển, chính điện.
+2. ~~Tách `js/04-the-gioi-nui.js`~~ — xong: 108 KB dữ liệu cảnh ra `js/04-00-du-lieu-canh.js`, phần chạy còn 27 KB ở `js/04-01-the-gioi-nui.js`.
 3. **Tách `css/27-dai-sanh.css`** (~112 KB) và `css/26-trang-ca-nhan.css` (~61 KB) theo khu.
 4. **Đưa dữ liệu mẫu ra `data/*.json`** để sau này thay bằng API mà không đụng giao diện.
 5. **Kiểm tra hình ảnh tự động:** chụp các màn chính, so với ảnh chuẩn để phát hiện vỡ giao diện.

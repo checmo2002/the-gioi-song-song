@@ -33,7 +33,8 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `01-man-cho.js` | Màn chờ có thanh phần trăm |
 | `02-am-lich.js` | Lịch âm Việt Nam (thuật toán Hồ Ngọc Đức, UTC+7), biến toàn cục `LV` |
 | `03-nhac-nen.js` | Nhạc nền tự soạn bằng Web Audio theo lối (đàn tranh / organ) |
-| `04-the-gioi-nui.js` | Thế giới núi: chân núi → lên núi → chính điện, nhân vật, di chuyển *(file lớn, cần tách tiếp)* |
+| `04-00-du-lieu-canh.js` | Dữ liệu 7 cảnh isometric (`window.SS_CANH`): lưới đi được, tỉ lệ, điểm bấm. Sửa cảnh là sửa file này |
+| `04-01-the-gioi-nui.js` | Thế giới núi: chân núi → lên núi → chính điện, nhân vật, di chuyển |
 | `05-dai-sanh.js` | Mở đại sảnh sau cổng, khi vào lại trang, khi bấm logo |
 | `06-trang-muc.js` | Mỗi mục là một trang riêng, điều hướng |
 | `07-01-dung-chung.js` | Hàm dùng chung (`$`, `$$`, `fmt`, `toast`), chuyển giữa trang giới thiệu và bên trong |
