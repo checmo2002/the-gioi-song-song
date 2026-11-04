@@ -52,6 +52,12 @@ python3 -m http.server 8000
 8. **Dữ liệu hiện là dữ liệu mẫu hư cấu**, lưu trong `localStorage` (khoá bắt đầu bằng `ss-`). Không bao giờ dùng tên, ảnh, giấy tờ của người thật làm dữ liệu mẫu.
 9. **Không lấy dữ liệu liệt sĩ** từ trang web khác về (lietsi.net, thongtinlietsi.com…). Chỉ dùng dữ liệu được phép rõ ràng.
 
+## Bản thử
+
+Chưa có hosting. Bản thử là một trang riêng tư trên claude.ai tên "Song Song bản thử", dựng lại từ `main` sau mỗi lần gộp:
+`python3 tools/ban-thu.py` rồi đăng `dist/ban-thu/index.html` kèm `css/`, `js/`, `data/`, `img/` lên đúng artifact đó (giữ link cũ).
+Chủ dự án mở link này trên điện thoại thật để thử.
+
 ## Cần chủ dự án duyệt (agent không tự quyết)
 
 - Thay đổi giao diện lớn, đổi phong cách đồ hoạ, đổi bố cục đại sảnh.

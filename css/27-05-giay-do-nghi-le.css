@@ -2,8 +2,8 @@
 :root{--then:#24160F;--then2:#3A2518;--son:#8E2B1E;--vang:#D4A24C;--vang2:#F2D08A;--do:#F5ECDA;--do2:#EFE2C8;--muc:#2A1D14}
 body.paged:not([data-pg="dau-trang"]){background:var(--then)}
 body.paged:not([data-pg="dau-trang"])::before{content:"";position:fixed;inset:-40px;z-index:-1;pointer-events:none;
-  background:linear-gradient(180deg,rgba(20,12,8,.55),rgba(20,12,8,.78)),url("img/lang/chan-iso.webp") center/cover no-repeat;filter:blur(14px) saturate(.85)}
-@media (max-aspect-ratio:1/1){body.paged:not([data-pg="dau-trang"])::before{background-image:linear-gradient(180deg,rgba(20,12,8,.55),rgba(20,12,8,.78)),url("img/lang/chan-iso.webp")}}
+  background:linear-gradient(180deg,rgba(20,12,8,.55),rgba(20,12,8,.78)),url("../img/lang/chan-iso.webp") center/cover no-repeat;filter:blur(14px) saturate(.85)}
+@media (max-aspect-ratio:1/1){body.paged:not([data-pg="dau-trang"])::before{background-image:linear-gradient(180deg,rgba(20,12,8,.55),rgba(20,12,8,.78)),url("../img/lang/chan-iso.webp")}}
 body.paged:not([data-pg="dau-trang"]) footer.site{display:none}
 /* tấm giấy */
 body.paged:not([data-pg="dau-trang"]) section.pg-on{position:relative;max-width:1180px;margin:14px auto 28px!important;border-radius:26px;overflow:hidden;
