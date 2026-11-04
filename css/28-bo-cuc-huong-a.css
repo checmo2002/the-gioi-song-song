@@ -25,3 +25,9 @@
 .hall[data-ws="chan"] .hall-ttl .t-phat,.hall[data-ws="chan"] .hall-ttl .t-cg{display:none!important}
 .hall[data-ws="chan"] .hall-ttl::before{content:"Chân núi";display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
 .hall[data-ws="nha"] .hall-ttl:not([data-nha])::before{content:"Gian thờ"}
+
+/* nhãn bản đồ khi rê chuột: dòng phụ nằm dưới tên (cột 2), biểu tượng cao 2 dòng, viên bo vừa thay vì hình con nhộng */
+.hall .wh .wh-lb b{grid-row:1;text-align:left}
+.hall .wh .wh-lb small{grid-column:2!important;grid-row:2;padding:0!important;text-align:left;line-height:1.25}
+.hall .wh .wh-ic{grid-row:1/span 2}
+@media (hover:hover){.hall .wh:hover .wh-lb,.hall .wh:focus-visible .wh-lb{border-radius:20px!important;padding-block:6px!important;row-gap:1px}}
