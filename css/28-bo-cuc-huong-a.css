@@ -1,0 +1,27 @@
+/* ---------- Bố cục hướng A (đã duyệt 04/11/2026): một thanh điều hướng, một nút Bày tỏ, ô trực tuyến gọn ---------- */
+
+/* bỏ hàng biểu tượng trùng trên cùng; chỉ giữ ô trực tuyến */
+.hall .hall-act>:not(#hallOnline){display:none!important}
+.hall .hall-act{background:none!important;border:0!important;box-shadow:none!important;padding:0!important}
+
+/* ô trực tuyến: chỉ hiện khi có từ 2 người, chỉ còn biểu tượng + số */
+#hallOnline[hidden]{display:none!important}
+#hallOnline>span:not(.hud-on-ic){display:none!important}
+
+/* máy tính: thanh điều hướng chữ luôn nằm trên cảnh */
+@media (min-width:861px){
+  html.hall-on header.nav{position:fixed!important;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:200!important;
+    background:transparent!important;border-bottom:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transform:none!important}
+  html.hall-on header.nav .brand{visibility:hidden}
+  html.hall-on header.nav .nav-prog{display:none}
+}
+
+/* một nút Bày tỏ: bấm mới mở 4 cách bày tỏ */
+.hall-emo .emo-tog{display:inline-flex;align-items:center;gap:6px;font:500 13px/1 var(--f-body,inherit);padding:0 12px;width:auto!important}
+.hall-emo:not(.emo-mo)>button[data-emo]{display:none!important}
+.hall-emo.emo-mo .emo-tog{opacity:.75}
+
+/* tên cảnh còn thiếu */
+.hall[data-ws="chan"] .hall-ttl .t-phat,.hall[data-ws="chan"] .hall-ttl .t-cg{display:none!important}
+.hall[data-ws="chan"] .hall-ttl::before{content:"Chân núi";display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.hall[data-ws="nha"] .hall-ttl:not([data-nha])::before{content:"Gian thờ"}

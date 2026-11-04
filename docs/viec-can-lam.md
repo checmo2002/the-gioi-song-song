@@ -9,7 +9,7 @@ Trưởng nhóm chuyển mỗi mục thành một GitHub Issue trước khi giao
 3. ~~Tách `css/27-dai-sanh.css` và `css/26-trang-ca-nhan.css`~~ — xong: thành `css/27-01…09-*.css` và `css/26-01…05-*.css`. Lưu ý: hai file gốc là các lớp sửa chồng lên nhau theo thời gian, nên một khu (ví dụ thế giới núi) có thể có kiểu ở vài file; thứ tự nạp vẫn quyết định.
 4. ~~Đưa dữ liệu mẫu ra file riêng~~ — xong: `data/du-lieu-mau.js` (JSON thuần trong `window.SS_DATA`, nạp đồng bộ để không đổi thứ tự khởi động). Còn lại: làng mẫu họ Phạm trong `20-lang-rieng.js`.
 5. ~~Kiểm tra hình ảnh tự động~~ — xong: `tests/hinh-anh.py` chụp 6 màn (cổng, thế giới, người thân, tiểu sử, cửa hàng, gia đình) ở 1366px và 390px, so với `tests/anh-chuan/`, chạy trên GitHub mỗi PR.
-6. **Sắp xếp lại bố cục cho dễ dùng** (ưu tiên của chủ dự án): rà từng màn, đề xuất bố cục mới bằng ảnh, chờ duyệt rồi mới làm.
+6. ~~Sắp xếp lại bố cục cho dễ dùng~~ — xong phần màn thế giới theo **hướng A** (chủ dự án chọn 04/11/2026): một thanh điều hướng có chữ, một nút "Bày tỏ", ô trực tuyến gọn và chỉ hiện từ 2 người, sửa tên cảnh và nhãn chạm mép. Kiểu nằm ở `css/28-bo-cuc-huong-a.css`.
 
 ## Đợt 2 — Đưa lên mạng thật (thêm agent vận hành)
 
@@ -28,6 +28,7 @@ Trưởng nhóm chuyển mỗi mục thành một GitHub Issue trước khi giao
 ## Đợt 4 — Đồ hoạ, video, nhân vật AI (thêm đội 3D, video, nhân vật AI)
 
 15. Render lại các không gian còn lệch phong cách isometric theo `docs/do-hoa.md`.
+15b. **Camera xoay vòng** (chủ dự án muốn có): mỗi cảnh hiện là một ảnh render một góc, nên muốn xoay phải render thêm góc nhìn (ví dụ 4 góc × 7 cảnh) kèm lưới đi được cho từng góc. Làm cùng đợt render lại.
 16. Hoàn thiện đại sảnh chân núi và lối lên đỉnh núi thờ.
 17. Video giới thiệu và hoạt cảnh mở cửa hai lối.
 18. Nhân vật AI người đã khuất: thiết kế trước (dữ liệu, an toàn, giọng nói, chi phí), chủ dự án duyệt rồi mới làm.

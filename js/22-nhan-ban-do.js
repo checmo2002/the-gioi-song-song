@@ -17,6 +17,7 @@
   list.forEach(function(it){var off=false,r=it.r;
    if(r.right<0||r.left>innerWidth||r.bottom<0||r.top>innerHeight){it.el.classList.remove('wh-off');return}
    if(it.k===1&&hall.dataset.ws==='lang'&&it.near>R)off=true;
+   if(!off&&it.k<4&&(r.left<4||r.right>innerWidth-4))off=true;
    if(!off&&it.k<4&&hud.some(function(h){return hit(r,h,2)}))off=true;
    if(!off&&placed.some(function(p){return hit(r,p,4)}))off=true;
    it.el.classList.toggle('wh-off',off);if(!off)placed.push(r)})}
