@@ -23,6 +23,7 @@ Hai vòng tròn lồng nhau, phần giao nhau tô vàng `#B8862F`. Bản SVG có
 
 - Dựng bằng **Blender** (có Blender MCP), có thể dùng **Meshy AI** làm mẫu thô.
 - Xuất **WebP**, đặt đúng thư mục: `img/lang/` (cảnh), `img/nv/` (nhân vật, mỗi tư thế một ảnh: đứng, đi, chắp tay, lạy, ngồi), `img/ho/` (đồ trong nhà).
+- Mỗi cảnh cần thêm dữ liệu lưới đi được trong `js/04-00-du-lieu-canh.js` (cùng tên cảnh với ảnh).
 - Ảnh cảnh nên dưới 400 KB để điện thoại tải nhanh.
 - Asset miễn phí là chính. Mua asset trả phí phải hỏi chủ dự án.
 - File gốc Blender ở máy chủ dự án: `E:\5.2\TheGioiSongSong`, chưa đưa vào repo.
