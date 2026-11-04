@@ -1,0 +1,29 @@
+name: Cập nhật ảnh chuẩn
+# Dùng khi thay đổi giao diện đã được duyệt. Chụp lại ảnh chuẩn trên chính máy GitHub rồi commit vào nhánh đó.
+# Cách gọi: Actions → Cập nhật ảnh chuẩn → Run workflow (chọn nhánh),
+# hoặc đẩy một commit có chữ [cap-nhat-anh] trong lời nhắn: git commit --allow-empty -m "[cap-nhat-anh]"
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [main]
+permissions:
+  contents: write
+jobs:
+  cap-nhat:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[cap-nhat-anh]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright==1.63.0 pillow && playwright install --with-deps chromium
+      - run: |
+          python3 -m http.server 8001 &
+          sleep 2
+          python3 tests/hinh-anh.py http://localhost:8001/ --cap-nhat
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add tests/anh-chuan
+          git diff --cached --quiet || (git commit -m "Cập nhật ảnh chuẩn (chụp trên máy GitHub)" && git push)

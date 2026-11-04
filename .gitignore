@@ -1,4 +1,6 @@
 __pycache__/
 *.png
 !img/**/*.png
+!tests/anh-chuan/*.png
+tests/ket-qua/
 .DS_Store
