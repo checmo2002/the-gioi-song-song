@@ -31,3 +31,6 @@
 .hall .wh .wh-lb small{grid-column:2!important;grid-row:2;padding:0!important;text-align:left;line-height:1.25}
 .hall .wh .wh-ic{grid-row:1/span 2}
 @media (hover:hover){.hall .wh:hover .wh-lb,.hall .wh:focus-visible .wh-lb{border-radius:20px!important;padding-block:6px!important;row-gap:1px}}
+
+/* NPC: không hiện nhãn tên (chỉ người thật mới có tên) */
+.hall .wa-npc .wa-tag{display:none}

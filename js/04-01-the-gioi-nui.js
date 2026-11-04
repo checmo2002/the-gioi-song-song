@@ -104,13 +104,15 @@
   requestAnimationFrame(tick)}
  var pend=null;
  function upsert(id,pr,isMe){var p=av[id];if(!p){p=av[id]=mk(id,isMe);if(!isMe){p.x=+pr.x||.5;p.y=+pr.y||.9}}
-  p.k=pr.k===1?1:0;if(!isMe){var tx=+pr.tx,ty=+pr.ty;if(isFinite(tx)&&isFinite(ty)&&(tx!==p._gx||ty!==p._gy)){p._gx=tx;p._gy=ty;if(st.map){var pa=pathTo(p.x,p.y,tx,ty),f0=pa.shift();p.tx=f0[0];p.ty=f0[1];p.path=pa}else{p.tx=tx;p.ty=ty}}p.want=['chap','lay','ngoi','dung'].indexOf(pr.a)>=0?pr.a:'dung';p.faceUp=pr.a==='chap'||pr.a==='lay';
+  p.k=pr.k===1?1:0;if(!isMe){var tx=+pr.tx,ty=+pr.ty;if(isFinite(tx)&&isFinite(ty)&&(tx!==p._gx||ty!==p._gy)){p._gx=tx;p._gy=ty;if(st.map){var pa=pathTo(p.x,p.y,tx,ty),f0=pa.shift()||[tx,ty];p.tx=f0[0];p.ty=f0[1];p.path=pa}else{p.tx=tx;p.ty=ty}}p.want=['chap','lay','ngoi','dung'].indexOf(pr.a)>=0?pr.a:'dung';p.faceUp=pr.a==='chap'||pr.a==='lay';
    if(p.want!==p._lastWant){p._lastWant=p.want;if(Math.hypot(p.tx-p.x,p.ty-p.y)<.003){p.a=p.want;p.f=0;if(p.faceUp)p.d=4}}}
   p.el.querySelector('.wa-tag').textContent=isMe?'Bạn':(typeof pr.n==='string'&&pr.n.trim()?pr.n.trim().slice(0,22):'Khách viếng');
   var EMO={pray:'🙏',heart:'❤️',flower:'🌸',light:'✨'},b=p.el.querySelector('.wa-bub'),e=EMO[pr.e];
   if(e&&(!b||b.textContent!==e)){b&&b.remove();b=document.createElement('span');b.className='wa-bub';b.textContent=e;p.el.appendChild(b)}else if(!e&&b)b.remove();return p}
  function sync(){if(!on())return;var seen={me:1},n=1,here=1;upsert('me',me,true);
   if(room)room.peers().forEach(function(pe){if(pe.kind!=='viewer'||(pe.isMe&&pe.sameTab))return;var pr=pe.presence||{};n++;if(pr.li&&window.ssLit)ssLit.peer(pe.peer,pr.li);if(pr.w!==1||pr.s!==(window.ssHoKey?ssHoKey(scene):scene)||pr.h!==1)return;here++;upsert(pe.peer,pr,false);seen[pe.peer]=1});
+  // NPC (js/25-npc.js): người trong cảnh, chỉ chạy trên máy này, không tính vào số người trực tuyến
+  if(window.ssNpcList)ssNpcList(scene).forEach(function(q){var p=upsert(q.id,q,false);p.el.classList.add('wa-npc');seen[q.id]=1});
   Object.keys(av).forEach(function(k){if(!seen[k]){av[k].el.remove();delete av[k]}});
   var o=document.getElementById('hallOnline');if(o){o.hidden=n<2;o.querySelector('b').textContent=n;o.title=here+' người đang ở '+(scene==='dien'?'Chính điện':'chân núi')+' · '+n+' người trực tuyến'}}
  function send(){if(!room||!on())return;var p=av.me||me;room.presence({w:1,f:'phat',s:(window.ssHoKey?ssHoKey(scene):scene),h:hall.hidden?0:1,x:+p.x.toFixed(3),y:+p.y.toFixed(3),tx:+me.tx.toFixed(3),ty:+me.ty.toFixed(3),a:me.a,k:me.k,e:me.e,n:myName(),li:window.ssLit?ssLit.mine():0}).catch(function(){})}
@@ -152,7 +154,7 @@
  hall.addEventListener('click',function(ev){var b=ev.target.closest('[data-emo]');if(!b||!on())return;me.e=b.dataset.emo;sync();send();clearTimeout(me._et);me._et=setTimeout(function(){me.e=null;sync();send()},4500)});
  // ---- bật/tắt theo lối
  function refresh(){var hs=homeScene();if(scene!=='sanh'&&(hs==='tho'&&(scene==='chan'||scene==='dien'))||(hs==='chan'&&scene==='tho')){scene=hs;me.s=hs;hall.dataset.ws=hs;Object.keys(av).forEach(function(k){av[k].el.remove();delete av[k]})}var w=active()&&!hall.hidden;hall.classList.toggle('world-on',w);W.hidden=!w;if(w){if(!av.me)setScene(scene);else layout();sync();send()}}
- window.ssWorld={home:homeScene,refresh:refresh,climb:climb,descend:descend,fade:fade,set:function(s){if(!on()){scene=s;me.s=s;hall.dataset.ws=s;Object.keys(av).forEach(function(k){av[k].el.remove();delete av[k]});refresh();return}setScene(s);refresh()},scene:function(){return scene},on:function(){return on()},send:function(){send()},walk:function(x,y,cb){var g=gridNear(x,y);goTo(g[0],g[1],'dung');pend=cb||null},bow:function(){var b=hall.querySelector('.w-bar [data-w="lay"]');b&&b.click()}};
+ window.ssWorld={home:homeScene,refresh:refresh,climb:climb,descend:descend,fade:fade,set:function(s){if(!on()){scene=s;me.s=s;hall.dataset.ws=s;Object.keys(av).forEach(function(k){av[k].el.remove();delete av[k]});refresh();return}setScene(s);refresh()},scene:function(){return scene},on:function(){return on()},sync:function(){sync()},pt:function(x,y){return SC[scene].map?gridNear(x,y):clampFloor(x,y)},pray:function(){var q=SC[scene].pray;return q&&q[O]},send:function(){send()},walk:function(x,y,cb){var g=gridNear(x,y);goTo(g[0],g[1],'dung');pend=cb||null},bow:function(){var b=hall.querySelector('.w-bar [data-w="lay"]');b&&b.click()}};
  addEventListener('ss-lit',function(){if(on()&&SC[scene].pray){var pq=SC[scene].pray[O];goTo((av.me||me).x,pq[1],'lay')}});
  new MutationObserver(function(){if(hall.hidden)hall.classList.remove('no-splash');setTimeout(refresh,30)}).observe(hall,{attributes:true,attributeFilter:['hidden']});
  addEventListener('ss-faith',function(){setTimeout(refresh,30)});
