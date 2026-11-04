@@ -89,7 +89,7 @@
   return {id:id,el:el,spr:el.querySelector('.wa-spr'),x:.5,y:.9,tx:.5,ty:.9,d:4,a:'dung',k:0,f:0,me:isMe,lay:0}}
  function draw(p){var ph=scaleAt(p.y)*st.sh,ch=ph/BODY,cw=ch*CELL.w/CELL.h,n=ANIM[p.a]||1,fi=Math.min(n-1,Math.floor(p.f)%n);
   p.el.style.transform='translate('+(p.x*st.sw-cw/2)+'px,'+(p.y*st.sh-ch*FEET)+'px)';p.el.style.width=cw+'px';p.el.style.height=ch+'px';p.el.style.zIndex=Math.round(p.y*1000);
-  var url='img/nv/'+KIND[p.k]+'-'+p.a+'.webp?v=2';if(p._u!==url){p.spr.style.backgroundImage='url("'+url+'")';p._u=url}
+  var url=(p.kind?'img/nv/npc/'+p.kind:'img/nv/'+KIND[p.k])+'-'+p.a+'.webp?v=2';if(p._u!==url){p.spr.style.backgroundImage='url("'+url+'")';p._u=url}
   p.spr.style.backgroundSize=(cw*n)+'px '+(ch*8)+'px';p.spr.style.backgroundPosition=(-fi*cw)+'px '+(-p.d*ch)+'px';p.el.style.setProperty('--fs',Math.max(10,Math.min(14,ch*.07))+'px')}
  function dirOf(dx,dy){var a=Math.atan2(dx*st.sw,dy*st.sh)/(Math.PI/4);return ((Math.round(a)%8)+8)%8}
  function tick(t){var dt=Math.min(.1,(t-(last||t))/1000);last=t;
@@ -112,7 +112,7 @@
  function sync(){if(!on())return;var seen={me:1},n=1,here=1;upsert('me',me,true);
   if(room)room.peers().forEach(function(pe){if(pe.kind!=='viewer'||(pe.isMe&&pe.sameTab))return;var pr=pe.presence||{};n++;if(pr.li&&window.ssLit)ssLit.peer(pe.peer,pr.li);if(pr.w!==1||pr.s!==(window.ssHoKey?ssHoKey(scene):scene)||pr.h!==1)return;here++;upsert(pe.peer,pr,false);seen[pe.peer]=1});
   // NPC (js/25-npc.js): người trong cảnh, chỉ chạy trên máy này, không tính vào số người trực tuyến
-  if(window.ssNpcList)ssNpcList(scene).forEach(function(q){var p=upsert(q.id,q,false);p.el.classList.add('wa-npc');seen[q.id]=1});
+  if(window.ssNpcList)ssNpcList(scene).forEach(function(q){var p=upsert(q.id,q,false);p.kind=q.v;p.el.classList.add('wa-npc');seen[q.id]=1});
   Object.keys(av).forEach(function(k){if(!seen[k]){av[k].el.remove();delete av[k]}});
   var o=document.getElementById('hallOnline');if(o){o.hidden=n<2;o.querySelector('b').textContent=n;o.title=here+' người đang ở '+(scene==='dien'?'Chính điện':'chân núi')+' · '+n+' người trực tuyến'}}
  function send(){if(!room||!on())return;var p=av.me||me;room.presence({w:1,f:'phat',s:(window.ssHoKey?ssHoKey(scene):scene),h:hall.hidden?0:1,x:+p.x.toFixed(3),y:+p.y.toFixed(3),tx:+me.tx.toFixed(3),ty:+me.ty.toFixed(3),a:me.a,k:me.k,e:me.e,n:myName(),li:window.ssLit?ssLit.mine():0}).catch(function(){})}

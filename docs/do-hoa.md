@@ -22,6 +22,8 @@ Hai vòng tròn lồng nhau, phần giao nhau tô vàng `#B8862F`. Bản SVG có
 ## Quy trình làm asset
 
 - Dựng bằng **Blender** (có Blender MCP), có thể dùng **Meshy AI** làm mẫu thô.
+- NPC: `img/nv/npc/<kiểu>-<tư thế>.webp`. Nhân vật gốc ở `E:\5.2\TheGioiSongSong\nhan-vat\nhan-vat.blend` (tạo bằng Meshy, gắn xương, động tác đứng/đi/vái từ thư viện Meshy, chắp tay và quỳ dựng bằng `tools/dung-nhan-vat.py`). Render: `blender -b nhan-vat.blend --python tools/render-npc.py -- <thư mục ra>`.
+- Song Song tách hẳn khỏi Bản Đồ Liệt Sĩ: không dùng asset, file .blend hay kịch bản từ thư mục dự án đó.
 - Xuất **WebP**, đặt đúng thư mục: `img/lang/` (cảnh), `img/nv/` (nhân vật, mỗi tư thế một ảnh: đứng, đi, chắp tay, lạy, ngồi), `img/ho/` (đồ trong nhà).
 - Mỗi cảnh cần thêm dữ liệu lưới đi được trong `js/04-00-du-lieu-canh.js` (cùng tên cảnh với ảnh).
 - Ảnh cảnh nên dưới 400 KB để điện thoại tải nhanh.
