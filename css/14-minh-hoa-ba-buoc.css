@@ -5,23 +5,23 @@
 .pav{width:40px;height:40px;border-radius:50%;background:#8C6324;overflow:hidden;flex-shrink:0}
 .pav svg{width:100%;height:100%;display:block}
 .pmeta{display:flex;flex-direction:column;min-width:0;line-height:1.25}
-.pmeta small{font:600 9px var(--f-body);color:#9A6E22;text-transform:uppercase;letter-spacing:.06em}
+.pmeta small{font:600 9px var(--f-body);color:#8C6324;text-transform:uppercase;letter-spacing:.06em}
 .pmeta b{font-weight:400;font-size:14px;color:#2B241C;white-space:nowrap}
 .pmeta span{font-size:10.5px;color:#7A6E5E}
 .pfield{height:9px;border-radius:3px;background:rgba(43,36,28,.06);overflow:hidden}
 .pfield i{display:block;height:100%;background:rgba(154,110,34,.28);transform-origin:left;animation:fill 4s var(--ease,ease) infinite}
 .pfield+.pfield i{animation-delay:.4s}
 @keyframes fill{0%{transform:scaleX(0)}35%,100%{transform:scaleX(1)}}
-.pbtn{align-self:flex-start;margin-top:4px;background:#B8862F;color:#fff;font-size:11.5px;font-weight:500;padding:7px 14px;border-radius:4px;animation:pbtn 4s ease-in-out infinite}
+.pbtn{align-self:flex-start;margin-top:4px;background:#8C6324;color:#fff;font-size:11.5px;font-weight:500;padding:7px 14px;border-radius:4px;animation:pbtn 4s ease-in-out infinite}
 @keyframes pbtn{0%,55%,100%{box-shadow:0 0 0 0 rgba(184,134,47,0)}62%{transform:scale(.95)}70%{box-shadow:0 0 0 10px rgba(184,134,47,0);transform:scale(1)}64%{box-shadow:0 0 0 0 rgba(184,134,47,.6)}}
 .pcur{position:absolute;width:18px;left:58%;top:78%;animation:pcur 4s var(--ease,ease) infinite}
 @keyframes pcur{0%{transform:translate(70px,40px);opacity:0}20%{opacity:1}55%,65%{transform:translate(-52px,-8px)}62%{transform:translate(-52px,-8px) scale(.85)}90%{opacity:1}100%{transform:translate(-52px,-8px);opacity:0}}
-.pfree{position:absolute;right:10px;top:10px;font:600 9.5px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:#9A6E22;border:1px solid rgba(154,110,34,.35);padding:2px 6px;border-radius:3px}
+.pfree{position:absolute;right:10px;top:10px;font:600 9.5px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:#8C6324;border:1px solid rgba(154,110,34,.35);padding:2px 6px;border-radius:3px}
 .sm2 .shouse{position:absolute;left:4%;bottom:6%;width:62%;height:auto}
 .sfan{position:absolute;right:7%;top:16%;width:42%;height:52%}
 .sfan span{position:absolute;right:0;top:0;width:62%;aspect-ratio:3/2;background:var(--g);border:3px solid #efe9dc;border-bottom-width:9px;box-shadow:0 8px 18px rgba(60,40,15,.28);transform:rotate(var(--r));transform-origin:bottom left;transition:transform .6s var(--ease,ease);animation:fan 5s var(--ease,ease) infinite alternate}
 .sfan span:nth-child(2){right:12%;top:14%}.sfan span:nth-child(3){right:24%;top:30%}
-.sfan .sadd{right:36%;top:46%;background:rgba(184,134,47,.15);border:1px dashed rgba(154,110,34,.6);color:#9A6E22;display:grid;place-items:center;font-size:18px;box-shadow:none}
+.sfan .sadd{right:36%;top:46%;background:rgba(184,134,47,.15);border:1px dashed rgba(154,110,34,.6);color:#8C6324;display:grid;place-items:center;font-size:18px;box-shadow:none}
 .sfan em{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-style:normal;font-size:12px}
 @keyframes fan{to{transform:rotate(calc(var(--r)*.4)) translateY(-3px)}}
 .sgift{position:absolute;left:10%;top:12%;width:26px;animation:float 3.6s ease-in-out infinite}
@@ -39,7 +39,7 @@
 .scheck small{font:600 8.5px var(--f-body);color:#7A6E5E;text-transform:uppercase;letter-spacing:.05em}
 .scheck span{display:flex;gap:6px;align-items:center;opacity:0;animation:chk 6s infinite}
 .scheck span:nth-of-type(2){animation-delay:.5s}.scheck span:nth-of-type(3){animation-delay:1s}
-.scheck b{display:inline-grid;place-items:center;width:13px;height:13px;border-radius:3px;background:#B8862F;color:#fff;font-size:8px}
+.scheck b{display:inline-grid;place-items:center;width:13px;height:13px;border-radius:3px;background:#8C6324;color:#fff;font-size:8px}
 @keyframes chk{0%{opacity:0;transform:translateX(-6px)}8%,85%{opacity:1;transform:none}100%{opacity:0}}
 .sba{display:flex;gap:4px;margin-top:3px}.sba i{flex:1;aspect-ratio:4/3;border-radius:2px;background:linear-gradient(135deg,#6b6650,#8f8a6e)}.sba i+i{background:linear-gradient(135deg,#d9d3bd,#e6c25a)}
 @media (prefers-reduced-motion:reduce){.smock *{animation:none!important}.pcur{display:none}.scheck span{opacity:1}}

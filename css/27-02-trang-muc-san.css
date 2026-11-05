@@ -16,7 +16,7 @@ body.paged section.pgs:not(.pg-on){display:none!important}
 .pgm-list{display:flex;flex-wrap:wrap;gap:8px}
 .pgm-list a,.pgm-hall{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid rgba(43,36,28,.14);background:rgba(255,255,255,.7);color:#2B241C;text-decoration:none;font:inherit;font-size:15px;cursor:pointer;transition:background .25s,transform .25s}
 .pgm-list a:hover,.pgm-hall:hover{background:#fff;transform:translateY(-2px)}
-.pgm-list .ic{width:18px;height:18px;color:#B8862F}
+.pgm-list .ic{width:18px;height:18px;color:#8C6324}
 .pgm-hall{margin-top:14px;background:#2B241C;color:#FBF6EC;border-color:#2B241C}.pgm-hall:hover{background:#4A3E30}
 @media (max-width:640px){.pgbar{padding-top:12px}.pg-title{font-size:20px}}
 @media (prefers-reduced-motion:reduce){.pg-on.pg-enter{animation:none}}
@@ -39,7 +39,7 @@ body.paged section.pgs:not(.pg-on){display:none!important}
   .hall-floor{top:calc(var(--stH) * .79);height:calc(var(--stH) * .13);left:4%;right:4%}
   body.faith-cg .hall-floor{top:calc(var(--stH) * .8)}
   .hall{--avz:.86}
-  .av .tag{font-size:11px;padding:3px 7px;bottom:64px}
+  .av .tag{font-size:12px;padding:3px 7px;bottom:64px}
   .av .bub{bottom:84px;font-size:21px}
   /* nút bày tỏ: hàng ngang nhỏ ở mép phải sân khấu */
   .hall-emo{top:auto;bottom:auto;right:10px;left:auto;flex-direction:row;top:calc(var(--stH) - 72px);gap:5px}

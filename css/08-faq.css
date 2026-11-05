@@ -6,5 +6,5 @@
 .faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;font-size:18px;font-weight:400;letter-spacing:-.015em}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:"+";flex-shrink:0;width:28px;height:28px;border:1px solid var(--line);border-radius:4px;display:grid;place-items:center;font-family:var(--f-body);color:var(--blue-2);transition:transform .2s}
-.faq details[open] summary::after{content:"–";background:var(--blue);border-color:var(--blue);color:#fff}
+.faq details[open] summary::after{content:"–";background:var(--nut);border-color:var(--nut);color:#fff}
 .faq details p{padding:0 44px 22px 0;color:var(--ink-soft);max-width:62ch}

@@ -54,7 +54,7 @@ body.faith-cg .hall-act>*,body.faith-cg .hall-dock>*{background:rgba(255,255,255
 @media (max-width:760px),(max-aspect-ratio:1/1){
   .hs-l,.hs-r{display:none}
   .hs-main{top:38%!important}
-  .hall-top{padding-inline:12px}.hall-ttl span{font-size:10px}.hall-ttl b{font-size:17px}.hall-act{flex-wrap:nowrap;gap:5px}.hall-act>*{padding:0 9px;font-size:13px;min-height:40px}
+  .hall-top{padding-inline:12px}.hall-ttl span{font-size:12px}.hall-ttl b{font-size:17px}.hall-act{flex-wrap:nowrap;gap:5px}.hall-act>*{padding:0 9px;font-size:13px;min-height:40px}
   .hall-list{max-height:52%;overflow:auto;padding-top:28px;background:linear-gradient(rgba(14,8,4,0),rgba(14,8,4,.78) 22%);justify-items:stretch}
   body.faith-cg .hall-list{background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.85) 22%);color:#2B241C}
   .hall-hint{display:block;margin:0;text-align:center;font-size:14px;opacity:.8}
@@ -179,7 +179,7 @@ body.faith-cg .hc:hover,body.faith-cg .hc:focus-visible{background:#fff;border-c
 
 /* ===== Đại sảnh: nút gọn hơn ===== */
 .hs-col{width:auto;gap:8px;top:46%}
-.hs-cap{font-size:11px}
+.hs-cap{font-size:12px}
 .hc{min-height:50px;padding:5px 16px 5px 5px;gap:10px;border-radius:999px}
 .hs-col.r .hc{padding:5px 5px 5px 16px}
 .hc .hs-dot{width:40px;height:40px}.hc .hs-dot .ic{width:20px;height:20px}

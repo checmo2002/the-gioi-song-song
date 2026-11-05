@@ -57,7 +57,7 @@
 .mo-tip{min-height:20px;margin-top:2px;text-align:center;font-size:13px;color:#FFD9A0}
 .mo-tip.nt{color:#FFE9A8;font-weight:600}
 .mo-st{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
-.mo-st div{padding:8px 4px;border-radius:12px;background:rgba(255,255,255,.06);text-align:center;font-size:11px;opacity:.9}
+.mo-st div{padding:8px 4px;border-radius:12px;background:rgba(255,255,255,.06);text-align:center;font-size:12px;opacity:.9}
 .mo-st b{display:block;font-size:16px;font-weight:600}
 .mo-skin{display:flex;gap:8px;justify-content:center;margin-top:10px}
 .mo-skin button{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
@@ -126,7 +126,7 @@
   flex-direction:column!important;gap:3px!important;border-radius:15px!important;box-shadow:none!important}
 .hall .w-bar [data-w]:not(.w-up):not(.w-down):not(.mo-btn){background:rgba(255,255,255,.06)!important;border-color:transparent!important;color:#FBF1DC!important}
 .hall .w-bar [data-w] svg{width:21px!important;height:21px!important}
-.hall .w-bar [data-w] span{display:block!important;max-width:100%;overflow:hidden;white-space:normal;text-align:center;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:11px;font-weight:600;line-height:1.12;letter-spacing:-.01em}
+.hall .w-bar [data-w] span{display:block!important;max-width:100%;overflow:hidden;white-space:normal;text-align:center;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:12px;font-weight:600;line-height:1.12;letter-spacing:-.01em}
 .hall .w-bar [data-w]:hover{transform:translateY(-2px)}
 @media (hover:hover){.hall .w-bar [data-w]:hover::after{content:none!important;display:none!important}}
 @media (min-width:700px){.hall .w-bar [data-w]{flex-basis:84px!important;height:62px!important}.hall .w-bar [data-w] span{font-size:12px}}

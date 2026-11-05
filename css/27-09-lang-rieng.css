@@ -1,7 +1,7 @@
 /* ===== Làng riêng ===== */
 .ho-h,.ho-d{position:absolute;pointer-events:none}
 .hall[data-ws="ho"] .hall-ttl .t-phat,.hall[data-ws="ho"] .hall-ttl .t-cg{display:none!important}
-.hall[data-ws="ho"] .hall-ttl::before{content:"Làng nhà tôi";display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.hall[data-ws="ho"] .hall-ttl::before{content:"Làng nhà tôi";display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
 .hall[data-ws="ho"] .w-bar [data-w]:not(.ho-btn):not([data-w="doi"]){display:none!important}
 .ho-h canvas,.ho-d img{width:100%;height:100%;display:block}
 .hall:not([data-ws="ho"]) .ho-h,.hall:not([data-ws="ho"]) .ho-d{display:none}
@@ -27,9 +27,9 @@
 .hos-act button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:16px;border:1px solid #E6DAC3;background:#fff;font:inherit;font-size:12.5px;font-weight:600;color:#3A2E20;cursor:pointer}
 .hos-act button svg{width:24px;height:24px;color:#A8661A}
 .hos-act button:hover{background:#FFF4DE}
-.hos h4{margin:16px 0 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8C7A60}
+.hos h4{margin:16px 0 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
 .hos-sty{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.hos-sty button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px 8px;border-radius:14px;border:2px solid transparent;background:#fff;font:inherit;font-size:11px;cursor:pointer;color:#3A2E20}
+.hos-sty button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px 8px;border-radius:14px;border:2px solid transparent;background:#fff;font:inherit;font-size:12px;cursor:pointer;color:#3A2E20}
 .hos-sty button[aria-pressed="true"]{border-color:#C9892E;background:#FFF4DE}
 .hos-sty canvas{width:100%;aspect-ratio:1;display:block}
 .hos-sw{display:flex;gap:8px;flex-wrap:wrap}
@@ -42,12 +42,12 @@
 .hos-foot{display:flex;gap:8px;margin-top:16px}
 .hos-foot button{flex:1;min-height:44px;border-radius:999px;border:1px solid #D9CDB5;background:#fff;font:inherit;font-weight:600;cursor:pointer}
 .hos-foot .pri{border:0;color:#fff;background:linear-gradient(180deg,#E2A548,#A8661A)}
-.hos-note{margin:10px 0 0;font-size:12px;color:#8C7A60}
-.gp-row{margin-top:10px}.gp-row>small{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8C7A60;margin-bottom:6px}
+.hos-note{margin:10px 0 0;font-size:12px;color:var(--ink-soft)}
+.gp-row{margin-top:10px}.gp-row>small{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
 .gp-ppl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .gp-ppl button{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border-radius:999px;border:1px solid #E6DAC3;background:#fff;font:inherit;font-size:13px;cursor:pointer;text-align:left}
 .gp-ppl button i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-style:normal;font-size:12px;font-weight:600;flex:none}
-.gp-ppl button small{display:block;font-size:11px;color:#8C7A60}
+.gp-ppl button small{display:block;font-size:12px;color:var(--ink-soft)}
 .gp-ppl .amp{color:#C9892E;font-weight:700}
 .gp-ppl .alive{opacity:.55;cursor:default}
 
@@ -58,8 +58,8 @@
 .lm-z button:hover{background:#FFF4DE}
 .lm-z i{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;flex:none}
 .lm-z i svg{width:20px;height:20px}
-.lm-z b{display:block;font-size:15px}.lm-z small{display:block;font-size:12px;color:#8C7A60}
-.lm-z em{margin-left:auto;font-style:normal;font-size:12px;font-weight:600;color:#8C7A60;white-space:nowrap}
+.lm-z b{display:block;font-size:15px}.lm-z small{display:block;font-size:12px;color:var(--ink-soft)}
+.lm-z em{margin-left:auto;font-style:normal;font-size:12px;font-weight:600;color:var(--ink-soft);white-space:nowrap}
 .lm-mini{position:relative;margin:0 0 12px;border-radius:16px;overflow:hidden;aspect-ratio:3/2;background:#7FA44A}
 .lm-mini img{width:100%;height:100%;object-fit:cover;display:block}
 .lm-mini span{position:absolute;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
@@ -91,7 +91,7 @@
 .dai-alt:not(.lit) .dai-smk{animation:none}
 .dai-bowl{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:140px;height:58px;background:linear-gradient(#C9A24B,#8E6A22);border-radius:10px 10px 58px 58px}
 .dai-bowl::before{content:"";position:absolute;top:-7px;left:-5px;right:-5px;height:14px;border-radius:50%;background:#D9B65E}
-.dai-bowl span{position:absolute;inset:16px 0 0;text-align:center;font-family:var(--f-display);font-size:11px;white-space:nowrap;color:#5A3E10;letter-spacing:.06em}
+.dai-bowl span{position:absolute;inset:16px 0 0;text-align:center;font-family:var(--f-display);font-size:12px;white-space:nowrap;color:#5A3E10;letter-spacing:.06em}
 .dai-inc{position:relative;display:grid;justify-items:center;line-height:1.2}
 .dai-inc b{font-size:2.3rem;font-weight:700;color:#F2C94C;font-variant-numeric:tabular-nums}
 .dai-inc span{font-size:.85rem;color:#CDBBA6}
@@ -107,8 +107,8 @@
 .dai-row button{padding:0 18px;border-radius:14px;border:0;background:#DA251D;color:#fff;font:inherit;font-weight:600;cursor:pointer}
 .dai-fd{margin:12px 14px 0;display:grid;gap:8px}
 .dai-fd div{background:#fff;border:1px solid #EFE4D0;border-left:3px solid #DA251D;border-radius:12px;padding:9px 12px;font-size:14px;line-height:1.45}
-.dai-fd small{display:block;margin-top:3px;font-size:12px;color:#8C7A60}
-.dai-fd p{margin:0;text-align:center;font-size:13px;color:#8C7A60}
+.dai-fd small{display:block;margin-top:3px;font-size:12px;color:var(--ink-soft)}
+.dai-fd p{margin:0;text-align:center;font-size:13px;color:var(--ink-soft)}
 .dai-lk{display:flex;align-items:center;justify-content:center;gap:6px;margin:14px 14px 0;font-size:13px;color:#8C5A16}
 @keyframes daiEmber{0%,100%{transform:scale(.85);opacity:.75}50%{transform:scale(1.15);opacity:1}}
 @keyframes daiSmoke{0%{transform:translateY(0) scaleX(.6);opacity:0}20%{opacity:.75}100%{transform:translateY(-70px) scaleX(1.6);opacity:0}}

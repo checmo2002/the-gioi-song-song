@@ -11,5 +11,6 @@ dau = re.sub(r'<title>.*?</title>', '<title>Song Song bản thử</title>', m.gr
 dau = re.sub(r'<meta charset[^>]*>|<meta name=viewport[^>]*>', '', dau).strip()
 ra = os.path.join(goc, 'dist', 'ban-thu')
 os.makedirs(ra, exist_ok=True)
-open(os.path.join(ra, 'index.html'), 'w', encoding='utf-8').write(dau + '\n' + m.group(2).strip() + '\n')
+lang = '<script>document.documentElement.lang="vi"</script>'  # vỏ của artifact không có lang="vi": trình đọc màn hình sẽ đọc sai giọng
+open(os.path.join(ra, 'index.html'), 'w', encoding='utf-8').write(lang + '\n' + dau + '\n' + m.group(2).strip() + '\n')
 print('đã ghi', os.path.join(ra, 'index.html'))

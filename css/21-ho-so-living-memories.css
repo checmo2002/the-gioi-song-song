@@ -12,10 +12,10 @@
 .lm-bars span{flex:1;background:var(--lm-bg);transform-origin:50% 100%;transform:scaleY(0)}
 .lm.play .lm-bars span{animation:lmBars 1.15s cubic-bezier(.75,0,.25,1) both;animation-delay:calc(var(--i)*45ms)}
 @keyframes lmBars{0%{transform:scaleY(1);opacity:1}60%{opacity:.85}100%{transform:scaleY(0);opacity:0}}
-.lm-cap{position:absolute;right:0;bottom:22%;font-size:11px;color:var(--lm-dim);writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.06em}
+.lm-cap{position:absolute;right:0;bottom:22%;font-size:12px;color:var(--lm-dim);writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.06em}
 .lm-old{position:absolute;left:3%;bottom:7%;width:31%;margin:0;transform:rotate(-1.5deg);filter:grayscale(1) contrast(1.05) drop-shadow(0 10px 18px rgba(0,0,0,.55));z-index:2;will-change:transform}
 .lm-old svg{display:block;width:100%;height:auto}
-.lm-old figcaption{font-size:11px;color:var(--lm-dim);margin-top:6px;font-family:var(--f-display);font-style:italic}
+.lm-old figcaption{font-size:12px;color:var(--lm-dim);margin-top:6px;font-family:var(--f-display);font-style:italic}
 .lm-old.no-helmet .helmet{display:none}
 .lm.play .lm-old{animation:lmOld 1s .9s ease-out both}
 @keyframes lmOld{from{opacity:0;translate:0 24px}to{opacity:1;translate:0 0}}
@@ -38,7 +38,7 @@
 .lm-note{text-align:center;color:var(--lm-dim);font-size:13px;margin-top:10px;min-height:1.4em}
 .lm-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:40px 0 0;border-top:1px dotted var(--lm-line)}
 .lm-facts div{padding:12px 14px 12px 0;border-bottom:1px dotted var(--lm-line)}
-.lm-facts dt{font-family:var(--f-body);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--lm-dim)}
+.lm-facts dt{font-family:var(--f-body);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--lm-dim)}
 .lm-facts dd{margin:2px 0 0;font-family:var(--f-display)}
 @media (max-width:480px){.lm-facts{grid-template-columns:1fr}}
 .lm-chapters{margin-top:40px}

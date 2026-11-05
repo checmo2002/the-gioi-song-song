@@ -6,7 +6,7 @@
 .home-tag{position:absolute;left:16px;top:16px;background:rgba(251,246,236,.72);border:1px solid rgba(43,36,28,.14);color:#2B241C;padding:6px 12px;border-radius:4px;font-size:13px;font-weight:500}
 .home-time{position:absolute;left:16px;bottom:16px;display:flex;gap:2px;background:rgba(251,246,236,.72);border:1px solid rgba(43,36,28,.14);padding:3px;border-radius:6px}
 .home-time button{border:0;background:transparent;padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;color:#6B5F50}
-.home-time button[aria-pressed="true"]{background:#B8862F;color:#fff}
+.home-time button[aria-pressed="true"]{background:#8C6324;color:#fff}
 .home-ctrl{padding:22px;display:flex;flex-direction:column;gap:22px;border-left:1px solid var(--line);max-height:640px;overflow-y:auto}
 @media (max-width:900px){.home-ctrl{border-left:0;border-top:1px solid var(--line);max-height:none}}
 .ctrl h4{font-family:var(--f-body);margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
