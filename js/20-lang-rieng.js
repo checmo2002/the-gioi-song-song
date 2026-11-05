@@ -132,7 +132,7 @@
   [['tree','Gia phả','<circle cx="12" cy="5" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M12 7.5V12M6 15.5V12h12v3.5"/>'],['ra','Làng chung','<path d="M3 11 12 4l9 7"/><path d="M5 10v11h14V10"/>']].forEach(function(x){
    var b=document.createElement('button');b.type='button';b.className='ho-btn';b.dataset.w='ho-'+x[0];b.dataset.hob=x[0];b.setAttribute('aria-label',x[1]);b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'+x[2]+'</svg><span>'+x[1]+'</span>';bar.appendChild(b)})}
  addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.ho-btn');if(!b)return;e.stopPropagation();e.preventDefault();if(b.dataset.hob==='tree')tree();else window.ssWorld&&ssWorld.fade('lang','Ra làng tưởng niệm…')},true);
- setInterval(addBtn,1500);addBtn();
+ ssKhiDoi(addBtn);
  // ---------- mở làng ----------
  function go(){layout();build();var W=window.ssWorld;if(!W)return;if(hall.hidden){W.set('ho');window.ssHall&&ssHall.open();setTimeout(function(){W.refresh()},60)}else W.fade('ho','Về làng nhà…')}
  window.ssHo={go:go,menu:menu,tree:tree,door:door,build:build,from:function(v){if(arguments.length)FROM=v;return FROM},key:key};

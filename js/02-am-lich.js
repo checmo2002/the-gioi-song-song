@@ -45,7 +45,7 @@ return{jdFromDate:jdFromDate,jdToDate:jdToDate,toLunar:toLunar,canChiNgay:canChi
  // bụi sáng
  var dust=gate.querySelector('.g-dust');for(var i=0;i<26;i++){var d=document.createElement('i');d.style.left=(Math.random()*100)+'%';d.style.animationDuration=(9+Math.random()*10)+'s';d.style.animationDelay=(-Math.random()*18)+'s';dust.appendChild(d)}
  // âm thanh: chiêng chùa trầm / chuông nhà thờ
- var ac=null;function sound(kind){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();var n=ac.currentTime,o=ac.createGain();o.gain.value=.45;o.connect(ac.destination);
+ var ac=null;function sound(kind){try{ac=ac||ssAm();var n=ac.currentTime,o=ac.createGain();o.gain.value=.45;o.connect(ac.destination);
   var P=kind==='cg'?[[392,.5,5],[196,.6,6],[470,.3,3.5],[588,.25,3],[784,.18,2.4],[980,.1,1.6]]:[[98,.8,7],[196,.4,5],[247,.25,4],[392,.15,2.6],[523,.08,1.8]];
   P.forEach(function(p){var os=ac.createOscillator(),g=ac.createGain();os.frequency.value=p[0];g.gain.setValueAtTime(0,n);g.gain.linearRampToValueAtTime(p[1],n+.02);g.gain.exponentialRampToValueAtTime(.0001,n+p[2]);os.connect(g);g.connect(o);os.start(n);os.stop(n+p[2])})}catch(e){}}
  window.ssBell=sound;
@@ -184,13 +184,14 @@ return{jdFromDate:jdFromDate,jdToDate:jdToDate,toLunar:toLunar,canChiNgay:canChi
   altar.classList.add('lit');altar.classList.remove('go');void altar.offsetWidth;altar.classList.add('go');
   msg.textContent=(window.ssFaith==='cg'?'Thắp nến cầu cho ':'Thành kính dâng ')+pick($('#altarTo')).toLowerCase().replace('anh hùng liệt sĩ','các anh hùng liệt sĩ');msg.classList.remove('show');void msg.offsetWidth;msg.classList.add('show');draw(true)});
  // thỉnh chuông: tiếng chuông tổng hợp bằng Web Audio
- var ac=null,prT=0;$('#hubBell').addEventListener('click',function(){if(window.ssFaith==='cg'){var pr=$('#prayer');$('#prName').textContent=pick($('#altarTo')).toLowerCase();pr.classList.add('show');clearTimeout(prT);prT=setTimeout(function(){pr.classList.remove('show')},12000);window.ssBell&&ssBell('cg');altar.classList.remove('ring');void altar.offsetWidth;altar.classList.add('ring');return}try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();var now=ac.currentTime,out=ac.createGain();out.gain.value=.5;out.connect(ac.destination);
+ var ac=null,prT=0;$('#hubBell').addEventListener('click',function(){if(window.ssFaith==='cg'){var pr=$('#prayer');$('#prName').textContent=pick($('#altarTo')).toLowerCase();pr.classList.add('show');clearTimeout(prT);prT=setTimeout(function(){pr.classList.remove('show')},12000);window.ssBell&&ssBell('cg');altar.classList.remove('ring');void altar.offsetWidth;altar.classList.add('ring');return}try{ac=ac||ssAm();var now=ac.currentTime,out=ac.createGain();out.gain.value=.5;out.connect(ac.destination);
   [[220,1,6],[440,.5,4.5],[587,.32,3.5],[880,.22,2.4],[1320,.12,1.6]].forEach(function(p){var o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=p[0];g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(p[1],now+.01);g.gain.exponentialRampToValueAtTime(.0001,now+p[2]);o.connect(g);g.connect(out);o.start(now);o.stop(now+p[2])})}catch(e){}
   altar.classList.remove('ring');void altar.offsetWidth;altar.classList.add('ring')});
  // thiệp tưởng niệm
  var cv=$('#cmCanvas');if(!cv)return;var cx=cv.getContext('2d');chips($('#cmTo'));chips($('#cmMsg'));
  function wrap(text,x,y,maxW,lh){var words=text.split(' '),line='',lines=[];words.forEach(function(w){var tt=line?line+' '+w:w;if(cx.measureText(tt).width>maxW&&line){lines.push(line);line=w}else line=tt});lines.push(line);lines.forEach(function(s,i){cx.fillText(s,x,y+i*lh)});return lines.length}
- function render(){var W=1080,H=1350,f=getComputedStyle(document.body).fontFamily;cx.clearRect(0,0,W,H);
+ function render(){var W=1080,H=1350,f=getComputedStyle(document.body).fontFamily;if(cv.width!==W){cv.width=W;cv.height=H}   // chỉ cấp 5,8 MB khi thật sự vẽ
+ cx.clearRect(0,0,W,H);
   var g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#FFFDF8');g.addColorStop(1,'#F1E2C2');cx.fillStyle=g;cx.fillRect(0,0,W,H);
   var r=cx.createRadialGradient(W/2,430,20,W/2,430,520);r.addColorStop(0,'rgba(255,236,190,.95)');r.addColorStop(1,'rgba(255,236,190,0)');cx.fillStyle=r;cx.fillRect(0,0,W,H);
   cx.strokeStyle='rgba(184,134,47,.55)';cx.lineWidth=3;cx.strokeRect(48,48,W-96,H-96);cx.strokeStyle='rgba(184,134,47,.25)';cx.strokeRect(64,64,W-128,H-128);
@@ -212,5 +213,5 @@ return{jdFromDate:jdFromDate,jdToDate:jdToDate,toLunar:toLunar,canChiNgay:canChi
  var dl=null;window.claude&&claude.use&&claude.use('downloads').then(function(d){dl=d;$('#cmSave').hidden=!d}).catch(function(){});
  $('#cmSave').addEventListener('click',function(){if(!dl)return;cv.toBlob(function(b){dl.save({filename:'thiep-tuong-niem.png',data:b}).catch(function(e){if(e&&e.code!=='declined'&&window.toast)toast('Chưa tải được thiệp, bạn thử lại sau nhé.')})},'image/png')});
  var sh=$('#cmShare');if(navigator.canShare){sh.hidden=false;sh.addEventListener('click',function(){cv.toBlob(function(b){var file=new File([b],'thiep-tuong-niem.png',{type:'image/png'});if(navigator.canShare({files:[file]}))navigator.share({files:[file],title:'Thiệp tưởng niệm'}).catch(function(){})})})}
- (document.fonts?document.fonts.ready:Promise.resolve()).then(render);
+ new IntersectionObserver(function(es,o){if(es[0].isIntersecting){o.disconnect();(document.fonts?document.fonts.ready:Promise.resolve()).then(render)}},{rootMargin:'600px'}).observe(cv);   // vẽ khi sắp cuộn tới
 })();

@@ -23,5 +23,5 @@
    if(!off&&it.k<4&&hud.some(function(h){return hit(r,h,2)}))off=true;
    if(!off&&placed.some(function(p){return hit(r,p,4)}))off=true;
    it.el.classList.toggle('wh-off',off);if(!off)placed.push(r)})}
- window.ssDeclutter=run;setInterval(function(){try{run()}catch(e){console.error('declutter',e)}},300);addEventListener('resize',function(){setTimeout(run,60)});
+ window.ssDeclutter=run;setInterval(function(){if(document.hidden)return;try{run()}catch(e){console.error('declutter',e)}},300);/* nhãn theo camera đi liền nên vẫn đo định kỳ; tab ẩn thì nghỉ */addEventListener('resize',function(){setTimeout(run,60)});
 })();

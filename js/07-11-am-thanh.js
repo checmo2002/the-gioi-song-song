@@ -15,7 +15,7 @@
     let idx=0,prev=0;const damp=.4985+.0012*Math.min(1,(midi-55)/24);// nốt cao tắt nhanh hơn
     for(let i=0;i<len;i++){const cur=ring[idx];const nxt=ring[(idx+1)%P];const v=damp*(cur+nxt);ring[idx]=v*.999+(prev-v)*.002;prev=v;d[i]=cur;idx=(idx+1)%P}
     for(let i=0;i<300;i++)d[i]*=i/300;return ksCache[midi]=buf}
-  function build(){ctx=new AC();master=ctx.createGain();master.gain.value=0;
+  function build(){ctx=ssAm();master=ctx.createGain();master.gain.value=0;
     const comp=ctx.createDynamicsCompressor();comp.threshold.value=-16;comp.ratio.value=3;master.connect(comp);comp.connect(ctx.destination);
     verb=ctx.createConvolver();verb.buffer=impulse(6.5,3);const vg=ctx.createGain();vg.gain.value=.5;verb.connect(vg);vg.connect(master);
     // gió rất nhẹ, như sân chùa vắng

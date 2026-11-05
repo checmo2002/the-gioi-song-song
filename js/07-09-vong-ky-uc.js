@@ -85,10 +85,12 @@
   const tilesEl=$('#ringTiles'),n=MEM.length;$('#ringCount').textContent=`${n} kỷ vật · ${MEM[0].y} – ${MEM[n-1].y}`;
   const tiles=MEM.map((m,i)=>{const b=document.createElement('button');b.className='rt';b.setAttribute('aria-label',`${m.y}, ${m.t}`);const cv=document.createElement('canvas');b.appendChild(cv);
     if(m.video){const v=document.createElement('span');v.className='rt-vid';v.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10"><path d="M7 4v16l13-8z"/></svg>${m.video}`;b.appendChild(v)}
-    const yr=document.createElement('span');yr.className='rt-y';yr.textContent=m.y;b.appendChild(yr);tilesEl.appendChild(b);paint(cv,m,i,300,200);return b});
+    const yr=document.createElement('span');yr.className='rt-y';yr.textContent=m.y;b.appendChild(yr);tilesEl.appendChild(b);return b});
+  // vẽ 14 tấm khi vòng sắp hiện (mỗi tấm ~1 MB bộ nhớ ảnh), không vẽ sẵn lúc mở trang
+  new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){o.disconnect();tiles.forEach((b,i)=>paint(b.querySelector('canvas'),MEM[i],i,300,200))}},{rootMargin:'600px'}).observe(ringEl);
   // ảnh thật của gia đình: thay lần lượt các tấm minh họa (chỉ trong phiên xem này)
   // shortcut: ảnh chưa được lưu lên máy chủ, mất khi tải lại trang; cần kho lưu ảnh khi làm sản phẩm thật
-  const loadImg=f=>(window.createImageBitmap?createImageBitmap(f):new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=no;im.src=URL.createObjectURL(f)}));
+  const loadImg=f=>(window.createImageBitmap?createImageBitmap(f):new Promise((ok,no)=>{const im=new Image();im.onload=()=>{URL.revokeObjectURL(im.src);ok(im)};im.onerror=no;im.src=URL.createObjectURL(f)}));
   $('#ringUpload').addEventListener('change',async e=>{const files=[...e.target.files].filter(f=>f.type.startsWith('image/'));let done=0;
     for(const f of files){const i=MEM.findIndex(m=>!m.img);if(i<0)break;try{const img=await loadImg(f);const m=MEM[i];m.img=img;m.t=f.name.replace(/\.[^.]+$/,'').slice(0,60);m.y=new Date(f.lastModified||Date.now()).getFullYear();m.d='Ảnh gia đình tải lên.';m.by='Bạn vừa tải lên';delete m.video;
       tiles[i].querySelector('.rt-y').textContent=m.y;const v=tiles[i].querySelector('.rt-vid');v&&v.remove();tiles[i].setAttribute('aria-label',`${m.y}, ${m.t}`);paint(tiles[i].querySelector('canvas'),m,i,300,200);done++}catch(_){}}
@@ -112,8 +114,8 @@
       const A=base+scrollA,Rx=Math.min(W*.37,W/2-tw*.42),Ry=Math.min(H*.34,H/2-th*.62);
       tiles.forEach((t,i)=>{const a=A+i/n*Math.PI*2,x=W/2+Rx*Math.cos(a),y=H/2+Ry*Math.sin(a),d=(Math.sin(a)+1)/2;let s=.7+.42*d;if(i===hover)s*=1.28;
         t.style.transform=`translate3d(${(x-tw/2).toFixed(1)}px,${(y-th/2).toFixed(1)}px,0) scale(${s.toFixed(3)}) rotate(${(Math.cos(a)*-4).toFixed(2)}deg)`;t.style.zIndex=i===hover?300:Math.round(d*100);t.style.opacity=(i===hover?1:.55+.45*d).toFixed(2)})}
-    requestAnimationFrame(frame)}
-  requestAnimationFrame(frame);setCap(-1);
+  }
+  ssVong(frame,[ringEl]);setCap(-1);
   // ---------- xem lớn ----------
   const lb=$('#lb');let cur=0;
   function show(i){cur=(i+n)%n;const m=MEM[cur];paint($('#lbCanvas'),m,cur,900,600);$('#lbN').textContent=String(cur+1).padStart(2,'0')+' / '+String(n).padStart(2,'0');$('#lbY').textContent=m.y;$('#lbT').textContent=m.t;$('#lbD').textContent=m.d;$('#lbBy').textContent=m.by+' · ảnh minh họa';$('#lbPlay').hidden=!m.video;$('#lbPlay').dataset.len=m.video||''}

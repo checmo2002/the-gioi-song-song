@@ -43,5 +43,5 @@
     ctx.globalCompositeOperation='lighter';motes.forEach(m=>{m.y-=m.v*dt;m.x+=Math.sin(t*.5+m.sw)*5*dt;if(m.y<-6){m.y=H+6;m.x=Math.random()*W}const al=.3+.3*Math.sin(t*1.6+m.sw*3);const R=m.r*4;const g=ctx.createRadialGradient(m.x,m.y,0,m.x,m.y,R);g.addColorStop(0,`rgba(255,236,190,${al.toFixed(2)})`);g.addColorStop(1,'rgba(255,236,190,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(m.x,m.y,R,0,7);ctx.fill()});
     ctx.globalCompositeOperation='source-over';petals.forEach(q=>{q.x+=q.vx*dt;q.y+=q.vy*dt+Math.sin(t+q.r)*.2;q.r+=q.vr*dt;if(q.x>W+10||q.y>H){q.x=-10;q.y=Math.random()*H*.6}ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.r);ctx.fillStyle='rgba(246,206,214,.7)';ctx.beginPath();ctx.ellipse(0,0,q.s,q.s*.55,0,0,7);ctx.fill();ctx.restore()})}
   if(reduce){frame(performance.now(),0);return}
-  let last=performance.now();(function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(vis&&W)frame(now,dt);requestAnimationFrame(loop)})(last);
+  let last=performance.now();ssVong(now=>{const dt=Math.min(.05,(now-last)/1000);last=now;if(W)frame(now,dt)},[hero]);
 })();

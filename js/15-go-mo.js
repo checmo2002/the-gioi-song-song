@@ -57,7 +57,7 @@
  var ac,F0={go:470,hong:440,son:455,vang:500};
  // tiếng mõ nhỏ khi tụng kinh (chủ dự án chọn 04/11/2026): xung dùi rất ngắn kích các cộng hưởng của thân gỗ rỗng, tắt sau ~50ms
  function tock(){var vol=.8;try{if(localStorage.getItem('ss-sound')==='0')return;vol=+(localStorage.getItem('ss-vol')||.8)}catch(e){}
-  try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();
+  try{ac=ac||ssAm();if(ac.state==='suspended')ac.resume();
    var sr=ac.sampleRate,t=ac.currentTime+.005,f0=620*(F0[st.skin]||470)/470*(1+(Math.random()-.5)*.02);
    var out=ac.createGain(),lp=ac.createBiquadFilter(),cmp=ac.createDynamicsCompressor();out.gain.value=2.4*vol;lp.type='lowpass';lp.frequency.value=4200;lp.Q.value=.5;out.connect(lp).connect(cmp).connect(ac.destination);
    var len=Math.floor(sr*.004),nb=ac.createBuffer(1,len,sr),d=nb.getChannelData(0);
@@ -79,7 +79,7 @@
   if(st.bead>=108){st.bead=0;st.trang++;var bn=Math.min(st.streak,7)*6;if(st.today<CAP){st.tot+=bn;st.today+=bn}say('Tròn một tràng'+(bn?' · chuyên cần +'+bn:''),'nt');window.ssBell&&ssBell('phat');showHH()}
   save();draw();if(lvOf(st.tot)>lv0)levelUp(lvOf(st.tot))}
  var NOTE=['','Mầm xanh đã nhú khỏi bùn','Lá sen xoè rộng che mát','Nụ sen hồng vươn lên','Cánh sen bắt đầu hé mở','Hoa sen nở trọn','Hương sen ngát toả xa','Đài sen vững vàng','Liên hoa viên mãn, công đức tròn đầy'];
- function chime(){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(localStorage.getItem('ss-sound')==='0')return;var t=ac.currentTime;[523,659,784,1047].forEach(function(f,i){var o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t+i*.12);g.gain.exponentialRampToValueAtTime(.22,t+i*.12+.02);g.gain.exponentialRampToValueAtTime(.0001,t+i*.12+1.2);o.connect(g).connect(ac.destination);o.start(t+i*.12);o.stop(t+i*.12+1.3)})}catch(e){}}
+ function chime(){try{ac=ac||ssAm();if(localStorage.getItem('ss-sound')==='0')return;var t=ac.currentTime;[523,659,784,1047].forEach(function(f,i){var o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t+i*.12);g.gain.exponentialRampToValueAtTime(.22,t+i*.12+.02);g.gain.exponentialRampToValueAtTime(.0001,t+i*.12+1.2);o.connect(g).connect(ac.destination);o.start(t+i*.12);o.stop(t+i*.12+1.3)})}catch(e){}}
  function levelUp(l){var u=document.createElement('div');u.className='lvu';u.setAttribute('role','alertdialog');u.setAttribute('aria-label','Chúc mừng lên phẩm '+LV[l][1]);
   var rw=[];for(var k in SK)if(SK[k][3]===l)rw.push('Mở khoá mõ '+SK[k][2]);
   var h='<div class="lvu-rays"></div><div class="lvu-glow"></div>';for(var i=0;i<44;i++){var pet=i%2===0;h+='<i class="lvu-p'+(pet?' pet':'')+'" style="--x:'+(Math.random()*100)+'vw;--d:'+(Math.random()*1.4)+'s;--t:'+(2.6+Math.random()*2)+'s;--r:'+(Math.random()*720-360)+'deg;--dx:'+(Math.random()*120-60)+'px;--s:'+(pet?10+Math.random()*10:4+Math.random()*4)+'px"></i>'}
@@ -112,5 +112,5 @@
   bar.appendChild(b)}
  // bắt ở window để chạy trước bộ xử lý [data-w] chung của thanh công cụ
  window.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.mo-btn')){e.stopPropagation();e.preventDefault();var hs=document.querySelector('.hall .wh[data-w="gomo"]');if(hs)hs.click();else ssMo.open()}},true);
- addBtn();setInterval(addBtn,1500);
+ ssKhiDoi(addBtn);
 })();

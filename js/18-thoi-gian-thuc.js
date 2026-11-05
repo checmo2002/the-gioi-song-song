@@ -66,6 +66,8 @@
  document.addEventListener('click',function(e){if(!pop.hidden&&!pop.contains(e.target)&&e.target!==pill)pop.hidden=true});
  // ---------- cảnh: ánh sáng theo giờ + mưa/sương/dông ----------
  var IN={dien:1,tho:1,nha:1},drops=[],mode='',ctx=cv.getContext('2d'),raf=0,lastF=0;
+ // mưa/tuyết ngừng hẳn khi đại sảnh đóng hoặc tab ẩn, mở lại thì chạy tiếp
+ var lai=function(){if(mode&&!raf&&!hall.hidden&&!document.hidden)loop()};new MutationObserver(lai).observe(hall,{attributes:true,attributeFilter:['hidden']});document.addEventListener('visibilitychange',lai);
  function scene(w,h){var ws=hall.dataset.ws,ind=IN[ws];
   // màu trời: đêm xanh thẫm, bình minh/hoàng hôn cam, ban ngày trong; mưa/mây làm tối
   var bg='transparent',op=1;
@@ -84,7 +86,7 @@
   storm=w.k==='storm'&&!ind}
  var storm=false,nextBolt=0;
  function size(){var r=hall.getBoundingClientRect(),dp=Math.min(2,devicePixelRatio||1);cv.width=r.width*dp;cv.height=r.height*dp;ctx.setTransform(dp,0,0,dp,0,0)}
- function loop(){if(!mode){raf=0;return}raf=requestAnimationFrame(loop);if(hall.hidden||document.hidden)return;var now=performance.now(),dt=Math.min(.05,(now-(lastF||now))/1000);lastF=now;
+ function loop(){if(!mode||hall.hidden||document.hidden){raf=0;lastF=0;return}raf=requestAnimationFrame(loop);var now=performance.now(),dt=Math.min(.05,(now-(lastF||now))/1000);lastF=now;
   var Wd=hall.clientWidth,Hd=hall.clientHeight,N=mode==='rain'?Math.round(Wd*Hd/2600):mode==='drz'?Math.round(Wd*Hd/5000):Math.round(Wd*Hd/9000);
   if(cv.width<2)size();
   while(drops.length<N)drops.push({x:Math.random()*Wd*1.2,y:Math.random()*Hd,v:mode==='rain'?700+Math.random()*400:mode==='drz'?260+Math.random()*120:50+Math.random()*40,l:mode==='rain'?12+Math.random()*10:5+Math.random()*4,s:Math.random()*.6+.4});

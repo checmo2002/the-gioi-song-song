@@ -3,7 +3,7 @@
  var KEY='ss-music',ctx=null,master=null,wet=null,timer=null,cur=null,nextT=0,st={},on=true;
  try{on=localStorage.getItem(KEY)!=='off'}catch(e){}
  var VOL=.16;
- function mk(){if(ctx)return;var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=new AC();
+ function mk(){if(ctx)return;var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=ssAm();
   master=ctx.createGain();master.gain.value=0;master.connect(ctx.destination);
   // vang: tiếng dội của chính điện / thánh đường
   var len=ctx.sampleRate*4.5,ir=ctx.createBuffer(2,len,ctx.sampleRate);
