@@ -25,6 +25,10 @@ Trưởng nhóm chuyển mỗi mục thành một GitHub Issue trước khi giao
 13. Quyền riêng tư theo hồ sơ: công khai / chỉ gia đình / riêng tư.
 14. Thanh toán thật cho ví nén và gói chăm mộ. *Chờ chủ dự án chốt mô hình kinh doanh.*
 
+## Đợt 3b — Chuyển sang 3D thời gian thực (chờ chủ dự án chốt)
+
+19. Hướng đồ hoạ chung và camera xoay tự do: xem `docs/de-xuat-do-hoa.md`. Thay cho việc 15b (render thêm góc).
+
 ## Đợt 4 — Đồ hoạ, video, nhân vật AI (thêm đội 3D, video, nhân vật AI)
 
 15. Render lại các không gian còn lệch phong cách isometric theo `docs/do-hoa.md`.
