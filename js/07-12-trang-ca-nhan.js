@@ -14,8 +14,9 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
   const isClan=()=>dead().length>=2;
   const yrs=m=>esc(m.d?`${m.b||'?'} – ${m.d}`:`${m.b||'?'} · còn sống`);  // trả về HTML đã lọc
   const hk=m=>m.houseOf&&get(m.houseOf)?m.houseOf:m.id;
-  function save(){try{const hs={};dead().forEach(m=>{const k=hk(m);if(homes[k])hs[k]=homes[k]});localStorage.setItem(KEY,JSON.stringify({user:ME.user,members:ME.members,seq:ME.seq,balance,homes:hs}))}catch(e){}}
-  function restore(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(!d||!d.user)return false;ME.user=d.user;ME.members=d.members||[];ME.seq=d.seq||ME.members.length+1;if(typeof d.balance==='number')setBalance(d.balance);Object.assign(homes,d.homes||{});ME.members.forEach(reg);return true}catch(e){return false}}
+  function save(){try{const hs={};dead().forEach(m=>{const k=hk(m);if(homes[k])hs[k]=homes[k]});localStorage.setItem(KEY,JSON.stringify({user:ME.user,members:ME.members,seq:ME.seq,balance,homes:hs}));return true}catch(e){return false}}   // false: trình duyệt chặn hoặc đầy bộ nhớ
+  function restore(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(!d||!d.user||typeof d.user.name!=='string')return false;ME.user=d.user;   // dữ liệu cũ hoặc hỏng: bỏ qua thay vì làm sập trang
+    ME.members=(Array.isArray(d.members)?d.members:[]).filter(m=>m&&typeof m==='object'&&typeof m.name==='string'&&m.id!=null);ME.seq=d.seq||ME.members.length+1;if(typeof d.balance==='number')setBalance(d.balance);Object.assign(homes,d.homes||{});ME.members.forEach(reg);return true}catch(e){return false}}
   // đưa người đã khuất của gia đình vào hệ thống hồ sơ + nhà 3D chung của trang
   function reg(m){const exist=byId[m.id];if(!m.d){if(exist){people.splice(people.indexOf(exist),1);delete byId[m.id]}return}
     const p=exist||{id:m.id,mine:true,inc:0};Object.assign(p,{c:m.ls?'ls':'dh',name:m.name,title:m.ls?'Liệt sĩ':(m.g==='f'?'Người mẹ, người bà của dòng họ':'Người cha, người ông của dòng họ'),b:m.b||'?',d:m.d,place:ME.user.place||'Quê nhà',
@@ -104,7 +105,7 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
   function head(){const u=ME.user;$('#meAv').textContent=(u.name.trim().split(/\s+/).pop()||'?')[0].toUpperCase();$('#meName').textContent=u.name;$('#meSub').textContent=[u.contact,u.place,'Thành viên từ '+u.since].filter(Boolean).join(' · ');
     const dc=dead().length,hc=new Set(dead().map(hk)).size;$('#meStats').innerHTML=[[ME.members.length,'người trong gia phả'],[dc,'người đã khuất'],[hc,'ngôi nhà 3D'],[isClan()?('Họ '+surname()):'Chưa lập','dòng họ']].map(([v,l])=>`<div><b>${esc(String(v))}</b><span>${l}</span></div>`).join('');
     $('#meClan').hidden=!isClan();$('#meClan').textContent='Dòng họ '+surname()}
-  function refresh(){if(!ME.user)return;ME.members.forEach(reg);syncRecipients();head();drawTree();drawVillage();drawHouses();save()}
+  function refresh(){if(!ME.user)return;ME.members.forEach(reg);syncRecipients();head();drawTree();drawVillage();drawHouses();return save()}
   function tab(t){$$('#meTabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$$('[data-mp]').forEach(p=>p.hidden=p.dataset.mp!==t)}
   $('#meTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)tab(b.dataset.t)});
   $('#ca-nhan').addEventListener('click',e=>{const g=e.target.closest('[data-goto]');if(g){tab(g.dataset.goto);if(g.dataset.goto==='tree'){sel=null;side('add')}}});
@@ -112,7 +113,7 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
     const a={id:id(),name:sn+' Văn Lễ',g:'m',b:1890,d:1951},b={id:id(),name:'Đinh Thị Tơ',g:'f',b:1894,d:1960},c={id:id(),name:sn+' Văn Cần',g:'m',b:1922,d:1990},w={id:id(),name:'Trần Thị Gái',g:'f',b:1925,d:2011},k={id:id(),name:sn+' Văn Khiêm',g:'m',b:1951,d:1972,ls:true},f={id:id(),name:sn+' Văn Khôi',g:'m',b:1948,d:2020};
     a.spouse=b.id;b.spouse=a.id;c.parent=a.id;c.spouse=w.id;w.spouse=c.id;w.houseOf=c.id;b.houseOf=a.id;k.parent=c.id;f.parent=c.id;self.parent=f.id;
     [a,b,c,w,k,f].forEach(m=>{m.parent=m.parent||null;m.spouse=m.spouse||null;m.houseOf=m.houseOf||null;ME.members.push(m)});sel=self.id;refresh();side();toast('Đã thêm gia phả mẫu 4 đời. Làng dòng họ '+sn+' đã mở.')});
-  $('#meInfo').addEventListener('submit',e=>{e.preventDefault();const n=$('#miName').value.trim();if(!n){toast('Hãy nhập họ và tên.');return}ME.user.name=n;ME.user.contact=$('#miContact').value.trim();ME.user.place=$('#miPlace').value.trim();const self=ME.members.find(m=>m.self);if(self)self.name=n;window.ssSetUser&&ssSetUser(n);refresh();toast('Đã lưu thông tin.')});
+  $('#meInfo').addEventListener('submit',e=>{e.preventDefault();const n=$('#miName').value.trim();if(!n){toast('Hãy nhập họ và tên.');return}ME.user.name=n;ME.user.contact=$('#miContact').value.trim();ME.user.place=$('#miPlace').value.trim();const self=ME.members.find(m=>m.self);if(self)self.name=n;window.ssSetUser&&ssSetUser(n);toast(refresh()?'Đã lưu thông tin.':'Chưa lưu được: trình duyệt đang chặn bộ nhớ, thông tin sẽ mất khi đóng trang.')});
   function fillInfo(){$('#miName').value=ME.user.name;$('#miContact').value=ME.user.contact||'';$('#miPlace').value=ME.user.place||''}
   function start(){document.body.classList.add('signed');const me=ME.members.find(m=>m.self);sel=me.id;refresh();fillInfo();if(ME.members.length>1)side();else side('add',{rel:'parent',to:me.id});tab('tree')}
   window.ssMe={tree:function(){return ME},homeOf:function(id){return homeOf(id)},goods:function(){return goods},balance:function(){return balance},
