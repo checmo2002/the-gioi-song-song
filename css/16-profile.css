@@ -9,12 +9,12 @@
 .incense{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--card);display:grid;grid-template-columns:90px 1fr;gap:14px;align-items:center}
 .incense svg{width:90px;height:110px}
 .incense .smoke path{fill:none;stroke:var(--ink-soft);stroke-width:1.2;stroke-linecap:round;opacity:0;stroke-dasharray:4 6}
-.incense.lit .smoke path{animation:smoke 4s linear infinite;opacity:.55}
+.incense.lit .smoke path{animation:smokeHoSo 4s linear infinite;opacity:.55}
 .incense.lit .smoke path:nth-child(2){animation-delay:1.3s}
 .incense.lit .smoke path:nth-child(3){animation-delay:2.6s}
 .incense .tip{fill:var(--line)}
 .incense.lit .tip{fill:#E8582C;filter:drop-shadow(0 0 3px #f2833f)}
-@keyframes smoke{from{stroke-dashoffset:0;transform:translateY(0)}to{stroke-dashoffset:-40px;transform:translateY(-6px)}}
+@keyframes smokeHoSo{from{stroke-dashoffset:0;transform:translateY(0)}to{stroke-dashoffset:-40px;transform:translateY(-6px)}}
 @media (prefers-reduced-motion:reduce){.incense.lit .smoke path{animation:none}}
 .incense b{font-family:var(--f-display);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
 .incense small{display:block;color:var(--ink-soft);font-size:12px}

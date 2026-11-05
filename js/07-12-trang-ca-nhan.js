@@ -85,7 +85,6 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
     ME.members=ME.members.filter(x=>x!==m);m.d=null;reg(m);sel=null;refresh();side();toast('Đã xoá '+m.name+' khỏi gia phả.')}
 
   // ---------- làng dòng họ 3D (cùng bộ dựng hình với làng chung) ----------
-  let clan=null;
   function drawVillage(){const box=$('#meVillage');
     box.innerHTML='<div class="me-lock"><b>Làng tưởng niệm</b><p>Nhà của từng người thân nằm trong Làng tưởng niệm dưới chân núi chùa.</p><button class="btn" type="button" data-go-lang>Vào làng</button></div>';
     box.querySelector('[data-go-lang]').addEventListener('click',()=>window.ssGoWorld&&ssGoWorld('lang'))}
