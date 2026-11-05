@@ -27,7 +27,7 @@ Trưởng nhóm chuyển mỗi mục thành một GitHub Issue trước khi giao
 
 ## Đợt 3b — Chuyển sang 3D thời gian thực (chờ chủ dự án chốt)
 
-19. Hướng đồ hoạ chung và camera xoay tự do: xem `docs/de-xuat-do-hoa.md`. Thay cho việc 15b (render thêm góc).
+19. Sa bàn xoay tự do: giữ kiểu cảnh chân núi, xuất chính các cảnh Blender lên web 3D, camera xoay 360°. Xem `docs/de-xuat-do-hoa.md`. Thay cho việc 15b.
 
 ## Đợt 4 — Đồ hoạ, video, nhân vật AI (thêm đội 3D, video, nhân vật AI)
 
