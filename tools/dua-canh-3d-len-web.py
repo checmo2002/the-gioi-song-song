@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Đưa kết quả nướng một cảnh (nuong-<cảnh>.py trong Blender) vào img/3d/<cảnh>/ cho web.
 Dùng: python3 tools/dua-canh-3d-len-web.py <thư mục nướng> <cảnh>        (cần Pillow, numpy, scipy)
-- canh.glb, cay.glb, tuong.glb (nếu có) -> .json nhúng base64 (bản thử trên claude.ai không phục vụ đuôi .glb)
+- canh.glb, cay.glb, tuong.glb (nếu có) -> .json nhúng base64; thong-tin.json (camera + lưới độ cao) giữ lại bản gọn (bản thử trên claude.ai không phục vụ đuôi .glb)
 - nen/vat-*.png -> webp, lấp vùng đen chưa nướng bằng màu điểm gần nhất (không lấp thì thu nhỏ bị lem viền đen nhấp nháy),
   bản 2048 (-2k) cho điện thoại; vat-0, vat-3 giữ thêm bản 4096 cho máy tính."""
 import sys, os, json, struct, base64
@@ -31,6 +31,10 @@ def lap_den(a):
     _, (iy, ix) = ndimage.distance_transform_edt(bo, return_indices=True)
     return a[iy, ix]
 
+p = os.path.join(vao, 'thong-tin.json')   # camera ảnh + lưới độ cao mặt đi (web dùng để đặt người đúng mặt sàn)
+if os.path.exists(p):
+    tt = json.load(open(p)); json.dump({k: tt[k] for k in ('cam', 'cao') if k in tt}, open(os.path.join(ra, 'thong-tin.json'), 'w'), separators=(',', ':'))
+    print('thong-tin.json', os.path.getsize(os.path.join(ra, 'thong-tin.json')))
 for t in ('canh', 'cay', 'tuong'):
     p = os.path.join(vao, t + '.glb')
     if os.path.exists(p): glb2json(p, os.path.join(ra, t + '.json'))

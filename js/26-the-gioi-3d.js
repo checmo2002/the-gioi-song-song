@@ -15,10 +15,13 @@ window.ss3dXong=!coWebGL;   // màn tải (js/01) và kiểm tra hình ảnh ch�
 // le: người đứng lễ cố định [mẫu, động tác, x, y]; lh: điểm người chắp tay quay mặt về; toc: hệ số tốc độ đi của 04-01 (đã theo cỡ người trong ảnh)
 // xa: khoảng cách camera mặc định (sảnh là chỗ chọn lối nên nhìn rộng thấy cả hai tượng)
 // tuong: có tuong.json (tượng giữ ảnh màu gốc, tự chiếu sáng như người); day: độ cao mặt sân lát (người đứng lên trên)
+// cao: có thong-tin.json với lưới độ cao mặt đi (bậc, nền cao trong gian thờ) thay cho day; goc: cảnh trong nhà cắt tường,
+//      chỉ cho xoay ±goc độ quanh hướng nhìn của ảnh để không vòng ra sau tường
 const CANH={
  sanh:{ten:'sảnh',tgt:[2,18],ow:88,tam:[2,10],le:[],lh:null,toc:.42,tuong:1,day:.09,xa:60},
  chan:{ten:'chân núi',tgt:[3,13],ow:132,tam:[0,-9],lh:[0,-8],toc:.42,day:0,xa:30,
-  le:[['BaCu','chap',-1.7,-11.45],['CoAoDai','chap',1.7,-11.45],['OngAoNau','ngoi',0,-12.05],['CuuChienBinh','dung',-3.8,-12.6]]}};
+  le:[['BaCu','chap',-1.7,-11.45],['CoAoDai','chap',1.7,-11.45],['OngAoNau','ngoi',0,-12.05],['CuuChienBinh','dung',-3.8,-12.6]]},
+ tho:{ten:'nhà thờ',tgt:[2,1.5],ow:42,tam:[2,1.5],le:[],lh:null,toc:.42,day:0,xa:30,cao:1,goc:40}};
 const THU=t=>'img/3d/'+t+'/';
 if(hall&&W&&coWebGL)khoi();
 
@@ -27,7 +30,7 @@ function khoi(){
  const box=document.createElement('div');box.className='w3d';box.setAttribute('aria-hidden','true');
  const hotL=document.createElement('div');hotL.className='w3d-hot';const tagL=document.createElement('div');tagL.className='w3d-tags';
  const stg=document.getElementById('wStage');W.insertBefore(box,W.firstChild);stg.after(hotL);hotL.after(tagL);   // nút và tên nằm trên lớp ánh sáng theo giờ (trong wStage)
- let ve=null,hong=false,anDi=true;const san={};   // trình vẽ, nạp lỗi, cảnh đã nạp xong
+ let ve=null,hong=false,anDi=true,tienCanh=null;const san={};   // trình vẽ, nạp lỗi, cảnh đã nạp xong
  // màn chờ phủ cả thanh điều hướng: vào cảnh 3D chưa nạp xong thì chờ ở đây, không lộ ảnh 2D
  const phu=document.createElement('div');phu.className='w3d-cho';phu.hidden=true;phu.setAttribute('role','status');
  phu.innerHTML='<b>Song Song</b><small></small><i><s></s></i>';document.body.appendChild(phu);
@@ -36,13 +39,17 @@ function khoi(){
 
  function canhNay(){const w=window.ssWorld;if(!w||hall.hidden||!w.on())return null;const s=w.scene();return CANH[s]?s:null}
  function vong(){requestAnimationFrame(vong);const s=canhNay();
-  phu.hidden=!(s&&!san[s]&&!hong);if(!phu.hidden){phu.querySelector('small').textContent='Đang dựng cảnh '+CANH[s].ten;phu.querySelector('s').style.transform='scaleX('+(window.ss3dTien||0)+')'}
+  phu.hidden=!(s&&!san[s]&&!hong&&!CANH[s].loi);if(!phu.hidden){phu.querySelector('small').textContent='Đang dựng cảnh '+CANH[s].ten;phu.querySelector('s').style.transform='scaleX('+(tienCanh?tienCanh(s):window.ss3dTien||0)+')'}
   const hien=!!(s&&san[s]);hall.classList.toggle('w3d-on',hien);window.ss3dTocDo=hien?CANH[s].toc:1;if(hien)ve(s);else anDi=true}   // anDi: lần sau hiện lại thì đặt lại như mới vào
  requestAnimationFrame(vong);
 
  async function nap(){
   // tiến độ cho màn tải: thư viện + mỗi cảnh (cảnh, cây, 4 ảnh) + 9 nhân vật
-  const DS=Object.keys(CANH);let xong=0;const TONG=1+DS.reduce((n,k)=>n+6+(CANH[k].tuong?1:0),0)+9,dem=pr=>pr.then(v=>{xong++;window.ss3dTien=Math.min(1,xong/TONG);return v});
+  // màn tải chỉ chờ cảnh sắp vào (cảnh đang lưu, mặc định sảnh) + 9 nhân vật; các cảnh khác nạp ngầm sau, vào lúc chưa xong thì có màn chờ
+  const w0=window.ssWorld&&ssWorld.scene&&ssWorld.scene(),DAU=CANH[w0]?w0:'sanh';
+  const soTep=k=>6+(CANH[k].tuong?1:0)+(CANH[k].cao?1:0),tien={};for(const k in CANH)tien[k]=0;
+  let xong=0;const TONG=1+9+soTep(DAU),capNhat=()=>{window.ss3dTien=Math.min(1,(xong+tien[DAU])/TONG)};
+  const dem=(pr,k)=>pr.then(v=>{if(k)tien[k]++;else xong++;capNhat();return v});tienCanh=k=>Math.min(1,tien[k]/soTep(k));
   const [THREE,{OrbitControls},{GLTFLoader},{MeshoptDecoder},SU]=await dem(Promise.all([
    import('three'),import('three/addons/controls/OrbitControls.js'),import('three/addons/loaders/GLTFLoader.js'),import('three/addons/libs/meshopt_decoder.module.js'),
    import('three/addons/utils/SkeletonUtils.js')]));
@@ -67,7 +74,7 @@ function khoi(){
   const dk=new OrbitControls(cam,r.domElement);dk.enableDamping=!GIAM;dk.dampingFactor=.08;dk.rotateSpeed=.7;dk.enableZoom=false;dk.enablePan=false;
   dk.minPolarAngle=15*Math.PI/180;dk.maxPolarAngle=68*Math.PI/180;
   const ori=()=>hall.clientWidth/Math.max(1,hall.clientHeight)<.9?'v':'h';
-  const xa=()=>{const g=dang?CANH[dang].xa:30;return THREE.MathUtils.clamp(g/(window.ssZoomK?ssZoomK(ori()):1),7,g*1.4)};   // nút góc nhìn, cuộn chuột, chụm ngón (js/16-goc-nhin.js) đổi khoảng cách camera
+  const xa=()=>{const g=dang?CANH[dang].xa:CANH[DAU].xa;return THREE.MathUtils.clamp(g/(window.ssZoomK?ssZoomK(ori()):1),7,g*1.4)};   // nút góc nhìn, cuộn chuột, chụm ngón (js/16-goc-nhin.js) đổi khoảng cách camera
   let cw=-1,ch=-1;   // cảnh nạp sớm lúc sảnh còn ẩn (cỡ 0) nên đo lại mỗi khi hiện
   function co(){const w=hall.clientWidth,h=hall.clientHeight;if(w===cw&&h===ch)return;cw=w;ch=h;cam.aspect=w/Math.max(1,h);cam.fov=w<h?48:35;cam.updateProjectionMatrix();r.setSize(w,h)}
   co();addEventListener('resize',co);
@@ -116,7 +123,8 @@ function khoi(){
    const c=CANH[ten],G=THU(ten),a=anhCua(c),canh=new THREE.Scene();canh.background=NEN;canh.fog=new THREE.Fog(NEN,55,110);
    const TAM=B(c.tam[0],c.tam[1]),den=new THREE.DirectionalLight(new THREE.Color(1,.9,.77),3.0);den.position.copy(TAM).addScaledVector(NANG,80);den.target.position.copy(TAM);
    canh.add(den,den.target,new THREE.HemisphereLight(0xfff1dc,0xe8d2b0,4.2));
-   const [jc,jcay,anh]=await Promise.all([dem(taiJSON(G+'canh.json')),dem(taiJSON(G+'cay.json')),Promise.all(['nen-2k',anhTo('vat-0'),'vat-1-2k',anhTo('vat-3')].map(t=>dem(taiAnh(G+t+'.webp'))))]);
+   const [jc,jcay,anh,tt]=await Promise.all([dem(taiJSON(G+'canh.json'),ten),dem(taiJSON(G+'cay.json'),ten),Promise.all(['nen-2k',anhTo('vat-0'),'vat-1-2k',anhTo('vat-3')].map(t=>dem(taiAnh(G+t+'.webp'),ten))),
+    c.cao?dem(taiJSON(G+'thong-tin.json'),ten):null]);
    const tex={'nuong-nen':anh[0],'nuong-vat-0':anh[1],'nuong-vat-1':anh[2],'nuong-vat-3':anh[3]};
    const g=await parse(jc),nen=[];g.scene.traverse(o=>{if(o.isMesh){const la=o.material.name==='nuong-nen';
     // tấm nền phẳng nằm sát dưới cỏ và sân: đẩy lùi trong bộ đệm sâu để lớp trên luôn thắng, không chập chờn
@@ -124,13 +132,16 @@ function khoi(){
    const gc=await parse(jcay);gc.scene.traverse(o=>{if(o.isMesh){
     const m=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9,metalness:0,envMapIntensity:0});m.onBeforeCompile=sh=>AGX(sh,true);o.material=m;nen.push(o)}});   // cây: ánh sáng trời dịu hơn người cho tán lá có khối
    canh.add(g.scene,gc.scene);
-   if(c.tuong){const gt=await parse(await dem(taiJSON(G+'tuong.json')));gt.scene.traverse(o=>{if(o.isMesh){
+   if(c.tuong){const gt=await parse(await dem(taiJSON(G+'tuong.json'),ten));gt.scene.traverse(o=>{if(o.isMesh){
     const m=new THREE.MeshStandardMaterial({map:o.material.map||null,color:o.material.map?0xffffff:o.material.color,roughness:.75,metalness:0,envMapIntensity:0});
     if(m.map){m.map.colorSpace=THREE.SRGBColorSpace;m.map.anisotropy=r.capabilities.getMaxAnisotropy()}m.onBeforeCompile=sh=>AGX(sh);o.material=m;nen.push(o)}});canh.add(gt.scene)}
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
-   DL[ten]={...a,canh,nen,lh,tinh,nut:[],nutO:''}}
+   DL[ten]={...a,canh,nen,lh,tinh,nut:[],nutO:'',cao:tt&&tt.cao}}
+  function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn
+   const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
+   return (z(i,j)*(1-fx)+z(i+1,j)*fx)*(1-fy)+(z(i,j+1)*(1-fx)+z(i+1,j+1)*fx)*fy}
 
   // ---- nút điểm đến: lấy đúng chỗ trên ảnh, bắn tia theo camera ảnh vào cảnh 3D để ra điểm thật
   const ray=new THREE.Raycaster();
@@ -161,7 +172,9 @@ function khoi(){
   const nguoi={};
   function doiCanh(ten){   // sang cảnh khác: bỏ người của cảnh cũ, dời vòng sáng, đặt lại camera quanh "Bạn"
    for(const id in nguoi){const q=nguoi[id];q.q&&boNguoi(q.q);q.tag&&q.tag.remove();delete nguoi[id]}
-   const d=DL[ten];d.canh.add(vongVang,ping);vongVang.visible=false;pingT=9;theo=null;daDat=false;dang=ten;dungNut(ten)}
+   const d=DL[ten];d.canh.add(vongVang,ping);vongVang.visible=false;pingT=9;theo=null;daDat=false;dang=ten;dungNut(ten)
+   const g=CANH[ten].goc,h=Math.hypot(DIR.x,DIR.y),t0=Math.atan2(DIR.x/h,DIR.y/h);   // hướng camera ảnh theo góc phương vị của OrbitControls
+   dk.minAzimuthAngle=g?t0-g*Math.PI/180:-Infinity;dk.maxAzimuthAngle=g?t0+g*Math.PI/180:Infinity;dk.maxPolarAngle=(g?60:68)*Math.PI/180}
   let truoc=performance.now();
   ve=function(ten){const t=performance.now(),dt=Math.min(.05,(t-truoc)/1000);truoc=t;if(dang!==ten||anDi){anDi=false;doiCanh(ten)}
    const d=DL[ten],w=window.ssWorld,av=w.avs?w.avs():{},thay={};
@@ -170,21 +183,21 @@ function khoi(){
     if(q&&q.ten!==m0&&q.q){boNguoi(q.q);q.tag&&q.tag.remove();q=null}
     if(!q){q=nguoi[id]={ten:m0,q:null,tag:null};mau(m0).then(gl=>{if(nguoi[id]!==q)return;q.q=dung(m0,gl,d.canh);q.q.dangA=''}).catch(()=>{});
      if(id.indexOf('npc-')!==0){q.tag=document.createElement('div');q.tag.className='w3d-tag'+(p.me?' me':'');q.tag.innerHTML='<span class="t"></span><span class="b"></span>';tagL.appendChild(q.tag)}}
-    const pb=d.tuAnh(p.x,p.y),wp=B(pb.x,pb.y),m=q.q;q.wp=wp;
+    const hz=caoTai(ten,p.x,p.y),pb=d.tuAnh(p.x,p.y,hz),wp=B(pb.x,pb.y,hz),m=q.q;q.wp=wp;
     if(q.tag){q.tag.querySelector('.t').textContent=(p.el.querySelector('.wa-tag')||{}).textContent||'';const bb=p.el.querySelector('.wa-bub');q.tag.querySelector('.b').textContent=bb?bb.textContent:''}
     if(!m)continue;
     const cu=m.rig.position,dx=wp.x-cu.x,dz=wp.z-cu.z,dd=Math.hypot(dx,dz);
     if(!m.daDat||dd>6){m.daDat=1}else if(dd>.004&&p.a==='di'){const y=Math.atan2(dx,dz);m.yaw+=Math.atan2(Math.sin(y-m.yaw),Math.cos(y-m.yaw))*Math.min(1,dt*8);m.toc=dd/Math.max(dt,1e-3)}
     if(d.lh&&(p.a==='chap'||p.a==='lay')&&wp.distanceTo(d.lh)<12){const y=Math.atan2(d.lh.x-wp.x,d.lh.z-wp.z);m.yaw+=Math.atan2(Math.sin(y-m.yaw),Math.cos(y-m.yaw))*Math.min(1,dt*6)}
-    const y0=CANH[ten].day;m.rig.position.set(wp.x,y0+.03,wp.z);m.rig.rotation.y=m.yaw;m.bo.position.set(wp.x,y0+.05,wp.z);
+    m.rig.position.set(wp.x,hz+.03,wp.z);m.rig.rotation.y=m.yaw;m.bo.position.set(wp.x,hz+.05,wp.z);
     const k=DONG[p.a]||'Idle';if(m.dangA!==k){m.dangA=k;choi(m,k)}
     if(k==='Walk'&&m.act.Walk)m.act.Walk.timeScale=THREE.MathUtils.clamp((m.toc||2.2)/2.2,.6,1.6);
     if(!GIAM)m.mx.update(dt);
-    if(p.me){vongVang.visible=true;vongVang.position.set(wp.x,CANH[ten].day+.06,wp.z);if(!GIAM)vongVang.material.opacity=.55+.3*Math.sin(t/320);theo=wp}}
+    if(p.me){vongVang.visible=true;vongVang.position.set(wp.x,hz+.06,wp.z);if(!GIAM)vongVang.material.opacity=.55+.3*Math.sin(t/320);theo=wp}}
    for(const id in nguoi)if(!thay[id]){const q=nguoi[id];q.q&&boNguoi(q.q);q.tag&&q.tag.remove();delete nguoi[id]}
    if(!GIAM)for(const q of d.tinh)q.mx.update(dt);
    // camera đi theo người chơi, giữ nguyên góc người dùng đã xoay
-   if(theo){tam2.set(theo.x,theo.y+1,theo.z);if(!daDat){datCamQuanh(tam2);daDat=true}
+   if(theo){tam2.set(theo.x,theo.y+1,theo.z);   // theo.y = độ cao mặt đứngif(!daDat){datCamQuanh(tam2);daDat=true}
     const k=GIAM?1:1-Math.exp(-dt*3),dv=tam2.clone().sub(dk.target).multiplyScalar(k);dk.target.add(dv);cam.position.add(dv)}
    const v=cam.position.clone().sub(dk.target),R=v.length(),Rm=xa();if(Math.abs(R-Rm)>.01)cam.position.copy(dk.target).addScaledVector(v,(R+(Rm-R)*(GIAM?1:Math.min(1,dt*6)))/R);
    d.canh.fog.near=Rm+25;d.canh.fog.far=Rm+80;   // sương lùi theo khoảng cách camera
@@ -197,8 +210,10 @@ function khoi(){
 
   // ---- nạp mọi cảnh + đủ 9 nhân vật, rồi dựng sẵn shader một lần để lúc đi và lúc NPC xuất hiện không bị khựng
   const ds=await Promise.all(['ThanhNien','ChiBaBa',...NPC,...new Set(Object.values(CANH).flatMap(c=>c.le.map(x=>x[0])))].map(t=>mau(t).catch(()=>null)));
-  await Promise.all(Object.keys(CANH).map(napCanh));
-  for(const ten of Object.keys(CANH)){
-   const d=DL[ten],tam=new THREE.Group();ds.forEach(gl=>gl&&tam.add(SU.clone(gl.scene)));d.canh.add(tam);datCamQuanh(B(...CANH[ten].tam));r.compile(d.canh,cam);d.canh.remove(tam);san[ten]=true}
-  await new Promise(ok=>setTimeout(ok,300));window.ss3dXong=true}
+  // cảnh đầu trước; sau đó lần lượt: ưu tiên cảnh người dùng đang đứng chờ, rồi theo thứ tự trong CANH
+  let dau=true;
+  for(;;){const s=canhNay(),ten=s&&!san[s]&&!DL[s]?s:dau?DAU:Object.keys(CANH).find(k=>!DL[k]);if(!ten)break;
+   try{await napCanh(ten);const d=DL[ten],tam=new THREE.Group();ds.forEach(gl=>gl&&tam.add(SU.clone(gl.scene)));d.canh.add(tam);datCamQuanh(B(...CANH[ten].tam));r.compile(d.canh,cam);d.canh.remove(tam);san[ten]=true}
+   catch(e){if(dau)throw e;console.warn('cảnh 3D '+ten+': dùng ảnh tĩnh',e);DL[ten]=DL[ten]||{loi:1};CANH[ten].loi=1}
+   if(dau){dau=false;await new Promise(ok=>setTimeout(ok,300));window.ss3dXong=true}}}
 }

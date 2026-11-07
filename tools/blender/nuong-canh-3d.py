@@ -1,17 +1,18 @@
-"""Sảnh Song Song -> web 3D kiểu đất nặn (cùng quy trình chân núi: canh-dat-set.py + nuong-canh.py + nuong-cay.py, gộp một file).
-blender -b <bản sao song-song-sanh-iso.blend> --python nuong-sanh.py -- <thư mục ra> [số mẫu=256] [ảnh nền=2048] [ảnh vật=4096]
-Ra: canh.glb (nền + 3 khối vật, UV nướng), nen.png, vat-0.png (sân, nhà), vat-1.png (cảnh xa), vat-3.png (đồ nhỏ),
-    tuong.glb (hai tượng, ảnh màu gốc, trình duyệt tự chiếu sáng),
-    cay.glb (cây: pháp tuyến + màu đỉnh, trình duyệt tự chiếu sáng), thong-tin.json (camera ảnh iso, nắng).
-Không lưu file .blend. Rút kinh nghiệm chân núi: tấm nền không nằm chồng dưới sân/đồi (bỏ ô bị che trước khi nướng)."""
+"""Một cảnh Song Song (song-song-<cảnh>-iso.blend) -> web 3D kiểu đất nặn. Dùng chung mọi cảnh (sảnh, hồ, thờ, nhà, điện, làng).
+blender -b <bản sao .blend> --python nuong-canh-3d.py -- <thư mục ra> [số mẫu=256] [ảnh nền=2048] [ảnh vật=4096]
+Ra: canh.glb (nền + 3 khối vật, UV nướng), nen.png, vat-0.png (khu chính), vat-1.png (cảnh xa), vat-3.png (đồ nhỏ),
+    tuong.glb (tượng nếu có: ảnh màu gốc, trình duyệt tự chiếu sáng), cay.glb (cây: pháp tuyến + màu đỉnh), thong-tin.json (camera ảnh iso).
+Không lưu file .blend. Bài học chân núi/sảnh: tấm nền bỏ ô nằm dưới sân/đồi, lá sen nâng so le, tượng xuất riêng."""
 import bpy, bmesh, sys, os, json, math
 from mathutils import Vector
 A = sys.argv[sys.argv.index('--') + 1:]
 OUTD = A[0]; os.makedirs(OUTD, exist_ok=True)
 SM = int(A[1]) if len(A) > 1 else 256; SN = int(A[2]) if len(A) > 2 else 2048; SV = int(A[3]) if len(A) > 3 else 4096
-sc = bpy.data.scenes['More']
+sc = max(bpy.data.scenes, key=lambda s: len(s.objects))   # cảnh chính trong file (More / DienIso / LangIso)
 for s in [x for x in bpy.data.scenes if x != sc]: bpy.data.scenes.remove(s)
-TX, TY, R = 2.0, 10.0, 75.0   # vùng giữ lại quanh sảnh; ngoài vùng là sương màu cỏ trên web
+CAM = next(o for o in sc.objects if o.type == 'CAMERA')
+_fw = (CAM.rotation_euler.to_matrix() @ Vector((0, 0, -1))).normalized(); _t = -CAM.location.z / _fw.z; _tg = CAM.location + _fw * _t
+OW = CAM.data.ortho_scale; TX, TY = round(_tg.x, 3), round(_tg.y, 3); R = max(40.0, OW * .8)   # vùng giữ lại quanh tâm ảnh; ngoài vùng là sương trên web
 
 def lin(h):
     return tuple(((int(h[i:i + 2], 16) / 255 + .055) / 1.055) ** 2.4 if int(h[i:i + 2], 16) > 10 else int(h[i:i + 2], 16) / 255 / 12.92 for i in (0, 2, 4))
@@ -22,11 +23,13 @@ BANG = {'gach': ('F0D8B0', 'D2A877'), 'co': ('9DB96B', 'AEC97B'), 'co2': ('8FAF5
         'ngoi': ('C87458', 'D98A6B'), 'tuongTrang': ('F4E4BA',), 'tuong': ('F0CC80',), 'sonDo': ('B9483A',), 'cua': ('9F4B36',), 'cuaGoT': ('9F4B36',),
         'cotCo': ('DBA65F',), 'den': ('F5C87B',), 'denTrang': ('FFF1D2',), 'vangKim': ('E3B150',), 'dongK': ('C08B4E',), 'haoQuangL': ('F2C661',), 'haoC': ('F2C661',),
         'vaiPhuon': ('E89B3E',), 'sen': ('F2A8B5',), 'hong': ('F29BB0',), 'hongP': ('E2574C',), 'nuoc': ('80B7B1',), 'maiXam': ('9AA0A8',), 'maiXam2': ('8A9098',),
-        'kinhMau': ('A9C3E6',), 'aoXanh': ('6D8FC0',), 'sat': ('5A524A',), 'bangGo': ('B98E5E',), 'goX': ('9A6B45',), 'latSanh': ('EEEAE2', 'DCD6CB')}
+        'kinhMau': ('A9C3E6',), 'aoXanh': ('6D8FC0',), 'sat': ('5A524A',), 'bangGo': ('B98E5E',), 'goX': ('9A6B45',), 'latSanh': ('EEEAE2', 'DCD6CB'),
+        'gach2': ('DDB284', 'C49364'), 'son': ('B9483A',), 'vang': ('E3B150',), 'hangRao': ('7FA650', '95B964'), 'coSan': ('A6C273', 'B4CE82'), 'lua': ('B6CB72', 'CADA8B'),
+        'ruongNuoc': ('A9C27B',), 'bo': ('B98E5E',), 'trang': ('FAF3E3',), 'cotTrang': ('F2EBDD',), 'cuaGo': ('9F4B36',), 'goDien': ('8E3F2E',), 'haoQuang': ('F2C661',)}
 TRON = {'la0', 'la1', 'la2', 'laTre'}
-CAY = ('cay', 'tanS', 'thanB', 'tanBd', 'bach', 'cau', 'bd', 'bdS')   # tên vật là cây (bụi, lá sen không phải cây)
+CAY = ('cay', 'tanS', 'thanB', 'tanBd', 'bach', 'cau', 'bd', 'bdS', 'tre')   # tên vật là cây (bụi, lá sen không phải cây)
 def la_cay(o): return o.name.split('.')[0] in CAY
-def la_tuong(o): return o.name.startswith('SS_')   # tượng Phật, tượng Chúa: giữ ảnh màu gốc, trình duyệt tự chiếu sáng
+def la_tuong(o): return o.type == 'MESH' and (o.name.startswith('SS_') or len(o.data.polygons) > 100000)   # tượng Phật, tượng Chúa: giữ ảnh màu gốc, trình duyệt tự chiếu sáng
 NK = open(os.path.join(OUTD, 'nhat-ky.txt'), 'w', encoding='utf-8')
 def log(*a): print(*a, flush=True); NK.write(' '.join(map(str, a)) + '\n'); NK.flush()
 def vat(o): return o.material_slots[0].name.split('.')[0] if o.material_slots else ''
@@ -34,8 +37,7 @@ def tam(o): return sum((o.matrix_world @ Vector(b) for b in o.bound_box), Vector
 
 def chinh():
     # ---- camera ảnh iso (web dùng để đổi toạ độ ảnh <-> 3D) và dọn vùng xa
-    cam = bpy.data.objects['camIso']; fw = (cam.matrix_world.to_3x3() @ Vector((0, 0, -1))).normalized(); t = -cam.location.z / fw.z
-    tg = cam.location + fw * t
+    cam = CAM; fw = _fw; t = _t; tg = _tg
     tt = {'cam': {'ortho': cam.data.ortho_scale, 'res': [sc.render.resolution_x, sc.render.resolution_y], 'tgt': list(tg), 'dist': t,
                   'el': math.degrees(math.asin(-fw.z)), 'az': math.degrees(math.atan2(-fw.x, fw.y))}}
     for o in list(sc.objects):
@@ -53,6 +55,7 @@ def chinh():
     for o in sc.objects:
         if o.type != 'MESH': continue
         if la_tuong(o):
+            o.modifiers.new('han', 'WELD').merge_threshold = 1e-4   # mô hình tải về thường rời đỉnh từng tam giác: hàn trước thì giảm mặt mới ăn
             d = o.modifiers.new('giam', 'DECIMATE'); d.ratio = min(1, 25000 / max(1, len(o.data.polygons)))
             for p in o.data.polygons: p.use_smooth = True
             continue
@@ -88,7 +91,7 @@ def chinh():
             nt.links.new(g.outputs['Position'], br.inputs['Vector']); nt.links.new(br.outputs['Color'], bs.inputs['Base Color'])
 
     # ---- nắng ấm mềm, trời kem, AgX như chân núi
-    sun = next(o for o in sc.objects if o.type == 'LIGHT'); sun.data.angle = math.radians(14); sun.data.energy = 3.2; sun.data.color = (1, .9, .77)
+    sun = next(o for o in sc.objects if o.type == 'LIGHT' and o.data.type == 'SUN'); sun.data.angle = math.radians(14); sun.data.energy = 3.2; sun.data.color = (1, .9, .77)
     nt = sc.world.node_tree; bg = next(n for n in nt.nodes if n.type == 'BACKGROUND')
     for l in list(bg.inputs['Color'].links): nt.links.remove(l)
     bg.inputs['Color'].default_value = (1, .9, .76, 1); bg.inputs['Strength'].default_value = 1.15
@@ -116,6 +119,10 @@ def chinh():
     # ---- cây: màu đỉnh đất sét (chân tối, ngọn sáng) + pháp tuyến, xuất riêng; giữ lại trong cảnh để đổ bóng khi nướng
     cay = [o for o in sc.objects if o.type == 'MESH' and la_cay(o)]
     for o in sc.objects: o.select_set(False)
+    tong = sum(len(o.data.polygons) for o in cay)
+    if tong > 80000:   # cảnh nhiều cây (làng): giảm mặt đều cho cây để tệp cây không quá nặng
+        for o in cay:
+            if len(o.data.polygons) > 40: o.modifiers.new('giam', 'DECIMATE').ratio = 80000 / tong
     for o in cay: ap_dung(o)
     for o in cay:
         c = [lin(h) for h in BANG.get(vat(o), ('7FA650',))]; a, b = c[0], c[-1]
@@ -139,15 +146,20 @@ def chinh():
     log('CAY', len(cay), len(gc.data.polygons))
 
     # ---- tượng: giảm mặt, ảnh màu gốc thu về 1024, xuất riêng; cũng giữ lại trong cảnh để đổ bóng khi nướng
-    tuong = [o for o in sc.objects if o.type == 'MESH' and la_tuong(o)]
+    tuong = [o for o in sc.objects if o.type == 'MESH' and la_tuong(o) and o is not gc]
     for o in tuong:
         ap_dung(o)
         if len(o.data.polygons) > 30000:   # mô hình nhiều mảnh rời: lượt giảm đầu dừng sớm, giảm thêm một lượt
             d = o.modifiers.new('giam2', 'DECIMATE'); d.ratio = 30000 / len(o.data.polygons); ap_dung(o)
     for im in {n.image for o in tuong for s in o.material_slots if s.material and s.material.node_tree for n in s.material.node_tree.nodes if n.type == 'TEX_IMAGE' and n.image}:
         if max(im.size) > 1024: im.scale(1024, 1024)
+    # tượng giống hệt nhau (Tam Thế Phật): dùng chung một lưới, một vật liệu -> tệp nhẹ gấp ba
+    for i, o in enumerate(tuong):
+        for p in tuong[:i]:
+            if p.data is not o.data and len(p.data.vertices) == len(o.data.vertices) and len(p.data.polygons) == len(o.data.polygons):
+                o.data = p.data; break
     for x in sc.objects: x.select_set(x in tuong)
-    bpy.ops.export_scene.gltf(filepath=os.path.join(OUTD, 'tuong.glb'), use_selection=True, export_format='GLB', export_apply=True,
+    if tuong: bpy.ops.export_scene.gltf(filepath=os.path.join(OUTD, 'tuong.glb'), use_selection=True, export_format='GLB', export_apply=True,
         export_normals=True, export_image_format='WEBP', export_image_quality=85, export_animations=False, export_materials='EXPORT', export_meshopt_compression_enable=True)
     log('TUONG', [(o.name, len(o.data.polygons)) for o in tuong])
 
@@ -179,19 +191,37 @@ def chinh():
         v = nen.data.vertices[l.vertex_index].co; uv.data[l.index].uv = ((v.x - TX + R) / (2 * R), (v.y - TY + R) / (2 * R))
     log('NEN bo', len(xoa), 'con', len(nen.data.polygons))
 
+    # ---- lưới độ cao mặt đi theo lưới đi của ảnh iso (144x96): bắn tia theo camera ảnh, bỏ qua cây và tượng.
+    # Web đặt người đứng đúng mặt sàn, bậc, nền cao (gian thờ, chính điện) thay vì một độ cao cố định.
+    dg2 = bpy.context.evaluated_depsgraph_get(); OH = OW * sc.render.resolution_y / sc.render.resolution_x
+    RI = fw.cross(Vector((0, 0, 1))).normalized(); UPv = RI.cross(fw).normalized(); C0 = tg - fw * 160
+    GW, GH = 144, 96; cao = []
+    for j in range(GH):
+        for i in range(GW):
+            o0 = C0 + RI * (((i + .5) / GW - .5) * OW) + UPv * ((.5 - (j + .5) / GH) * OH); z = 0.0
+            for _ in range(8):
+                ok, loc, nor, fi, ob, mx = sc.ray_cast(dg2, o0, fw)
+                if not ok: break
+                if ob is gc or ob in tuong or nor.z < .5 or loc.z > 3.5: o0 = loc + fw * 1e-3; continue
+                z = loc.z; break
+            cao.append(round(z * 100))
+    tt['cao'] = {'w': GW, 'h': GH, 'cm': cao}
+    log('CAO', min(cao), max(cao))
+
     # ---- nhóm vật: sân + nhà (vat-0), cảnh xa (vat-1), đồ nhỏ + tượng (vat-3, người xem phóng sát nên cần nhiều điểm ảnh)
     def gop(objs, ten):
         for o in sc.objects: o.select_set(False)
         bpy.context.view_layer.objects.active = objs[0]
         for o in objs: o.select_set(True)
-        bpy.ops.object.join(); g = bpy.context.view_layer.objects.active; g.name = ten
+        bpy.ops.object.join(); g = bpy.context.view_layer.objects.active; g.name = ten; g['ten'] = ten   # tên vật có thể bị Blender đổi (.001) nếu cảnh đã có vật cùng tên
         for l in list(g.data.uv_layers): g.data.uv_layers.remove(l)
         g.data.uv_layers.new(name='lm'); bpy.ops.object.select_all(action='DESELECT'); g.select_set(True)
         bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
         bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=0.0, area_weight=1.0, scale_to_bounds=False)
         bpy.ops.uv.pack_islands(rotate=True, margin=0.0015, shape_method='CONCAVE')
         bpy.ops.object.mode_set(mode='OBJECT'); return g
-    san = [o for o in con if -34 < tam(o).x < 36 and -24 < tam(o).y < 52 and max(o.dimensions) < 60]
+    H = OW * .45   # khu chính: quanh tâm ảnh, được ảnh nướng 4096 riêng
+    san = [o for o in con if abs(tam(o).x - TX) < H and abs(tam(o).y - TY) < H and max(o.dimensions) < 60]
     gan = [o for o in san if max(o.dimensions) < 3.2 or o.name.startswith(('Torus', 'hao'))]
     san = [o for o in san if o not in gan]; xa = [o for o in con if o not in san and o not in gan]
     log('NHOM', len(san), len(xa), len(gan))
@@ -211,10 +241,11 @@ def chinh():
     for x in [nen] + [k for k, _ in khoi]:
         for s in x.material_slots: s.material = s.material.copy()
     nuong(nen, 'nen', SN)
-    for k, sz in khoi: nuong(k, k.name, sz)
+    nen['ten'] = 'nen'
+    for k, sz in khoi: nuong(k, k['ten'], sz)
     for x in [nen] + [k for k, _ in khoi]:
-        m = bpy.data.materials.new('nuong-' + x.name); m.use_nodes = True; nt = m.node_tree
-        t = nt.nodes.new('ShaderNodeTexImage'); t.image = bpy.data.images.load(os.path.join(OUTD, x.name + '.png')); nt.links.new(t.outputs[0], nt.nodes['Principled BSDF'].inputs['Base Color'])
+        m = bpy.data.materials.new('nuong-' + x['ten']); m.use_nodes = True; nt = m.node_tree
+        t = nt.nodes.new('ShaderNodeTexImage'); t.image = bpy.data.images.load(os.path.join(OUTD, x['ten'] + '.png')); nt.links.new(t.outputs[0], nt.nodes['Principled BSDF'].inputs['Base Color'])
         x.data.materials.clear(); x.data.materials.append(m)
     for x in sc.objects: x.select_set(x in [nen] + [k for k, _ in khoi])
     bpy.ops.export_scene.gltf(filepath=os.path.join(OUTD, 'canh.glb'), use_selection=True, export_format='GLB', export_apply=True,
@@ -225,4 +256,6 @@ def chinh():
     log('XONG')
 
 with bpy.context.temp_override(scene=sc, view_layer=sc.view_layers[0]):
-    chinh()
+    try: chinh()
+    except Exception:
+        import traceback; log('LOI\n' + traceback.format_exc()); raise
