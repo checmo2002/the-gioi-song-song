@@ -95,7 +95,7 @@
  function tick(t){var dt=Math.min(.1,(t-(last||t))/1000);last=t;
   Object.keys(av).forEach(function(k){var p=av[k],dx=p.tx-p.x,dy=p.ty-p.y,dpx=Math.hypot(dx*st.sw,dy*st.sh);
    if(dpx<=1.5&&p.path&&p.path.length){var nq=p.path.shift();p.tx=nq[0];p.ty=nq[1];dx=p.tx-p.x;dy=p.ty-p.y;dpx=Math.hypot(dx*st.sw,dy*st.sh)}
-   if(dpx>1.5){var sp=scaleAt(p.y)*st.sh*(st.map?3.0:.8)*dt,u=Math.min(1,sp/dpx),nx=p.x+dx*u,ny=p.y+dy*u;if(st.map){var g=SC[scene].grid;if(!walk(Math.floor(nx*g.w),Math.floor(ny*g.h))){if(walk(Math.floor(nx*g.w),Math.floor(p.y*g.h)))ny=p.y;else if(walk(Math.floor(p.x*g.w),Math.floor(ny*g.h)))nx=p.x}}p.x=nx;p.y=ny;p.d=dirOf(dx,dy);if(p.a!=='di'){p.a='di';p.f=0}p.f+=dt*10;p.arr=0}
+   if(dpx>1.5){var sp=scaleAt(p.y)*st.sh*(st.map?3.0*(window.ss3dTocDo||1):.8)*dt,u=Math.min(1,sp/dpx),nx=p.x+dx*u,ny=p.y+dy*u;if(st.map){var g=SC[scene].grid;if(!walk(Math.floor(nx*g.w),Math.floor(ny*g.h))){if(walk(Math.floor(nx*g.w),Math.floor(p.y*g.h)))ny=p.y;else if(walk(Math.floor(p.x*g.w),Math.floor(ny*g.h)))nx=p.x}}p.x=nx;p.y=ny;p.d=dirOf(dx,dy);if(p.a!=='di'){p.a='di';p.f=0}p.f+=dt*10;p.arr=0}
    else{if(p.a==='di'){p.a=p.want||'dung';p.f=0;if(p.faceUp)p.d=4}
     if(p.a==='lay'){p.f+=dt*2.6;if(p.f>=5.99){p.a='chap';p.f=0}}}
    if(p.me&&pend&&dpx<=1.5&&!(p.path&&p.path.length)){var q=pend;pend=null;q()}
@@ -155,6 +155,7 @@
  // ---- bật/tắt theo lối
  function refresh(){var hs=homeScene();if(scene!=='sanh'&&(hs==='tho'&&(scene==='chan'||scene==='dien'))||(hs==='chan'&&scene==='tho')){scene=hs;me.s=hs;hall.dataset.ws=hs;Object.keys(av).forEach(function(k){av[k].el.remove();delete av[k]})}var w=active()&&!hall.hidden;hall.classList.toggle('world-on',w);W.hidden=!w;if(w){if(!av.me)setScene(scene);else layout();sync();send()}}
  window.ssWorld={home:homeScene,refresh:refresh,climb:climb,descend:descend,fade:fade,set:function(s){if(!on()){scene=s;me.s=s;hall.dataset.ws=s;Object.keys(av).forEach(function(k){av[k].el.remove();delete av[k]});refresh();return}setScene(s);refresh()},scene:function(){return scene},on:function(){return on()},sync:function(){sync()},pt:function(x,y){return SC[scene].map?gridNear(x,y):clampFloor(x,y)},pray:function(){var q=SC[scene].pray;return q&&q[O]},send:function(){send()},walk:function(x,y,cb){var g=gridNear(x,y);goTo(g[0],g[1],'dung');pend=cb||null},bow:function(){var b=hall.querySelector('.w-bar [data-w="lay"]');b&&b.click()}};
+ window.ssWorld.avs=function(){return av};   // chân núi 3D (js/26-chan-3d.js) đọc vị trí mọi người để vẽ lại
  addEventListener('ss-lit',function(){if(on()&&SC[scene].pray){var pq=SC[scene].pray[O];goTo((av.me||me).x,pq[1],'lay')}});
  new MutationObserver(function(){if(hall.hidden)hall.classList.remove('no-splash');setTimeout(refresh,30)}).observe(hall,{attributes:true,attributeFilter:['hidden']});
  addEventListener('ss-faith',function(){setTimeout(refresh,30)});

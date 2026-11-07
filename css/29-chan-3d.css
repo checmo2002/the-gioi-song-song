@@ -1,0 +1,14 @@
+/* ===== Chân núi 3D (js/26-chan-3d.js): cảnh three.js thay ảnh tĩnh, nút và tên người vẽ theo vị trí 3D ===== */
+.w3d,.w3d-hot,.w3d-tags{position:absolute;inset:0;display:none}
+.hall.w3d-on .w3d,.hall.w3d-on .w3d-hot,.hall.w3d-on .w3d-tags{display:block}
+.w3d canvas{display:block;width:100%;height:100%;touch-action:none;cursor:pointer}
+.w3d-hot,.w3d-tags{pointer-events:none}
+.w3d-hot .wh{pointer-events:auto}
+/* ảnh tĩnh, người dạng hình và nút cũ ẩn đi; lớp ánh sáng theo giờ trong wStage vẫn giữ */
+.hall.w3d-on .w-bg,.hall.w3d-on .w-floor,.hall.w3d-on .w-hot{visibility:hidden}
+.hall.w3d-on .w-stage{pointer-events:none}
+.w3d-tag{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:2px;white-space:nowrap}
+.w3d-tag .t{font-size:12px;line-height:1;padding:3px 7px;border-radius:999px;background:rgba(20,10,4,.66);color:#FFF6E6;border:1px solid rgba(255,220,150,.35)}
+.w3d-tag.me .t{background:linear-gradient(180deg,#B8701A,#7A3E0A);border-color:#FFD98A}
+.w3d-tag .b{order:-1;font-size:22px;line-height:1}
+.w3d-tag .b:empty{display:none}
