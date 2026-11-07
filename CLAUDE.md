@@ -58,6 +58,10 @@ Chưa có hosting. Bản thử là một trang riêng tư trên claude.ai tên "
 `python3 tools/ban-thu.py` rồi đăng `dist/ban-thu/index.html` kèm `css/`, `js/`, `data/`, `img/` lên đúng artifact đó (giữ link cũ).
 Chủ dự án mở link này trên điện thoại thật để thử.
 
+Hosting thử (Cloudflare Pages, miễn phí): `songsong.bandolietsi.vn`, tự dựng lại mỗi lần `main` đổi, mỗi PR có link xem trước riêng.
+Cài đặt trang Pages: Build command `python3 tools/cloudflare.py`, Build output directory `dist/cloudflare`, nhánh `main`.
+Script chỉ đưa lên `index.html`, `css/`, `js/`, `data/`, `img/` và thêm `_headers` (cache, bảo mật). Thêm thư mục mới mà trang cần thì sửa danh sách `CAN` trong script.
+
 ## Cần chủ dự án duyệt (agent không tự quyết)
 
 - Thay đổi giao diện lớn, đổi phong cách đồ hoạ, đổi bố cục đại sảnh.
