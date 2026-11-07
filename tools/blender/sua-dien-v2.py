@@ -149,14 +149,14 @@ for x, y in ((-12.3, -5.7), (12.3, -5.7), (-12.3, 4.0), (-12.3, 10.0), (-8, -5.7
     hop('chanCotH', DA, (x, y, P + .69), (.9, .9, .3)); tru('cotHien', SON, (x, y, P + .54), .3, 5.6, 14)
 for y in (-5.7, -3, 4, 10, 13.3): hop('xa', GO, (0, y, P + 6.25), (25.6, .34, .42))
 for x in (-12.3, -8, 8, 12.3): hop('xaD', GO, (x, 3.8, P + 6.55), (.34, 19.4, .34))
-mai('SS_Mai1', MAI, (0, 3.8, P + 6.4), 25.8, 19.8, 2.8, 1.5, ridge=.62, cong=.55)
-hop('SS_MaiTuong', MAIT, (0, 4.2, P + 8.6), (15.5, 8.6, 1.6))
-for x in (-6, -2, 2, 6): hop('SS_MaiCua', MAI, (x, -.12, P + 8.6), (1.4, .1, 1.0))
-mai('SS_Mai2', MAI, (0, 4.2, P + 9.35), 15.5, 8.6, 2.6, 1.2, ridge=.5, cong=.45)
-hop('SS_MaiNoc', MAIV, (0, 4.2, P + 12.0), (8.2, .35, .3))
-cau('SS_MaiNgoc', MAIV, (0, 4.2, P + 12.55), .42, 2)
+mai('SS_Mai1', MAI, (0, 3.8, P + 6.4), 25.8, 19.8, 4.4, 1.5, ridge=.62, cong=.55)   # dốc như mái chùa Việt
+hop('SS_MaiTuong', MAIT, (0, 4.2, P + 10.2), (15.5, 8.6, 1.6))
+for x in (-6, -2, 2, 6): hop('SS_MaiCua', MAI, (x, -.12, P + 10.2), (1.4, .1, 1.0))
+mai('SS_Mai2', MAI, (0, 4.2, P + 10.95), 15.5, 8.6, 3.4, 1.2, ridge=.5, cong=.45)
+hop('SS_MaiNoc', MAIV, (0, 4.2, P + 14.4), (8.2, .35, .3))
+cau('SS_MaiNgoc', MAIV, (0, 4.2, P + 14.95), .42, 2)
 for sx in (-1, 1):
-    hop('SS_MaiRong', MAIV, (sx * 4.3, 4.2, P + 12.35), (.9, .3, .55)); hop('SS_MaiDuoi', MAIV, (sx * 4.65, 4.2, P + 12.8), (.3, .3, .7))
+    hop('SS_MaiRong', MAIV, (sx * 4.3, 4.2, P + 14.75), (.9, .3, .55)); hop('SS_MaiDuoi', MAIV, (sx * 4.65, 4.2, P + 15.2), (.3, .3, .7))
     for sy in (-1, 1): cau('SS_MaiGoc', MAIV, (sx * 14.4, 3.8 + sy * 11.3, P + 7.25), .28, 1)
 
 # khu lễ Phật: ba chiếu lễ giữa lối trước bàn thờ

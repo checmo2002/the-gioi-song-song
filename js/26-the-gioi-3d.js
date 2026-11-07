@@ -114,7 +114,7 @@ function khoi(){
    const k=TR.set?1-Math.exp(-dt*1.2):1;TR.set=true;   // đổi dần trong vài giây (đổi cảnh thì nhảy luôn)
    TR.tint.lerp(DICH.tint,k);TR.tren.lerp(DICH.tren,k);TR.duoi.lerp(DICH.duoi,k);for(const x of ['nang','toa','dom','gan','mua'])TR[x]+=(DICH[x]-TR[x])*k;
    let chop=0;if(DICH.dong&&!GIAM){if(now>samSau){samSau=now+5000+Math.random()*9000;sam=now}chop=Math.max(0,1-(now-sam)/180)}
-   for(const m of d.bk)m.color.copy(TR.tint).addScalar(chop*.6);cyM.copy(TR.tint).lerp(TRANG,.55).addScalar(chop*.6);for(const m of d.cy)m.color.copy(cyM);for(const m of NVM)m.color.copy(cyM);   // cây, tượng, người còn được đèn chiếu: nhân nhẹ hơn kẻo đêm đen kịt
+   for(const m of d.bk)m.color.copy(TR.tint).addScalar(chop*.6);cyM.copy(TR.tint).lerp(TRANG,.55).addScalar(chop*.6);for(const m of d.cy){m.color.copy(cyM);if(m.userData.goc)m.color.multiply(m.userData.goc)}for(const m of NVM)m.color.copy(cyM);   // cây, tượng, người còn được đèn chiếu: nhân nhẹ hơn kẻo đêm đen kịt
    if(d.den){d.den.intensity=TR.nang+chop*3;d.hemi.intensity=TR.toa+chop*4}
    d.canh.fog.color.copy(TR.duoi);d.canh.fog.near=Math.max(4,d.canh.fog.near-TR.gan);d.canh.fog.far=Math.max(d.canh.fog.near+25,d.canh.fog.far-TR.gan*1.6);
    const kh=TR.tren.getHexString()+TR.duoi.getHexString();if(kh!==cvT._k){cvT._k=kh;const gr=xT.createLinearGradient(0,0,0,256);gr.addColorStop(0,'#'+TR.tren.getHexString());gr.addColorStop(1,'#'+TR.duoi.getHexString());xT.fillStyle=gr;xT.fillRect(0,0,4,256);TROI.needsUpdate=true}
@@ -271,7 +271,7 @@ function khoi(){
    canh.add(g.scene,gc.scene);
    if(c.tuong){const gt=await parse(await dem(taiJSON(G+'tuong.json'),ten));gt.scene.traverse(o=>{if(o.isMesh){
     // giữ chất liệu gốc (tượng Phật là kim loại vàng): cho phản chiếu một phòng sáng dịu, không thì kim loại thành màu kem nhạt
-    const laMai=/^SS_Mai/.test(o.name);o.userData.tuong=!laMai;const m=o.material;m.envMap=moiTruong();m.envMapIntensity=laMai?0:.7;cy.push(m);if(m.map)m.map.anisotropy=r.capabilities.getMaxAnisotropy();m.onBeforeCompile=sh=>AGX(sh);if(!laMai)nen.push(o)}});/* mái chính điện: làm mờ khi vào điện, không chặn tia bấm */canh.add(gt.scene)}
+    const laMai=/^SS_Mai/.test(o.name);o.userData.tuong=!laMai;const m=o.material;if(laMai)m.userData.goc=m.color.clone();m.envMap=moiTruong();m.envMapIntensity=laMai?0:.7;cy.push(m);if(m.map)m.map.anisotropy=r.capabilities.getMaxAnisotropy();m.onBeforeCompile=sh=>AGX(sh);if(!laMai)nen.push(o)}});/* mái chính điện: làm mờ khi vào điện, không chặn tia bấm */canh.add(gt.scene)}
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
