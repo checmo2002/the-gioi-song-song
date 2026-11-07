@@ -68,7 +68,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `23-dai-tuong-niem-liet-si.js` | Đài tưởng niệm liệt sĩ: nhang tri ân, lời tri ân |
 | `24-bay-to.js` | Một nút "Bày tỏ", bấm mới mở 4 cách bày tỏ (chắp tay, thương nhớ, dâng hoa, cầu an) |
 | `25-npc.js` | NPC người viếng: 1–3 người mỗi cảnh đi lại, chắp tay, vái lạy, ngồi. Chỉ chạy trên máy người xem, không tên, không tính vào số người trực tuyến, đứng yên khi bật giảm chuyển động |
-| `26-the-gioi-3d.js` | Thế giới 3D thời gian thực, hiện có sảnh, chân núi, nhà thờ, làng tưởng niệm (three.js, `css/29-the-gioi-3d.css`): vẽ lại cảnh, nhân vật đất nặn của mình, người khác và NPC từ vị trí của `04-01`; bấm để đi, kéo để xoay. Nạp ngay khi mở trang, màn tải (`01`) chờ 3D xong mới mở; vào cảnh 3D lúc chưa xong thì có màn chờ riêng. Máy không có GPU thật thì giữ ảnh 2D |
+| `26-the-gioi-3d.js` | Thế giới 3D thời gian thực, hiện có sảnh, chân núi, nhà thờ, làng tưởng niệm, làng dòng họ (three.js, `css/29-the-gioi-3d.css`): vẽ lại cảnh, nhân vật đất nặn của mình, người khác và NPC từ vị trí của `04-01`; bấm để đi, kéo để xoay. Nạp ngay khi mở trang, màn tải (`01`) chờ 3D xong mới mở; vào cảnh 3D lúc chưa xong thì có màn chờ riêng. Máy không có GPU thật thì giữ ảnh 2D |
 
 > Các file `07-NN-*.js` dùng chung tên cấp ngoài cùng (`people`, `current`, `select`, `buy`…) qua phạm vi toàn cục của trang.
 > Vì vậy phải giữ đúng thứ tự nạp, và file khác không được khai báo trùng các tên này ở cấp ngoài cùng.
