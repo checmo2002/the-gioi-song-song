@@ -23,3 +23,10 @@
 .w3d-tranh{position:absolute;inset:0;display:none;pointer-events:none;overflow:hidden}
 .hall.w3d-on .w3d-tranh{display:block}
 .w3d-tranh .ho-h,.w3d-tranh .ho-d{position:absolute}
+/* đoạn phim chuyển cảnh (js/26 ss3dPhim): khung 3D chiếu trong màn chuyển, hai dải đen điện ảnh, chữ nằm ở dải dưới */
+.w-trans.phim{background:#0d0b09!important;padding-bottom:0;align-items:flex-end;animation:wIn .35s ease both!important}
+.w-trans.phim.out{animation:wOut .9s ease both!important}
+.w-trans>canvas{position:absolute;inset:0;transition:opacity .4s ease}
+.w-trans.phim::before,.w-trans.phim::after{content:'';position:absolute;left:0;right:0;height:max(44px,8vh);background:#0d0b09;z-index:1}
+.w-trans.phim::before{top:0}.w-trans.phim::after{bottom:0}
+.w-trans.phim span{position:relative;z-index:2;height:max(44px,8vh);display:flex;align-items:center;font-size:clamp(17px,2.2vw,24px)}
