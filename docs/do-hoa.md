@@ -27,6 +27,8 @@ Hai vòng tròn lồng nhau, phần giao nhau tô vàng `#B8862F`. Bản SVG có
 - Mỗi cảnh cần thêm dữ liệu lưới đi được trong `js/04-00-du-lieu-canh.js` (cùng tên cảnh với ảnh).
 - Ảnh cảnh nên dưới 400 KB để điện thoại tải nhanh.
 - Cảnh 3D: nướng sáng từ Blender vào texture (`img/3d/vat-*.webp`), hình khối ở `img/3d/canh.json` (glb mã hoá base64 vì bản thử trên claude.ai không phục vụ file .glb). Cây và nhân vật được chiếu sáng thời gian thực (không đổ bóng thật; bóng cây nằm sẵn trong ảnh nướng, người có bóng mềm dưới chân), màu đất nặn theo đỉnh (`img/3d/cay.json`, `img/3d/nv/*.json`).
+- Ảnh nướng sáng phải **lấp vùng đen** giữa các mảnh ghép trước khi đưa lên (`python3 tools/lap-den-anh-nuong.py vao.webp ra.webp`). Không lấp thì khi thu nhỏ, màu đen tràn ra mép thành vệt răng cưa nhấp nháy.
+- Không để mặt nền phẳng nằm chồng dưới bãi cỏ hoặc sườn đồi. Hai lớp sát nhau sẽ tranh nhau hiện thành vệt đen nhấp nháy, và phần bị che khi nướng ra màu đen. Xoá phần nền bị che trong Blender trước khi nướng.
 - Thư viện 3D: three.js r160 chép sẵn trong `js/vendor/three/` (không tải từ CDN, để chạy được khi không có mạng ngoài).
 - Máy không có GPU thật (trình vẽ phần mềm như SwiftShader) tự quay về ảnh isometric 2D. Thêm `?3d` vào địa chỉ để ép bật 3D khi thử.
 - Asset miễn phí là chính. Mua asset trả phí phải hỏi chủ dự án.
