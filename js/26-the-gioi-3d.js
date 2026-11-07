@@ -125,7 +125,7 @@ function khoi(){
   const dk=new OrbitControls(cam,r.domElement);dk.enableDamping=!GIAM;dk.dampingFactor=.08;dk.rotateSpeed=.7;dk.enableZoom=false;dk.enablePan=false;
   dk.minPolarAngle=15*Math.PI/180;dk.maxPolarAngle=68*Math.PI/180;
   const ori=()=>hall.clientWidth/Math.max(1,hall.clientHeight)<.9?'v':'h';
-  const xa=()=>{const g=dang?CANH[dang].xa:CANH[DAU].xa;return THREE.MathUtils.clamp(g/(window.ssZoomK?ssZoomK(ori()):1),7,g*2.5)};   // tới 2,5 lần (nút thu nhỏ hết cỡ, js/16 MIN .4); nút góc nhìn, cuộn chuột, chụm ngón (js/16-goc-nhin.js) đổi khoảng cách camera
+  const xa=()=>{const g=dang?CANH[dang].xa:CANH[DAU].xa;return THREE.MathUtils.clamp(g/(window.ssZoomK?ssZoomK(ori()):1),7,g*2)};   // tới 2 lần (nút thu nhỏ hết cỡ, js/16 MIN .5); nút góc nhìn, cuộn chuột, chụm ngón (js/16-goc-nhin.js) đổi khoảng cách camera
   let cw=-1,ch=-1;   // cảnh nạp sớm lúc sảnh còn ẩn (cỡ 0) nên đo lại mỗi khi hiện
   function co(){const w=hall.clientWidth,h=hall.clientHeight;if(w===cw&&h===ch)return;cw=w;ch=h;cam.aspect=w/Math.max(1,h);cam.fov=w<h?48:35;cam.updateProjectionMatrix();r.setSize(w,h)}
   co();addEventListener('resize',co);
@@ -249,6 +249,10 @@ function khoi(){
 
   // ---- camera: đi theo "Bạn", người dùng kéo để xoay
   let theo=null,daDat=false;
+  // free cam: người xem kéo xoay / thu nhỏ để nhìn đường đi; thả tay VE_SAU ms thì camera lướt về góc mặc định
+  const VE_SAU=4000,huongMD=new V3();let raT=0,keo=false;const cham=()=>{raT=performance.now()};
+  dk.addEventListener('start',()=>{keo=true;cham()});dk.addEventListener('end',()=>{keo=false;cham()});
+  hall.addEventListener('wheel',cham,{passive:true});hall.addEventListener('touchmove',cham,{passive:true});hall.addEventListener('click',e=>{if(e.target.closest('.zm'))cham()});
   // mở cùng hướng nhìn với ảnh iso cũ (từ tây nam nhìn lên) cho người quen đường không bị lạc;
   // nghiêng 55° (cao hơn ảnh cũ 42°) để mái cổng không che người vừa vào sân
   function datCamQuanh(t){const n=(dang&&CANH[dang].nghieng||55)*Math.PI/180,h=Math.hypot(DIR.x,DIR.y);cam.position.copy(t).addScaledVector(B(DIR.x/h*Math.cos(n),DIR.y/h*Math.cos(n),Math.sin(n)),xa());dk.target.copy(t)}
@@ -312,6 +316,11 @@ function khoi(){
    if(theo){tam2.set(theo.x,theo.y+1,theo.z);   // theo.y = độ cao mặt đứng
     if(!daDat){datCamQuanh(tam2);daDat=true}   // vào cảnh: đặt lại camera quanh "Bạn" (trước đây dòng này lỡ nằm trong chú thích nên camera giữ góc của cảnh trước)
     const k=GIAM?1:1-Math.exp(-dt*3),dv=tam2.clone().sub(dk.target).multiplyScalar(k);dk.target.add(dv);cam.position.add(dv)}
+   if(raT&&!keo&&t-raT>VE_SAU){   // về góc mặc định (cùng hướng datCamQuanh) và độ xa mặc định nếu đang thu nhỏ
+    if(window.ssZoomVe&&raT>0){ssZoomVe();raT=-raT}
+    const n=(dang&&CANH[dang].nghieng||55)*Math.PI/180,h=Math.hypot(DIR.x,DIR.y);huongMD.copy(B(DIR.x/h*Math.cos(n),DIR.y/h*Math.cos(n),Math.sin(n))).normalize();
+    const v0=cam.position.clone().sub(dk.target),R0=v0.length();v0.divideScalar(R0);
+    if(v0.angleTo(huongMD)<.003)raT=0;else cam.position.copy(dk.target).addScaledVector(v0.lerp(huongMD,GIAM?1:Math.min(1,dt*2.2)).normalize(),R0)}
    const v=cam.position.clone().sub(dk.target),R=v.length(),Rm=xa();if(Math.abs(R-Rm)>.01)cam.position.copy(dk.target).addScaledVector(v,(R+(Rm-R)*(GIAM?1:Math.min(1,dt*6)))/R);
    d.canh.fog.near=Rm+8;d.canh.fog.far=Rm+75;   // sương lùi theo khoảng cách camera; bắt đầu sát sau người cho cảnh xa mờ dần
    DOM.position.set(dk.target.x,dk.target.y-2,dk.target.z);bayDom(dt,t);troiBuoc(d,dt,t,Rm);
