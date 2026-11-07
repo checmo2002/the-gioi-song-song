@@ -51,6 +51,16 @@ def chinh():
     # lá sen cùng độ cao chồng lên nhau: chỗ chồng nướng ra đen, nâng mỗi lá cao hơn lá trước vài mm
     for i, o in enumerate(sorted([o for o in sc.objects if o.name.split('.')[0] in ('laSen', 'laSenP')], key=lambda o: o.name)):
         o.location.z += .004 * (i + 1)
+    # mảnh phẳng sát đất (lối đi, sân, thềm) cùng độ cao chồng lên nhau: chỗ chồng nướng ra sọc đen, nhấp nháy.
+    # Xếp tầng: mảnh nhỏ nằm trên mảnh lớn chồng lên nó, mỗi tầng cao hơn 2,5 mm
+    phang = [o for o in sc.objects if o.type == 'MESH' and o.dimensions.z < .25 and max(o.dimensions.x, o.dimensions.y) > 1.5
+             and max(o.dimensions) < 100 and min(v.co.z for v in o.data.vertices) * o.scale.z + o.location.z < .2 and not la_cay(o)]
+    def hop(o):
+        ps = [o.matrix_world @ Vector(c) for c in o.bound_box]; return min(p.x for p in ps), max(p.x for p in ps), min(p.y for p in ps), max(p.y for p in ps)
+    hh = {o: hop(o) for o in phang}; dt = {o: o.dimensions.x * o.dimensions.y for o in phang}
+    for o in phang:   # nâng theo số mảnh lớn hơn đang chồng lên đúng chỗ này (không nâng dồn cả cảnh)
+        a0 = hh[o]; n = sum(1 for p in phang if p is not o and dt[p] > dt[o] and hh[p][0] < a0[1] and hh[p][1] > a0[0] and hh[p][2] < a0[3] and hh[p][3] > a0[2])
+        o.location.z += .0025 * n
     # ---- kiểu đất nặn: tượng giảm mặt, cạnh bo tròn, tán lá chia mịn, vật liệu mờ như đất sét
     for o in sc.objects:
         if o.type != 'MESH': continue

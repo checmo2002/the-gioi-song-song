@@ -19,3 +19,7 @@
 .w3d-cho small{font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#6E6253}
 .w3d-cho i{display:block;width:min(220px,60vw);height:2px;margin-top:8px;background:rgba(43,36,28,.12);overflow:hidden}
 .w3d-cho s{display:block;height:100%;background:#B8862F;transform:scaleX(0);transform-origin:left;transition:transform .4s}
+/* tranh 2D (nhà dựng từ gia phả, js/20) đặt lại theo camera 3D */
+.w3d-tranh{position:absolute;inset:0;display:none;pointer-events:none;overflow:hidden}
+.hall.w3d-on .w3d-tranh{display:block}
+.w3d-tranh .ho-h,.w3d-tranh .ho-d{position:absolute}
