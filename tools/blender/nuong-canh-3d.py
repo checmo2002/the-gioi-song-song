@@ -174,9 +174,10 @@ def chinh():
     for im in {n.image for o in tuong for s in o.material_slots if s.material and s.material.node_tree for n in s.material.node_tree.nodes if n.type == 'TEX_IMAGE' and n.image}:
         if max(im.size) > 1024: im.scale(1024, 1024)
     # tượng giống hệt nhau (Tam Thế Phật): dùng chung một lưới, một vật liệu -> tệp nhẹ gấp ba
+    def khung(d): return [round(f(v.co[k] for v in d.vertices), 3) for k in range(3) for f in (min, max)]   # cùng số đỉnh chưa đủ: mái chính điện hai tầng cùng 6 đỉnh
     for i, o in enumerate(tuong):
         for p in tuong[:i]:
-            if p.data is not o.data and len(p.data.vertices) == len(o.data.vertices) and len(p.data.polygons) == len(o.data.polygons):
+            if p.data is not o.data and len(p.data.vertices) == len(o.data.vertices) and len(p.data.polygons) == len(o.data.polygons) and khung(p.data) == khung(o.data):
                 o.data = p.data; break
     for x in sc.objects: x.select_set(x in tuong)
     if tuong: bpy.ops.export_scene.gltf(filepath=os.path.join(OUTD, 'tuong.glb'), use_selection=True, export_format='GLB', export_apply=True,
