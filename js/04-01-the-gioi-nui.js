@@ -151,7 +151,9 @@
   else if(w.indexOf('p:')===0){var pid=w.slice(2),dr=doorOf(pid);if(dr){goTo(dr[0],dr[1],'dung');pend=function(){window.ssVaoNha&&ssVaoNha(pid)}}else window.ssVaoNha&&ssVaoNha(pid)}
   else if(w==='chap'||w==='lay'){if(SC[scene].pray){var pp=SC[scene].pray[O];goTo(pp[0]+(Math.random()-.5)*.12,pp[1]+Math.random()*.03,w)}else goTo((av.me||me).x,(av.me||me).y,w);if(av.me){av.me.faceUp=true}}
   else if(w==='gomo'){var ms=SC.dien.mo,gm=gridNear(ms[0],ms[1]);goTo(gm[0],gm[1],'ngoi');pend=function(){if(av.me){av.me.d=4;av.me.faceUp=true}window.ssMo&&ssMo.open()}}
-  else if(w==='chuong'){window.ssBell&&ssBell();window.toast&&toast('Một hồi chuông ngân vang')}
+  else if(w==='chuong'){var cd=SC[scene].chuongDoor,ring=function(){window.ssBell&&ssBell();window.toast&&toast('Một hồi chuông ngân vang')};if(cd){var gc=gridNear(cd[0],cd[1]);goTo(gc[0],gc[1],'chap');pend=ring}else ring()}
+  else if(w==='le-phat'){var lp=SC.dien.lePhat,gl=gridNear(lp[0],lp[1]);goTo(gl[0],gl[1],'lay');pend=function(){if(av.me){av.me.d=4;av.me.faceUp=true}window.toast&&toast('Thành tâm đảnh lễ Đức Phật')}}
+  else if(w==='thien'){var td=SC.dien.thienDoor,gt=gridNear(td[0],td[1]);goTo(gt[0],gt[1],'ngoi');pend=function(){if(av.me){av.me.d=4;av.me.faceUp=true}window.toast&&toast('Ngồi tĩnh tâm dưới cội bồ đề · nghe suối chảy, chim kêu')}}
   else if(w==='nhang'){var pq=SC[scene].pray[O];goTo(pq[0]+(Math.random()-.5)*.1,pq[1],'chap');window.ssRitual&&ssRitual.open()}
   else if(w==='cal'){var c=hall.querySelector('.hall-act [data-open-cal]');c&&c.click()}
   else if(w==='ngoi')goTo((av.me||me).x,(av.me||me).y,'ngoi');

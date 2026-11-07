@@ -27,7 +27,9 @@ const CANH={
  lang:{ten:'làng tưởng niệm',tgt:[0,2],ow:118,tam:[0,2],le:[],lh:null,toc:.42,day:0,xa:55,cao:1},
  ho:{ten:'làng dòng họ',tgt:[0,6],ow:100,tam:[0,6],le:[],lh:null,toc:.42,day:0,xa:50,cao:1,goc:30,nghieng:42,tranh:1},
  nha:{ten:'ngôi nhà',tgt:[0,-1],ow:38,tam:[0,-1],le:[],lh:null,toc:.42,day:0,xa:28,cao:1,goc:40,anh:1},
- dien:{ten:'chính điện',tgt:[0,2.5],ow:41,tam:[0,2.5],le:[],lh:null,toc:.42,day:0,xa:30,cao:1,goc:40,tuong:1}};
+ dien:{ten:'chính điện',tgt:[0,-2.5],ow:66,tam:[0,-2.5],le:[],lh:null,toc:.42,day:0,xa:32,cao:1,goc:55,tuong:1}};
+// chùa đỉnh núi (tools/blender/sua-dien-v2.py): độ cao đỉnh, hồ, suối, thác, lư hương, cội bồ đề, bồn hoa, vùng mái chính điện (toạ độ Blender)
+const CHUA={"P":6.0,"ho":[21.0,9.0,5.4,4.2,6.07],"suoi":[[24.6,5.4,6.1],[25.0,1.2,6.1],[24.0,-3.2,6.1],[25.8,-7.8,6.1],[28.2,-12.5,6.1],[30.5,-15.5,5.27]],"thac":[[21.0,13.4,13.2,6.2,2.4],[31.6,-17.0,6.3,0.2,1.6]],"lh":[0,-12,8.1],"bd":[-19.0,5.5,11.0],"hoa":[[-8,-16.6],[8,-16.6],[-16.4,-7],[16.4,-7],[21.0,9.0]],"mai":{"x":[-13.6,13.6],"y":[-6.8,14.2]}};
 const THU=t=>'img/3d/'+t+'/';
 if(hall&&W&&coWebGL)khoi();
 
@@ -112,7 +114,7 @@ function khoi(){
    const k=TR.set?1-Math.exp(-dt*1.2):1;TR.set=true;   // đổi dần trong vài giây (đổi cảnh thì nhảy luôn)
    TR.tint.lerp(DICH.tint,k);TR.tren.lerp(DICH.tren,k);TR.duoi.lerp(DICH.duoi,k);for(const x of ['nang','toa','dom','gan','mua'])TR[x]+=(DICH[x]-TR[x])*k;
    let chop=0;if(DICH.dong&&!GIAM){if(now>samSau){samSau=now+5000+Math.random()*9000;sam=now}chop=Math.max(0,1-(now-sam)/180)}
-   for(const m of d.bk)m.color.copy(TR.tint).addScalar(chop*.6);cyM.copy(TR.tint).lerp(TRANG,.55).addScalar(chop*.6);for(const m of d.cy)m.color.copy(cyM);for(const m of NVM)m.color.copy(cyM);   // cây, tượng, người còn được đèn chiếu: nhân nhẹ hơn kẻo đêm đen kịt
+   for(const m of d.bk)m.color.copy(TR.tint).addScalar(chop*.6);cyM.copy(TR.tint).lerp(TRANG,.55).addScalar(chop*.6);for(const m of d.cy){m.color.copy(cyM);if(m.userData.goc)m.color.multiply(m.userData.goc)}for(const m of NVM)m.color.copy(cyM);   // cây, tượng, người còn được đèn chiếu: nhân nhẹ hơn kẻo đêm đen kịt
    if(d.den){d.den.intensity=TR.nang+chop*3;d.hemi.intensity=TR.toa+chop*4}
    d.canh.fog.color.copy(TR.duoi);d.canh.fog.near=Math.max(4,d.canh.fog.near-TR.gan);d.canh.fog.far=Math.max(d.canh.fog.near+25,d.canh.fog.far-TR.gan*1.6);
    const kh=TR.tren.getHexString()+TR.duoi.getHexString();if(kh!==cvT._k){cvT._k=kh;const gr=xT.createLinearGradient(0,0,0,256);gr.addColorStop(0,'#'+TR.tren.getHexString());gr.addColorStop(1,'#'+TR.duoi.getHexString());xT.fillStyle=gr;xT.fillRect(0,0,4,256);TROI.needsUpdate=true}
@@ -154,6 +156,57 @@ function khoi(){
    const tam=B(0,4,3.6),hq=new THREE.Sprite(new THREE.SpriteMaterial({...VC,map:vetTron,color:0xffd27a,opacity:.85})),tia=new THREE.Sprite(new THREE.SpriteMaterial({...VC,map:vetTia,color:0xffe2a0,opacity:.5}));
    hq.position.copy(tam);tia.position.copy(tam);hq.scale.setScalar(9);tia.scale.setScalar(14);d.canh.add(hq,tia);
    d.capNhat=(t,dt)=>{for(const g of cot)nhipCot(g,t,dt);const s=.5+.5*Math.sin(t*.0018);hq.material.opacity=.55+.35*s;hq.scale.setScalar(8+2*s);if(!GIAM)tia.material.rotation+=dt*.12;tia.material.opacity=.3+.25*s}}
+  // ---- chùa trên đỉnh núi: cảnh động cho tịnh tâm (cò bay, bướm, khói hương, nước hồ, suối, thác, mây quanh núi, lá bồ đề rơi)
+  //      và mái chính điện mờ dần khi "Bạn" bước vào điện. Toạ độ Blender lấy từ tools/blender/sua-dien-v2.py (CHUA)
+  const vetSoc=(()=>{const c=document.createElement('canvas');c.width=64;c.height=256;const x=c.getContext('2d');
+   for(let i=0;i<40;i++){const px=Math.random()*64,py=Math.random()*256,l=20+Math.random()*60,g=x.createLinearGradient(0,py,0,py+l);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.5,'rgba(255,255,255,'+(.35+Math.random()*.5)+')');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(px,py,1.5+Math.random()*2,l)}
+   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t})();
+  const vetGon=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.strokeStyle='rgba(255,255,255,.55)';x.lineWidth=2;
+   for(let i=0;i<26;i++){x.beginPath();const cx=Math.random()*256,cy=Math.random()*256,r=8+Math.random()*30;x.ellipse(cx,cy,r,r*.55,0,Math.random()*3,Math.random()*3+2.4);x.stroke()}
+   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t})();
+  function trangTriDien(d){
+   const C=CHUA,P=C.P,cn=[],them=o=>{d.canh.add(o);return o},TB={transparent:true,depthWrite:false,toneMapped:false};
+   // mặt hồ: gợn sóng trôi chậm
+   const [hx,hy,rx,ry,hz]=C.ho,ho=them(new THREE.Mesh(new THREE.CircleGeometry(1,48),new THREE.MeshBasicMaterial({...TB,map:vetGon,color:0xeaf6f4,opacity:.45,blending:THREE.AdditiveBlending})));
+   ho.rotation.x=-Math.PI/2;ho.scale.set(rx*.95,ry*.95,1);ho.position.copy(B(hx,hy,hz+.03));vetGon.repeat.set(2,2);
+   // suối: dải nước chảy theo từng đoạn
+   const suoi=[];for(let i=0;i+1<C.suoi.length;i++){const a=B(...C.suoi[i]),b=B(...C.suoi[i+1]),L=a.distanceTo(b),m=new THREE.Mesh(new THREE.PlaneGeometry(1.6,L+.4),new THREE.MeshBasicMaterial({...TB,map:vetSoc.clone(),color:0xffffff,opacity:.5}));
+    m.material.map.needsUpdate=true;m.material.map.repeat.set(1,L/4);m.position.copy(a).lerp(b,.5);m.position.y+=.04;m.lookAt(b.x,m.position.y,b.z);m.rotateX(-Math.PI/2);them(m);suoi.push(m)}
+   // thác: tấm nước dựng đứng trôi xuống + bọt dưới chân
+   const thac=C.thac.map(([x,y,z1,z0,w])=>{const h=z1-z0,m=them(new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({...TB,map:vetSoc.clone(),color:0xffffff,opacity:.75,side:THREE.DoubleSide})));
+    m.material.map.needsUpdate=true;m.material.map.repeat.set(w/2,h/5);m.position.copy(B(x,y-.35,(z1+z0)/2));
+    const bot=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xffffff,opacity:.7})));bot.position.copy(B(x,y-.8,z0+.4));bot.scale.set(w*1.8,1.2,1);return {m,bot}});
+   // khói hương bay lên từ lư hương giữa sân
+   const khoi=[];for(let i=0;i<16;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xf4efe6,opacity:0})));s.userData.t=i/16;khoi.push(s)}
+   // mây trôi quanh chân núi
+   const may=[];for(let i=0;i<12;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({map:vetTron,color:0xffffff,transparent:true,depthWrite:false,opacity:.5,fog:true})));
+    const a=i/12*6.283+Math.random()*.3,r=36+Math.random()*12;s.userData={a,r,z:1+Math.random()*3,v:(Math.random()<.5?-1:1)*(.006+Math.random()*.006)};s.scale.set(18+Math.random()*10,7+Math.random()*3,1);may.push(s)}
+   // cò trắng bay vòng trên đỉnh núi: thân + hai cánh vỗ chậm
+   const trang=new THREE.MeshLambertMaterial({color:0xfbfaf6,side:THREE.DoubleSide});d.cy.push(trang);
+   const canhG=new THREE.BufferGeometry();canhG.setAttribute('position',new THREE.Float32BufferAttribute([0,0,-.25,0,0,.3,1.25,0,.05],3));canhG.computeVertexNormals();
+   const co=[];for(let i=0;i<7;i++){const g=new THREE.Group(),than=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),trang);than.scale.set(1,.8,2.4);
+    const mo=new THREE.Mesh(new THREE.ConeGeometry(.05,.5,6),new THREE.MeshLambertMaterial({color:0xe3b150}));mo.rotation.x=Math.PI/2;mo.position.z=.7;
+    const t1=new THREE.Mesh(canhG,trang),t2=new THREE.Mesh(canhG,trang);t2.scale.x=-1;g.add(than,mo,t1,t2);g.userData={t1,t2,r:16+i*3.2,a:i*.9,h:P+11+(i%3)*2.2,v:.05+(i%4)*.012,p:Math.random()*6};them(g);co.push(g)}
+   // bướm quanh bồn hoa và hồ sen
+   const buom=[];C.hoa.forEach(([x,y],k)=>{for(let j=0;j<2;j++){const mau=[0xffd27a,0xf6a6bf,0xffffff,0xb8d8ff][(k+j)%4],m=new THREE.MeshBasicMaterial({color:mau,side:THREE.DoubleSide,toneMapped:false}),g=new THREE.Group();
+    const w1=new THREE.Mesh(new THREE.PlaneGeometry(.22,.16),m),w2=w1.clone();w1.position.x=.11;w2.position.x=-.11;g.add(w1,w2);g.userData={w1,w2,x,y,p:Math.random()*6,v:.6+Math.random()*.5};them(g);buom.push(g)}});
+   // lá bồ đề rơi
+   const la=[];for(let i=0;i<12;i++){const m=them(new THREE.Mesh(new THREE.PlaneGeometry(.22,.3),new THREE.MeshBasicMaterial({color:i%3?0x9cbf62:0xe3c35a,side:THREE.DoubleSide})));m.userData={t:Math.random()};la.push(m)}
+   // mái chính điện (tượng/tuong.json, tên SS_Mai*): mờ khi "Bạn" ở trong điện
+   const mai=[];d.canh.traverse(o=>{if(o.isMesh&&/^SS_Mai/.test(o.name)){o.material.transparent=true;mai.push(o)}});let maiK=1;
+   const tmp=new V3(),lhP=B(...C.lh),bdP=B(...C.bd);
+   d.capNhat=(t,dt)=>{const s=t/1000;
+    // mái: vào trong điện thì mờ hẳn, ra sân thì hiện lại
+    const vao=theo&&theo.x>C.mai.x[0]&&theo.x<C.mai.x[1]&&-theo.z>C.mai.y[0]&&-theo.z<C.mai.y[1],dich=vao?0:1;maiK+=(dich-maiK)*Math.min(1,dt*(GIAM?99:3));
+    for(const o of mai){o.material.opacity=maiK;o.material.depthWrite=maiK>.98;o.visible=maiK>.02}
+    if(GIAM)return;
+    vetGon.offset.set(s*.012,s*.008);for(const m of suoi)m.material.map.offset.y=-s*.35;for(const q of thac){q.m.material.map.offset.y=s*.9;q.bot.material.opacity=.55+.2*Math.sin(s*3)}
+    for(const k of khoi){const u=(k.userData.t+s*.07)%1;k.position.set(lhP.x+Math.sin(u*9+k.id)*.5*u,lhP.y+u*7,lhP.z+Math.cos(u*7+k.id)*.4*u);k.scale.setScalar(.5+u*2.6);k.material.opacity=.32*Math.sin(Math.PI*u)}
+    for(const m of may){const u=m.userData;u.a+=u.v*dt;m.position.copy(B(Math.cos(u.a)*u.r*1.15,Math.sin(u.a)*u.r,u.z));m.material.opacity=.42+.12*Math.sin(s*.3+u.a)}
+    for(const g of co){const u=g.userData;u.a+=u.v*dt;const x=Math.cos(u.a)*u.r,y=Math.sin(u.a)*u.r*.8-2;g.position.copy(B(x,y,u.h+Math.sin(s*.4+u.p)*.8));
+     tmp.copy(B(Math.cos(u.a+.05)*u.r,Math.sin(u.a+.05)*u.r*.8-2,u.h));g.lookAt(tmp.x,g.position.y,tmp.z);const v=Math.sin(s*2.6+u.p)*.55;u.t1.rotation.z=v;u.t2.rotation.z=-v;g.rotation.z=-.15}
+    for(const g of buom){const u=g.userData,a=s*u.v+u.p;g.position.copy(B(u.x+Math.cos(a)*1.3+Math.sin(a*2.3)*.4,u.y+Math.sin(a*1.3)*1.1,P+.9+Math.sin(a*3)*.35));g.rotation.y=a;const v=Math.sin(s*14+u.p)*1.1;u.w1.rotation.y=v;u.w2.rotation.y=-v}
+    for(const m of la){const u=m.userData;u.t=(u.t+dt*.07)%1;m.position.set(bdP.x+Math.sin(m.id*7.1)*3.4+Math.sin(u.t*9+m.id)*.6,bdP.y+2.5-u.t*7.6,bdP.z+Math.cos(m.id*3.3)*3+Math.cos(u.t*7)*.5);m.rotation.set(u.t*9,u.t*6+m.id,0)}}}
   // ---- phi thăng khi chọn lối (thay hoạt ảnh 2D cũ): cột sáng hạ xuống chỗ "Bạn", người bay lên tan vào ánh sáng, màn chuyển ngà nối tiếp
   let nangMe=null;
   window.ss3dPhiThang=function(fa,xong){if(hong||GIAM||dang!=='sanh'||phim||!theo)return false;
@@ -218,11 +271,11 @@ function khoi(){
    canh.add(g.scene,gc.scene);
    if(c.tuong){const gt=await parse(await dem(taiJSON(G+'tuong.json'),ten));gt.scene.traverse(o=>{if(o.isMesh){
     // giữ chất liệu gốc (tượng Phật là kim loại vàng): cho phản chiếu một phòng sáng dịu, không thì kim loại thành màu kem nhạt
-    o.userData.tuong=1;const m=o.material;m.envMap=moiTruong();m.envMapIntensity=.7;cy.push(m);if(m.map)m.map.anisotropy=r.capabilities.getMaxAnisotropy();m.onBeforeCompile=sh=>AGX(sh);nen.push(o)}});canh.add(gt.scene)}
+    const laMai=/^SS_Mai/.test(o.name);o.userData.tuong=!laMai;const m=o.material;if(laMai)m.userData.goc=m.color.clone();m.envMap=moiTruong();m.envMapIntensity=laMai?0:.7;cy.push(m);if(m.map)m.map.anisotropy=r.capabilities.getMaxAnisotropy();m.onBeforeCompile=sh=>AGX(sh);if(!laMai)nen.push(o)}});/* mái chính điện: làm mờ khi vào điện, không chặn tia bấm */canh.add(gt.scene)}
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
-   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten])}
+   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(ten==='dien')trangTriDien(DL[ten])}
   function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn
    const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
    return (z(i,j)*(1-fx)+z(i+1,j)*fx)*(1-fy)+(z(i,j+1)*(1-fx)+z(i+1,j+1)*fx)*fy}
@@ -335,7 +388,7 @@ function khoi(){
   // ---- đoạn phim chuyển cảnh thay màn tải: "Bạn" đi bộ trên đường thật của cảnh (lên chùa: leo bậc đá chân núi), máy quay bám theo.
   // Cảnh đích chưa nạp xong thì đi lại đoạn đường cho tới khi xong. Trả false khi không chiếu được (giảm chuyển động, cảnh chưa có) để 04-01 dùng màn cũ
   const THANG=[[.478,.495],[.458,.455],[.437,.415],[.418,.37],[.404,.33],[.388,.29],[.366,.215]];   // giữa bậc đá lên chùa trên ảnh chân núi, từ chân lên đỉnh
-  const VAO={sanh:[.77,.9],ho:[.78,.8],tho:[.86,.62],nha:[.75,.86],dien:[.76,.82],chan:[.95,.52],lang:[.8,.86]};   // ngoài cổng mỗi cảnh, trên đường vào
+  const VAO={sanh:[.77,.9],ho:[.78,.8],tho:[.86,.62],nha:[.75,.86],dien:[0.7659,0.9098],chan:[.95,.52],lang:[.8,.86]};   // ngoài cổng mỗi cảnh, trên đường vào
   const VDI=2.2,tr=document.getElementById('wTrans');   // m/s: nhịp bước của hoạt ảnh Walk
   function co2(){const w=hall.clientWidth,h=hall.clientHeight;if(w!==cw||h!==ch){cw=w;ch=h;r.setSize(w,h)}cam.aspect=w/Math.max(1,h);cam.fov=w<h?50:40;cam.updateProjectionMatrix()}
   window.ss3dPhim=function(kieu,s,sp,xong){
