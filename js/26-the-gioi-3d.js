@@ -17,11 +17,14 @@ window.ss3dXong=!coWebGL;   // màn tải (js/01) và kiểm tra hình ảnh ch�
 // tuong: có tuong.json (tượng giữ ảnh màu gốc, tự chiếu sáng như người); day: độ cao mặt sân lát (người đứng lên trên)
 // cao: có thong-tin.json với lưới độ cao mặt đi (bậc, nền cao trong gian thờ) thay cho day; goc: cảnh trong nhà cắt tường,
 //      chỉ cho xoay ±goc độ quanh hướng nhìn của ảnh để không vòng ra sau tường
+// anh: có di ảnh trên bàn thờ (.w-anh) cần đặt lại theo camera 3D; nghieng: góc nghiêng camera cố định; tranh: cảnh có tranh 2D vẽ thêm (nhà dựng từ gia phả, js/20) -> khoá camera đúng góc ảnh iso
+//      rồi chiếu tranh từ toạ độ ảnh xuống mặt đất 3D lên màn hình, nhà đứng đúng ô đất
 const CANH={
  sanh:{ten:'sảnh',tgt:[2,18],ow:88,tam:[2,10],le:[],lh:null,toc:.42,tuong:1,day:.09,xa:60},
  chan:{ten:'chân núi',tgt:[3,13],ow:132,tam:[0,-9],lh:[0,-8],toc:.42,day:0,xa:30,
   le:[['BaCu','chap',-1.7,-11.45],['CoAoDai','chap',1.7,-11.45],['OngAoNau','ngoi',0,-12.05],['CuuChienBinh','dung',-3.8,-12.6]]},
- tho:{ten:'nhà thờ',tgt:[2,1.5],ow:42,tam:[2,1.5],le:[],lh:null,toc:.42,day:0,xa:30,cao:1,goc:40}};
+ tho:{ten:'nhà thờ',tgt:[2,1.5],ow:42,tam:[2,1.5],le:[],lh:null,toc:.42,day:0,xa:30,cao:1,goc:40},
+ lang:{ten:'làng tưởng niệm',tgt:[0,2],ow:118,tam:[0,2],le:[],lh:null,toc:.42,day:0,xa:55,cao:1}};
 const THU=t=>'img/3d/'+t+'/';
 if(hall&&W&&coWebGL)khoi();
 
@@ -29,7 +32,8 @@ function khoi(){
  const GIAM=matchMedia('(prefers-reduced-motion: reduce)').matches,CAM_UNG=matchMedia('(pointer:coarse)').matches;
  const box=document.createElement('div');box.className='w3d';box.setAttribute('aria-hidden','true');
  const hotL=document.createElement('div');hotL.className='w3d-hot';const tagL=document.createElement('div');tagL.className='w3d-tags';
- const stg=document.getElementById('wStage');W.insertBefore(box,W.firstChild);stg.after(hotL);hotL.after(tagL);   // nút và tên nằm trên lớp ánh sáng theo giờ (trong wStage)
+ const tranhL=document.createElement('div');tranhL.className='w3d-tranh';
+ const stg=document.getElementById('wStage');W.insertBefore(box,W.firstChild);stg.after(tranhL);tranhL.after(hotL);hotL.after(tagL);   // nút và tên nằm trên lớp ánh sáng theo giờ (trong wStage)
  let ve=null,hong=false,anDi=true,tienCanh=null;const san={};   // trình vẽ, nạp lỗi, cảnh đã nạp xong
  // màn chờ phủ cả thanh điều hướng: vào cảnh 3D chưa nạp xong thì chờ ở đây, không lộ ảnh 2D
  const phu=document.createElement('div');phu.className='w3d-cho';phu.hidden=true;phu.setAttribute('role','status');
@@ -50,9 +54,9 @@ function khoi(){
   const soTep=k=>6+(CANH[k].tuong?1:0)+(CANH[k].cao?1:0),tien={};for(const k in CANH)tien[k]=0;
   let xong=0;const TONG=1+9+soTep(DAU),capNhat=()=>{window.ss3dTien=Math.min(1,(xong+tien[DAU])/TONG)};
   const dem=(pr,k)=>pr.then(v=>{if(k)tien[k]++;else xong++;capNhat();return v});tienCanh=k=>Math.min(1,tien[k]/soTep(k));
-  const [THREE,{OrbitControls},{GLTFLoader},{MeshoptDecoder},SU]=await dem(Promise.all([
+  const [THREE,{OrbitControls},{GLTFLoader},{MeshoptDecoder},SU,{RoomEnvironment}]=await dem(Promise.all([
    import('three'),import('three/addons/controls/OrbitControls.js'),import('three/addons/loaders/GLTFLoader.js'),import('three/addons/libs/meshopt_decoder.module.js'),
-   import('three/addons/utils/SkeletonUtils.js')]));
+   import('three/addons/utils/SkeletonUtils.js'),import('three/addons/environments/RoomEnvironment.js')]));
   const V3=THREE.Vector3;
   // toạ độ Blender (x, y, z lên) -> three (x, z, -y)
   const B=(x,y,z=0)=>new V3(x,z,-y);
@@ -95,6 +99,7 @@ function khoi(){
   const taiAnh=url=>new Promise((ok,loi)=>new THREE.TextureLoader().load(url,t=>{t.flipY=false;t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=r.capabilities.getMaxAnisotropy();ok(t)},undefined,loi));
   const anhTo=ten=>CAM_UNG?ten+'-2k':ten;   // ảnh 4096 chỉ cho máy tính; điện thoại dùng 2048 để không tràn bộ nhớ đồ hoạ
 
+  let MT=null;const moiTruong=()=>MT||(MT=new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(),.04).texture);
   // ---- nhân vật: mỗi mẫu nạp một lần, dùng chung mọi cảnh, nhân bản cho từng người
   const MAU={},ANHB=r.capabilities.getMaxAnisotropy();
   function mau(ten){return MAU[ten]||(MAU[ten]=dem(taiJSON('img/3d/nv/'+ten+'.json')).then(parse).then(gl=>{gl.scene.traverse(o=>{if(!o.isMesh)return;const m=o.material;m.metalness=0;m.roughness=.78;m.envMapIntensity=0;
@@ -133,8 +138,8 @@ function khoi(){
     const m=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9,metalness:0,envMapIntensity:0});m.onBeforeCompile=sh=>AGX(sh,true);o.material=m;nen.push(o)}});   // cây: ánh sáng trời dịu hơn người cho tán lá có khối
    canh.add(g.scene,gc.scene);
    if(c.tuong){const gt=await parse(await dem(taiJSON(G+'tuong.json'),ten));gt.scene.traverse(o=>{if(o.isMesh){
-    const m=new THREE.MeshStandardMaterial({map:o.material.map||null,color:o.material.map?0xffffff:o.material.color,roughness:.75,metalness:0,envMapIntensity:0});
-    if(m.map){m.map.colorSpace=THREE.SRGBColorSpace;m.map.anisotropy=r.capabilities.getMaxAnisotropy()}m.onBeforeCompile=sh=>AGX(sh);o.material=m;nen.push(o)}});canh.add(gt.scene)}
+    // giữ chất liệu gốc (tượng Phật là kim loại vàng): cho phản chiếu một phòng sáng dịu, không thì kim loại thành màu kem nhạt
+    const m=o.material;m.envMap=moiTruong();m.envMapIntensity=.7;if(m.map)m.map.anisotropy=r.capabilities.getMaxAnisotropy();m.onBeforeCompile=sh=>AGX(sh);nen.push(o)}});canh.add(gt.scene)}
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
@@ -165,7 +170,7 @@ function khoi(){
   let theo=null,daDat=false;
   // mở cùng hướng nhìn với ảnh iso cũ (từ tây nam nhìn lên) cho người quen đường không bị lạc;
   // nghiêng 55° (cao hơn ảnh cũ 42°) để mái cổng không che người vừa vào sân
-  function datCamQuanh(t){const n=55*Math.PI/180,h=Math.hypot(DIR.x,DIR.y);cam.position.copy(t).addScaledVector(B(DIR.x/h*Math.cos(n),DIR.y/h*Math.cos(n),Math.sin(n)),xa());dk.target.copy(t)}
+  function datCamQuanh(t){const n=(dang&&CANH[dang].nghieng||55)*Math.PI/180,h=Math.hypot(DIR.x,DIR.y);cam.position.copy(t).addScaledVector(B(DIR.x/h*Math.cos(n),DIR.y/h*Math.cos(n),Math.sin(n)),xa());dk.target.copy(t)}
   const chieu=new V3(),tam2=new V3();
   function nhan(el,p,cao){chieu.copy(p);chieu.y+=cao;chieu.project(cam);const ok=chieu.z<1&&Math.abs(chieu.x)<1.2&&Math.abs(chieu.y)<1.2;el.style.display=ok?'':'none';
    if(ok){el.style.left=((chieu.x+1)/2*hall.clientWidth).toFixed(1)+'px';el.style.top=((1-chieu.y)/2*hall.clientHeight).toFixed(1)+'px'}}
@@ -174,7 +179,29 @@ function khoi(){
    for(const id in nguoi){const q=nguoi[id];q.q&&boNguoi(q.q);q.tag&&q.tag.remove();delete nguoi[id]}
    const d=DL[ten];d.canh.add(vongVang,ping);vongVang.visible=false;pingT=9;theo=null;daDat=false;dang=ten;dungNut(ten)
    const g=CANH[ten].goc,h=Math.hypot(DIR.x,DIR.y),t0=Math.atan2(DIR.x/h,-DIR.y/h);   // hướng camera ảnh theo góc phương vị của OrbitControls (atan2(x, z) trong toạ độ three, z = -y Blender)
-   dk.minAzimuthAngle=g?t0-g*Math.PI/180:-Infinity;dk.maxAzimuthAngle=g?t0+g*Math.PI/180:Infinity;dk.maxPolarAngle=(g?60:68)*Math.PI/180}
+   dk.minAzimuthAngle=g?t0-g*Math.PI/180:-Infinity;dk.maxAzimuthAngle=g?t0+g*Math.PI/180:Infinity;
+   const ng=CANH[ten].nghieng;dk.minPolarAngle=(ng?90-ng:15)*Math.PI/180;dk.maxPolarAngle=(ng?90-ng:g?60:68)*Math.PI/180}
+  // tranh 2D của js/20 (nhà, xe, đồ trong vườn) nằm trong wStage theo % ảnh: chuyển sang lớp riêng và đặt lại theo camera 3D mỗi khung
+  const c1=new V3(),c2=new V3(),c3=new V3();
+  // di ảnh trên bàn thờ (.w-anh của 04-01, khung chữ nhật trên ảnh): bắn tia camera ảnh vào tâm khung tìm điểm trên tường,
+  // cỡ thật theo mét (chiều đứng bù góc nghiêng 42° của ảnh), chiếu lên màn hình mỗi khung
+  function datAnh(ten){const el=hall.querySelector('.w-anh');if(!el)return;const d=DL[ten],c=CANH[ten];
+   if(el.parentNode!==tranhL)tranhL.appendChild(el);
+   const k=el.style.left+el.style.top+el.style.width+el.style.height;
+   if(el._k!==k){el._k=k;const L=parseFloat(el.style.left)/100,T=parseFloat(el.style.top)/100,w=parseFloat(el.style.width)/100,h=parseFloat(el.style.height)/100;
+    ray.ray.copy(d.tiaAnh(L+w/2,T+h/2));const hit=ray.intersectObjects(d.nen,false)[0];
+    el._p=hit?hit.point.clone():null;el._wm=w*c.ow;el._hm=h*c.ow*2/3/Math.cos(EL)}
+   if(!el._p){el.style.display='none';return}el.style.display='';
+   const Wd=hall.clientWidth,Hd=hall.clientHeight,ri=new V3(1,0,0).applyQuaternion(cam.quaternion);
+   c1.copy(el._p).project(cam);c2.copy(el._p).addScaledVector(ri,el._wm).project(cam);c3.copy(el._p).add(new V3(0,el._hm,0)).project(cam);
+   const x=(c1.x+1)/2*Wd,y=(1-c1.y)/2*Hd,pw=Math.abs(c2.x-c1.x)/2*Wd,ph=Math.abs(c3.y-c1.y)/2*Hd;
+   el.style.left=(x-pw/2).toFixed(1)+'px';el.style.top=(y-ph/2).toFixed(1)+'px';el.style.width=pw.toFixed(1)+'px';el.style.height=ph.toFixed(1)+'px';el._k=el.style.left+el.style.top+el.style.width+el.style.height}
+  function datTranh(ten){const d=DL[ten],Wd=hall.clientWidth,Hd=hall.clientHeight;
+   for(const el of stg.querySelectorAll('.ho-h,.ho-d')){el._g={L:parseFloat(el.style.left)/100,T:parseFloat(el.style.top)/100,w:parseFloat(el.style.width)/100};tranhL.appendChild(el)}
+   for(const el of tranhL.children){const g=el._g;if(!g)continue;
+    const a=d.tuAnh(g.L,g.T),b=d.tuAnh(g.L+g.w,g.T+g.w*1.5);c1.copy(B(a.x,a.y)).project(cam);c2.copy(B(b.x,b.y)).project(cam);
+    const x1=(c1.x+1)/2*Wd,y1=(1-c1.y)/2*Hd,x2=(c2.x+1)/2*Wd,y2=(1-c2.y)/2*Hd;
+    el.style.left=x1.toFixed(1)+'px';el.style.top=y1.toFixed(1)+'px';el.style.width=(x2-x1).toFixed(1)+'px';el.style.height=(y2-y1).toFixed(1)+'px'}}
   let truoc=performance.now();
   ve=function(ten){const t=performance.now(),dt=Math.min(.05,(t-truoc)/1000);truoc=t;if(dang!==ten||anDi){anDi=false;doiCanh(ten)}
    const d=DL[ten],w=window.ssWorld,av=w.avs?w.avs():{},thay={};
@@ -205,6 +232,8 @@ function khoi(){
    for(const id in nguoi){const q=nguoi[id];if(q.tag&&q.wp)nhan(q.tag,q.wp,TO*1.45)}
    if(pingT<1){pingT+=dt/.7;ping.material.opacity=.95*(1-pingT);ping.scale.setScalar(1+pingT*1.2)}else ping.material.opacity=0;
    for(const n of d.nut)nhan(n.el,n.p,0);
+   if(CANH[ten].tranh)datTranh(ten);
+   if(CANH[ten].anh)datAnh(ten);
    r.render(d.canh,cam)};
   window.ss3dCanh={cam,dk,B,get canh(){return dang&&DL[dang].canh},get raAnh(){return dang&&DL[dang].raAnh},get tuAnh(){return dang&&DL[dang].tuAnh}};   // để thử nghiệm
 

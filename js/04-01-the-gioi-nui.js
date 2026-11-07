@@ -62,7 +62,8 @@
    top=Math.max(Hd-sh,Math.min(0,(Hd-res)-f.b*sh))}else top=(Hd-sh)*.5;
   st={sw:sw,sh:sh,top:top,H:Hd,map:0};stage.style.width=sw+'px';stage.style.height=sh+'px';stage.style.left=(Wd-sw)/2+'px';stage.style.top=top+'px';
   bg.style.backgroundImage='url("'+img+'")';drawAnh();drawHot();Object.keys(av).forEach(function(k){draw(av[k])})}
- function drawAnh(){var a=stage.querySelector('.w-anh');if(scene!=='nha'){a&&a.remove();return}if(!a){a=document.createElement('div');a.className='w-anh';stage.insertBefore(a,fl)}
+ function drawAnh(){var a=hall.querySelector('.w-anh');   // hall: thế giới 3D (js/26) chuyển di ảnh sang lớp riêng
+ if(scene!=='nha'){a&&a.remove();return}if(!a){a=document.createElement('div');a.className='w-anh';stage.insertBefore(a,fl)}
   var r=SC.nha.anh[O],p=window.ssPerson&&ssPerson.get();a.style.left=r[0]*100+'%';a.style.top=r[1]*100+'%';a.style.width=(r[2]-r[0])*100+'%';a.style.height=(r[3]-r[1])*100+'%';
   var C={ls:'#8B3A1E',tb:'#2F5D8A',dh:'#4E7A3A',nt:'#7A4A8C'};a.style.setProperty('--c',p&&C[p.c]||'#8B5A2B');a.innerHTML=p?'<i>'+String(p.name).trim().split(/\s+/).pop()[0]+'</i>':'';a.title=p?p.name:''}
  function drawHot(){var c=SC[scene];hot.innerHTML='';var list=c.hot[O].slice();
