@@ -134,6 +134,37 @@ function khoi(){
    if(them)sh.fragmentShader=sh.fragmentShader.replace('#include <lights_fragment_maps>','#include <lights_fragment_maps>\n irradiance *= 0.45;');
    sh.fragmentShader=sh.fragmentShader.replace('#include <tonemapping_fragment>','gl_FragColor.rgb = AgXToneMapping( gl_FragColor.rgb );')};   // tự áp AgX như ảnh Blender
 
+  // ---- sảnh chọn lối: hai cột hào quang ở cổng chùa (vàng) và cổng nhà thờ (trắng xanh) để người dùng chú ý chọn lối; logo Song Song giữa đài phun phát sáng
+  const vetDoc=(()=>{const c=document.createElement('canvas');c.width=4;c.height=128;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,128);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.55,'rgba(255,255,255,.35)');g.addColorStop(1,'rgba(255,255,255,1)');x.fillStyle=g;x.fillRect(0,0,4,128);return new THREE.CanvasTexture(c)})();
+  const vetTron=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,'rgba(255,255,255,.55)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)})();
+  const vetTia=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.translate(128,128);for(let i=0;i<24;i++){x.rotate(Math.PI/12);const g=x.createLinearGradient(0,0,0,-128);g.addColorStop(0,'rgba(255,255,255,.9)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.beginPath();x.moveTo(-3,0);x.lineTo(0,-128);x.lineTo(3,0);x.fill()}return new THREE.CanvasTexture(c)})();
+  const VC={transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false,fog:false};
+  function cotSang(mau,r,cao){   // cột sáng: ống mờ dần lên trên + vầng sáng dưới chân + đốm bay lên
+   const g=new THREE.Group(),m=new THREE.MeshBasicMaterial({...VC,map:vetDoc,color:mau,side:THREE.DoubleSide,opacity:.55});
+   const ong=new THREE.Mesh(new THREE.CylinderGeometry(r*.8,r,cao,40,1,true),m);ong.position.y=cao/2;ong.rotation.x=Math.PI;
+   const ong2=new THREE.Mesh(new THREE.CylinderGeometry(r*.35,r*.45,cao*1.15,24,1,true),new THREE.MeshBasicMaterial({...VC,map:vetDoc,color:mau,side:THREE.DoubleSide,opacity:.8}));ong2.position.y=cao*.575;ong2.rotation.x=Math.PI;
+   const nen=new THREE.Mesh(new THREE.PlaneGeometry(r*4.2,r*4.2),new THREE.MeshBasicMaterial({...VC,map:vetTron,color:mau,opacity:.9}));nen.rotation.x=-Math.PI/2;nen.position.y=.08;
+   const N=36,pg=new THREE.BufferGeometry(),pp=new Float32Array(N*3);for(let i=0;i<N;i++){const a=Math.random()*6.283,rr=Math.random()*r;pp.set([Math.cos(a)*rr,Math.random()*cao*.8,Math.sin(a)*rr],i*3)}
+   pg.setAttribute('position',new THREE.BufferAttribute(pp,3));const dom=new THREE.Points(pg,new THREE.PointsMaterial({...VC,map:vetTron,color:mau,size:.7,opacity:.9}));
+   g.add(ong,ong2,nen,dom);g.userData={ong,ong2,nen,dom,cao,m};return g}
+  function nhipCot(g,t,dt,k=1){const u=g.userData,s=.5+.5*Math.sin(t*.0022+g.id);u.m.opacity=(.38+.25*s)*k;u.ong2.material.opacity=(.55+.3*s)*k;u.nen.material.opacity=(.65+.3*s)*k;u.nen.scale.setScalar(.9+.15*s);u.dom.material.opacity=.9*k;
+   if(GIAM)return;const p=u.dom.geometry.attributes.position;for(let i=0;i<p.count;i++){let y=p.getY(i)+dt*(1.2+(i%5)*.3);if(y>u.cao*.8)y=0;p.setY(i,y)}p.needsUpdate=true}
+  function trangTriSanh(d){
+   const cot=[[-14,23,0xffc45a],[14,23,0xbcd2ff]].map(([x,y,mau])=>{const g=cotSang(mau,2.6,24);g.position.copy(B(x,y,0));d.canh.add(g);return g});
+   const tam=B(0,4,3.6),hq=new THREE.Sprite(new THREE.SpriteMaterial({...VC,map:vetTron,color:0xffd27a,opacity:.85})),tia=new THREE.Sprite(new THREE.SpriteMaterial({...VC,map:vetTia,color:0xffe2a0,opacity:.5}));
+   hq.position.copy(tam);tia.position.copy(tam);hq.scale.setScalar(9);tia.scale.setScalar(14);d.canh.add(hq,tia);
+   d.capNhat=(t,dt)=>{for(const g of cot)nhipCot(g,t,dt);const s=.5+.5*Math.sin(t*.0018);hq.material.opacity=.55+.35*s;hq.scale.setScalar(8+2*s);if(!GIAM)tia.material.rotation+=dt*.12;tia.material.opacity=.3+.25*s}}
+  // ---- phi thăng khi chọn lối (thay hoạt ảnh 2D cũ): cột sáng hạ xuống chỗ "Bạn", người bay lên tan vào ánh sáng, màn chuyển ngà nối tiếp
+  let nangMe=null;
+  window.ss3dPhiThang=function(fa,xong){if(hong||GIAM||dang!=='sanh'||phim||!theo)return false;
+   const d=DL.sanh,mau=fa==='cg'?0xc8d8ff:0xffc96a,g=cotSang(mau,1.6,30);g.position.set(theo.x,theo.y-1,theo.z);g.scale.y=.01;d.canh.add(g);
+   const flash=document.createElement('div');flash.className='asc3';flash.style.setProperty('--m',fa==='cg'?'200,216,255':'255,201,106');document.body.appendChild(flash);
+   const t0=performance.now();nangMe={y:0,s:1};const cu=d.capNhat;
+   d.capNhat=(t,dt)=>{cu&&cu(t,dt);const e=(t-t0)/1000;g.scale.y=Math.min(1,e/.5);nhipCot(g,t,dt,Math.min(1,e*2));
+    const k=THREE.MathUtils.smoothstep(e,.35,1.5);nangMe.y=k*7;nangMe.s=1-k*.75;
+    if(e>1.6&&!g.userData.xong){g.userData.xong=1;d.canh.remove(g);d.capNhat=cu;nangMe=null;xong();setTimeout(()=>flash.remove(),1400)}};
+   return true};
+
   // ---- nạp: glTF nhúng sẵn dữ liệu (JSON + base64, chạy được cả trên bản thử claude.ai)
   const ld=new GLTFLoader();ld.setMeshoptDecoder(MeshoptDecoder);
   async function taiJSON(url){const q=await fetch(url);if(!q.ok)throw new Error(url+' '+q.status);return q.json()}
@@ -191,7 +222,7 @@ function khoi(){
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
-   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,tinh,nut:[],nutO:'',cao:tt&&tt.cao}}
+   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten])}
   function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn
    const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
    return (z(i,j)*(1-fx)+z(i+1,j)*fx)*(1-fy)+(z(i,j+1)*(1-fx)+z(i+1,j+1)*fx)*fy}
@@ -273,6 +304,7 @@ function khoi(){
     const k=DONG[p.a]||'Idle';if(m.dangA!==k){m.dangA=k;choi(m,k)}
     if(k==='Walk'&&m.act.Walk)m.act.Walk.timeScale=THREE.MathUtils.clamp((m.toc||2.2)/2.2,.6,1.6);
     if(!GIAM)m.mx.update(dt);
+    if(p.me&&nangMe){m.rig.position.y+=nangMe.y;m.rig.scale.setScalar(TO*nangMe.s)}else if(p.me&&m.rig.scale.x!==TO)m.rig.scale.setScalar(TO);
     if(p.me){vongVang.visible=true;vongVang.position.set(wp.x,hz+.06,wp.z);if(!GIAM)vongVang.material.opacity=.55+.3*Math.sin(t/320);theo=wp}}
    for(const id in nguoi)if(!thay[id]){const q=nguoi[id];q.q&&boNguoi(q.q);q.tag&&q.tag.remove();delete nguoi[id]}
    if(!GIAM)for(const q of d.tinh)q.mx.update(dt);
@@ -287,6 +319,7 @@ function khoi(){
    for(const id in nguoi){const q=nguoi[id];if(q.tag&&q.wp)nhan(q.tag,q.wp,TO*1.45)}
    if(pingT<1){pingT+=dt/.7;ping.material.opacity=.95*(1-pingT);ping.scale.setScalar(1+pingT*1.2)}else ping.material.opacity=0;
    for(const n of d.nut)nhan(n.el,n.p,0);
+   if(d.capNhat)d.capNhat(t,dt);
    if(CANH[ten].tranh)datTranh(ten);
    if(CANH[ten].anh)datAnh(ten);
    r.render(d.canh,cam)};
