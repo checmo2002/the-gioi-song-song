@@ -89,6 +89,38 @@ function khoi(){
    const o=new THREE.Points(g,m);o.frustumCulled=false;o.renderOrder=3;return o})();
   function bayDom(dt,t){if(GIAM)return;const p=DOM.geometry.attributes.position,a=DOM.geometry.attributes.pha;for(let i=0;i<p.count;i++){let y=p.getY(i)+dt*(.25+.25*a.getX(i));if(y>12)y=0;
    p.setXYZ(i,p.getX(i)+Math.sin(t*.0004+i)*dt*.15,y,p.getZ(i)+Math.cos(t*.0003+i*1.7)*dt*.15)}p.needsUpdate=true}
+  // ---- trời theo giờ thực và thời tiết (js/18 ssWx): đêm, bình minh, ngày, hoàng hôn; mây, mưa, dông, sương.
+  // Ảnh nướng là ban ngày: nhân màu cho tất cả vật nướng, đổi màu trời, sương, đèn (cây, tượng, người), mưa 3D quanh camera
+  // [giờ, màu nhân cảnh, trời trên, chân trời và sương, nắng, trời toả, độ sáng đốm tàn hương]
+  const GIO=[[0,'#55618f','#0f1630','#2a3354',.2,1.3,1],[4.6,'#55618f','#0f1630','#2a3354',.2,1.3,1],[5.6,'#b590a6','#4a4f7a','#c99c90',.9,2.6,.8],
+   [6.6,'#f4cfb0','#aeb9cf','#f0caa4',2.3,3.6,.6],[8,'#ffffff','#c9c3b2','#d8cfb6',3,4.2,.5],[16,'#ffffff','#c9c3b2','#d8cfb6',3,4.2,.5],
+   [17.3,'#f7d3ab','#bba99e','#f1c08e',2.4,3.6,.6],[18.3,'#d99c8c','#6e5f86','#e0957a',1.2,2.6,.8],[19.3,'#6c71a0','#1d2444','#3c4268',.35,1.6,1],[24,'#55618f','#0f1630','#2a3354',.2,1.3,1]].map(g=>[g[0],...g.slice(1,4).map(x=>new THREE.Color(x)),g[4],g[5],g[6]]);
+  // thời tiết: [tối đi, kéo trời về xám, sương gần lại (m), mưa]
+  const KHI={clear:[1,0,0,0],cloud:[.86,.4,0,0],drizzle:[.78,.55,10,.35],rain:[.6,.75,18,1],storm:[.5,.85,22,1.3],fog:[.94,.75,30,0],snow:[.9,.5,10,0]};
+  const XAM=new THREE.Color('#9fa5ab'),TRANG=new THREE.Color(1,1,1),cyM=new THREE.Color(),TR={tint:new THREE.Color(1,1,1),tren:new THREE.Color(),duoi:new THREE.Color(),nang:3,toa:4.2,dom:.5,gan:0,mua:0,set:false},DICH={tint:new THREE.Color(),tren:new THREE.Color(),duoi:new THREE.Color()};
+  const cvT=TROI.image,xT=cvT.getContext('2d');let tinhT=0,sam=0,samSau=0;
+  function mucTieu(){const n=new Date(),h=n.getHours()+n.getMinutes()/60,w=(window.ssWx&&ssWx.now&&ssWx.now())||{k:'clear'},k=KHI[w.k]||KHI.clear;
+   let i=0;while(i<GIO.length-2&&GIO[i+1][0]<=h)i++;const a=GIO[i],b=GIO[i+1],f=(h-a[0])/Math.max(1e-6,b[0]-a[0]);
+   DICH.tint.copy(a[1]).lerp(b[1],f).multiplyScalar(k[0]);DICH.tren.copy(a[2]).lerp(b[2],f);DICH.duoi.copy(a[3]).lerp(b[3],f);
+   const sang=(DICH.duoi.r+DICH.duoi.g+DICH.duoi.b)/3;DICH.tren.lerp(XAM.clone().multiplyScalar(sang*1.3),k[1]);DICH.duoi.lerp(XAM.clone().multiplyScalar(sang*1.25),k[1]);
+   DICH.nang=(a[4]+(b[4]-a[4])*f)*(1-k[1]*.8);DICH.toa=(a[5]+(b[5]-a[5])*f)*k[0];DICH.dom=a[6]+(b[6]-a[6])*f;DICH.gan=k[2];DICH.mua=GIAM?0:k[3];DICH.dong=w.k==='storm';
+   hall.dataset.troi=(h<5.6||h>=19.3?'dem':h<8?'sang':h<17.3?'ngay':'chieu')+(k[3]?' mua':'')}
+  // mưa: vệt rơi xiên quanh tâm camera, theo sương
+  const MUA=(()=>{const N=CAM_UNG?260:520,g=new THREE.BufferGeometry(),p=new Float32Array(N*6);for(let i=0;i<N;i++){const x=(Math.random()-.5)*50,y=Math.random()*22,z=(Math.random()-.5)*50;p.set([x,y,z,x+.1,y+1.2,z+.05],i*6)}
+   g.setAttribute('position',new THREE.BufferAttribute(p,3));const o=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xeef4fb,transparent:true,opacity:.7,fog:true,depthWrite:false,toneMapped:false}));o.frustumCulled=false;o.visible=false;return o})();
+  function troiBuoc(d,dt,now,Rm){if(now>tinhT){tinhT=now+2000;mucTieu()}
+   const k=TR.set?1-Math.exp(-dt*1.2):1;TR.set=true;   // đổi dần trong vài giây (đổi cảnh thì nhảy luôn)
+   TR.tint.lerp(DICH.tint,k);TR.tren.lerp(DICH.tren,k);TR.duoi.lerp(DICH.duoi,k);for(const x of ['nang','toa','dom','gan','mua'])TR[x]+=(DICH[x]-TR[x])*k;
+   let chop=0;if(DICH.dong&&!GIAM){if(now>samSau){samSau=now+5000+Math.random()*9000;sam=now}chop=Math.max(0,1-(now-sam)/180)}
+   for(const m of d.bk)m.color.copy(TR.tint).addScalar(chop*.6);cyM.copy(TR.tint).lerp(TRANG,.55).addScalar(chop*.6);for(const m of d.cy)m.color.copy(cyM);   // cây còn được đèn chiếu: nhân nhẹ hơn kẻo đêm đen kịt
+   if(d.den){d.den.intensity=TR.nang+chop*3;d.hemi.intensity=TR.toa+chop*4}
+   d.canh.fog.color.copy(TR.duoi);d.canh.fog.near=Math.max(4,d.canh.fog.near-TR.gan);d.canh.fog.far=Math.max(d.canh.fog.near+25,d.canh.fog.far-TR.gan*1.6);
+   const kh=TR.tren.getHexString()+TR.duoi.getHexString();if(kh!==cvT._k){cvT._k=kh;const gr=xT.createLinearGradient(0,0,0,256);gr.addColorStop(0,'#'+TR.tren.getHexString());gr.addColorStop(1,'#'+TR.duoi.getHexString());xT.fillStyle=gr;xT.fillRect(0,0,4,256);TROI.needsUpdate=true}
+   DOM.material.opacity=.9*Math.min(1,TR.dom*1.4)*(1-Math.min(1,TR.mua)*.7);
+   MUA.visible=TR.mua>.05;if(MUA.visible){if(MUA.parent!==d.canh)d.canh.add(MUA);MUA.material.opacity=.75*Math.min(1,TR.mua);MUA.position.copy(cam.position).lerp(dk.target,.45);MUA.position.y-=10;   // quanh giữa camera và người: hạt gần thành vệt rõ
+    const p=MUA.geometry.attributes.position,v=(14+6*TR.mua)*dt,n=Math.ceil(p.count/2*Math.min(1,TR.mua));for(let i=0;i<p.count/2;i++){let y=p.getY(i*2)-v;if(y<0)y+=22;const x=p.getX(i*2)-v*.08;
+     p.setXYZ(i*2,i<n?x:9e3,y,p.getZ(i*2));p.setXYZ(i*2+1,i<n?x+.1:9e3,y+1.2,p.getZ(i*2)+.05)}p.needsUpdate=true}}
+
   const cam=new THREE.PerspectiveCamera(35,1,1,400);   // near 1 m (camera luôn cách đích ≥ 7 m): bộ đệm sâu mịn hơn 10 lần, các mảnh phẳng cách nhau vài mm không còn sọc nhấp nháy
   const dk=new OrbitControls(cam,r.domElement);dk.enableDamping=!GIAM;dk.dampingFactor=.08;dk.rotateSpeed=.7;dk.enableZoom=false;dk.enablePan=false;
   dk.minPolarAngle=15*Math.PI/180;dk.maxPolarAngle=68*Math.PI/180;
@@ -142,15 +174,15 @@ function khoi(){
   async function napCanh(ten){
    const c=CANH[ten],G=THU(ten),a=anhCua(c),canh=new THREE.Scene();canh.background=TROI;canh.fog=new THREE.Fog(NEN,55,110);
    const TAM=B(c.tam[0],c.tam[1]),den=new THREE.DirectionalLight(new THREE.Color(1,.9,.77),3.0);den.position.copy(TAM).addScaledVector(NANG,80);den.target.position.copy(TAM);
-   canh.add(den,den.target,new THREE.HemisphereLight(0xfff1dc,0xe8d2b0,4.2));
+   const hemi=new THREE.HemisphereLight(0xfff1dc,0xe8d2b0,4.2);canh.add(den,den.target,hemi);
    const [jc,jcay,anh,tt]=await Promise.all([dem(taiJSON(G+'canh.json'),ten),dem(taiJSON(G+'cay.json'),ten),Promise.all(['nen-2k',anhTo('vat-0'),'vat-1-2k',anhTo('vat-3')].map(t=>dem(taiAnh(G+t+'.webp'),ten))),
     c.cao?dem(taiJSON(G+'thong-tin.json'),ten):null]);
    const tex={'nuong-nen':anh[0],'nuong-vat-0':anh[1],'nuong-vat-1':anh[2],'nuong-vat-3':anh[3]};
-   const g=await parse(jc),nen=[],dat=[];g.scene.traverse(o=>{if(o.isMesh){const la=o.material.name==='nuong-nen';
+   const g=await parse(jc),nen=[],dat=[],bk=[],cy=[];g.scene.traverse(o=>{if(o.isMesh){const la=o.material.name==='nuong-nen';
     // tấm nền phẳng nằm sát dưới cỏ và sân: đẩy lùi trong bộ đệm sâu để lớp trên luôn thắng, không chập chờn
-    o.material=new THREE.MeshBasicMaterial({map:tex[o.material.name],toneMapped:false,side:THREE.DoubleSide,fog:true,polygonOffset:la,polygonOffsetFactor:la?4:0,polygonOffsetUnits:la?16:0});nen.push(o);dat.push(o)}});
+    o.material=new THREE.MeshBasicMaterial({map:tex[o.material.name],toneMapped:false,side:THREE.DoubleSide,fog:true,polygonOffset:la,polygonOffsetFactor:la?4:0,polygonOffsetUnits:la?16:0});nen.push(o);dat.push(o);bk.push(o.material)}});
    const gc=await parse(jcay);gc.scene.traverse(o=>{if(o.isMesh){
-    const m=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9,metalness:0,envMapIntensity:0});m.onBeforeCompile=sh=>AGX(sh,true);o.material=m;nen.push(o)}});   // cây: ánh sáng trời dịu hơn người cho tán lá có khối
+    const m=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9,metalness:0,envMapIntensity:0});m.onBeforeCompile=sh=>AGX(sh,true);o.material=m;nen.push(o);cy.push(m)}});   // cây: ánh sáng trời dịu hơn người cho tán lá có khối
    canh.add(g.scene,gc.scene);
    if(c.tuong){const gt=await parse(await dem(taiJSON(G+'tuong.json'),ten));gt.scene.traverse(o=>{if(o.isMesh){
     // giữ chất liệu gốc (tượng Phật là kim loại vàng): cho phản chiếu một phòng sáng dịu, không thì kim loại thành màu kem nhạt
@@ -158,7 +190,7 @@ function khoi(){
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
-   DL[ten]={...a,canh,nen,dat,lh,tinh,nut:[],nutO:'',cao:tt&&tt.cao}}
+   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,tinh,nut:[],nutO:'',cao:tt&&tt.cao}}
   function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn
    const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
    return (z(i,j)*(1-fx)+z(i+1,j)*fx)*(1-fy)+(z(i,j+1)*(1-fx)+z(i+1,j+1)*fx)*fy}
@@ -192,7 +224,7 @@ function khoi(){
   const nguoi={};
   function doiCanh(ten){   // sang cảnh khác: bỏ người của cảnh cũ, dời vòng sáng, đặt lại camera quanh "Bạn"
    for(const id in nguoi){const q=nguoi[id];q.q&&boNguoi(q.q);q.tag&&q.tag.remove();delete nguoi[id]}
-   const d=DL[ten];d.canh.add(vongVang,ping,DOM);vongVang.visible=false;pingT=9;theo=null;daDat=false;dang=ten;dungNut(ten)
+   const d=DL[ten];d.canh.add(vongVang,ping,DOM);TR.set=false;tinhT=0;/* vào cảnh: trời nhảy ngay đúng giờ, không đổi dần */vongVang.visible=false;pingT=9;theo=null;daDat=false;dang=ten;dungNut(ten)
    const g=CANH[ten].goc,h=Math.hypot(DIR.x,DIR.y),t0=Math.atan2(DIR.x/h,-DIR.y/h);   // hướng camera ảnh theo góc phương vị của OrbitControls (atan2(x, z) trong toạ độ three, z = -y Blender)
    dk.minAzimuthAngle=g?t0-g*Math.PI/180:-Infinity;dk.maxAzimuthAngle=g?t0+g*Math.PI/180:Infinity;
    const ng=CANH[ten].nghieng;dk.minPolarAngle=(ng?90-ng:15)*Math.PI/180;dk.maxPolarAngle=(ng?90-ng:g?60:68)*Math.PI/180}
@@ -247,7 +279,7 @@ function khoi(){
     const k=GIAM?1:1-Math.exp(-dt*3),dv=tam2.clone().sub(dk.target).multiplyScalar(k);dk.target.add(dv);cam.position.add(dv)}
    const v=cam.position.clone().sub(dk.target),R=v.length(),Rm=xa();if(Math.abs(R-Rm)>.01)cam.position.copy(dk.target).addScaledVector(v,(R+(Rm-R)*(GIAM?1:Math.min(1,dt*6)))/R);
    d.canh.fog.near=Rm+8;d.canh.fog.far=Rm+75;   // sương lùi theo khoảng cách camera; bắt đầu sát sau người cho cảnh xa mờ dần
-   DOM.position.set(dk.target.x,dk.target.y-2,dk.target.z);bayDom(dt,t);
+   DOM.position.set(dk.target.x,dk.target.y-2,dk.target.z);bayDom(dt,t);troiBuoc(d,dt,t,Rm);
    dk.update();cam.updateMatrixWorld();   // nhãn tên và nút tính theo camera của khung này, không trễ một nhịp
    for(const id in nguoi){const q=nguoi[id];if(q.tag&&q.wp)nhan(q.tag,q.wp,TO*1.45)}
    if(pingT<1){pingT+=dt/.7;ping.material.opacity=.95*(1-pingT);ping.scale.setScalar(1+pingT*1.2)}else ping.material.opacity=0;
@@ -312,7 +344,7 @@ function khoi(){
     const fx=Math.sin(yaw),fz=Math.cos(yaw);
     ph.set(vt.x+fx*K[0]-fz*K[1],vt.y+K[2],vt.z+fz*K[0]+fx*K[1]);nhin.set(vt.x+fx*K[3],vt.y+K[4],vt.z+fz*K[3]);
     if(dau){camM.copy(nhin);cam.position.copy(ph);dau=false}else{const k=1-Math.exp(-dt*4);cam.position.lerp(ph,k);camM.lerp(nhin,k)}
-    cam.lookAt(camM);d.canh.fog.near=25;d.canh.fog.far=90;co2();r.render(d.canh,cam)}};
+    cam.lookAt(camM);d.canh.fog.near=25;d.canh.fog.far=90;troiBuoc(d,dt,now,30);co2();r.render(d.canh,cam)}};
    return true};
   window.ss3dCanh={cam,dk,B,get canh(){return dang&&DL[dang].canh},get raAnh(){return dang&&DL[dang].raAnh},get tuAnh(){return dang&&DL[dang].tuAnh}};   // để thử nghiệm
 

@@ -6,7 +6,7 @@
 - **Mọi không gian dùng chung một phong cách**: đại sảnh, làng, chính điện, nhà, làng dòng họ. Không gian mới phải đặt cạnh ảnh chuẩn mà không lạc tông.
 - **Nhân vật đất nặn (clay) bán chibi**, tay tròn kiểu găng, màu phẳng sạch, không vằn, không rách. Chủ dự án chốt tháng 11/2026, thay cho nhân vật tả thực cũ.
 - **Đã chuyển sang 3D thời gian thực** (hướng 1: camera phối cảnh; đã bỏ nhoè hậu cảnh vì nhìn không rõ, bỏ bóng thời gian thực vì gây vệt đen trên nền dốc). Xong: chân núi, sảnh, nhà thờ, làng tưởng niệm, làng dòng họ, ngôi nhà, chính điện (`js/26-the-gioi-3d.js`, mỗi cảnh một thư mục `img/3d/<cảnh>/`, nhân vật dùng chung `img/3d/nv/`). Máy không có GPU thật vẫn dùng ảnh isometric.
-- Ánh sáng cảnh đổi theo **giờ thực Việt Nam (GMT+7)**: ngày, hoàng hôn, đêm.
+- Ánh sáng cảnh đổi theo **giờ thực Việt Nam (GMT+7)**: ngày, hoàng hôn, đêm. Cảnh 3D tự đổi màu trời, sương, đèn theo giờ và thời tiết thật của `js/18` (mây, mưa, dông chớp, sương mù; mưa là vệt 3D quanh camera). Bảng màu theo giờ: mảng `GIO` trong `js/26`.
 - **Không khí tưởng niệm** (chủ dự án duyệt 11/2026): cảnh 3D sáng, ấm, thanh thản (`css/29`: hơi ngả vàng nhẹ, bớt rực một chút; chủ dự án không muốn u ám như nghĩa trang thật), nắng vàng nhẹ xiên góc trên trái, viền tối rất nhẹ bốn góc, trời ngà có sương xa, đốm sáng li ti bay lên như tàn hương (`js/26`). Không làm cảnh tươi rực như game.
 
 ## Bảng màu và chữ

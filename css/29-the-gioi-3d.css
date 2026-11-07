@@ -38,3 +38,9 @@ html:has(.hall>.w-trans.on:not(.out)) header.nav,html:has(.hall>.w-trans.on:not(
 /* nắng vàng nhẹ xiên từ góc trên trái; viền tối rất nhẹ bốn góc (chủ dự án: sáng, thanh thản, không u ám như nghĩa trang thật) */
 .hall.w3d-on .w3d::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;mix-blend-mode:soft-light;background:linear-gradient(150deg,rgba(255,214,150,.6) 0%,rgba(255,226,180,.18) 50%,rgba(150,120,110,.18) 100%)}
 .hall.w3d-on .w3d::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(120% 95% at 50% 42%,transparent 60%,rgba(60,40,20,.22) 100%)}
+/* trời 3D tự đổi theo giờ và thời tiết (js/26): tắt lớp màu trời, mưa vẽ phẳng của 2D (js/18) cho khỏi chồng hai lần;
+   nắng vàng chỉ có ban ngày, đêm và mưa thì tắt */
+.hall.w3d-on .wx-sky,.hall.w3d-on .wx-cv,.hall.w3d-on .wx-flash{display:none}
+.hall.w3d-on .w3d::before{transition:opacity 3s}
+.hall[data-troi^="dem"] .w3d::before,.hall[data-troi*="mua"] .w3d::before{opacity:0}
+.hall[data-troi^="chieu"] .w3d::before,.hall[data-troi^="sang"] .w3d::before{opacity:.6}
