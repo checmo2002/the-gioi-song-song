@@ -187,7 +187,7 @@ function khoi(){
    canh.add(g.scene,gc.scene);
    if(c.tuong){const gt=await parse(await dem(taiJSON(G+'tuong.json'),ten));gt.scene.traverse(o=>{if(o.isMesh){
     // giữ chất liệu gốc (tượng Phật là kim loại vàng): cho phản chiếu một phòng sáng dịu, không thì kim loại thành màu kem nhạt
-    const m=o.material;m.envMap=moiTruong();m.envMapIntensity=.7;cy.push(m);if(m.map)m.map.anisotropy=r.capabilities.getMaxAnisotropy();m.onBeforeCompile=sh=>AGX(sh);nen.push(o)}});canh.add(gt.scene)}
+    o.userData.tuong=1;const m=o.material;m.envMap=moiTruong();m.envMapIntensity=.7;cy.push(m);if(m.map)m.map.anisotropy=r.capabilities.getMaxAnisotropy();m.onBeforeCompile=sh=>AGX(sh);nen.push(o)}});canh.add(gt.scene)}
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
@@ -200,7 +200,9 @@ function khoi(){
   const ray=new THREE.Raycaster();
   function dungNut(ten){const d=DL[ten],O=ori();d.nutO=O;hotL.innerHTML='';d.nut=[];
    const ds=(window.SS_CANH&&SS_CANH[ten]&&SS_CANH[ten].hot&&SS_CANH[ten].hot[O])||[];
-   ds.forEach((h,i)=>{ray.ray.copy(d.tiaAnh(h.x,h.y));const hit=ray.intersectObjects(d.nen,false)[0];const p=hit?hit.point.clone():(()=>{const q=d.tuAnh(h.x,h.y);return B(q.x,q.y)})();
+   ds.forEach((h,i)=>{ray.ray.copy(d.tiaAnh(h.x,h.y));const hit=ray.intersectObjects(d.nen,false)[0];
+    if(hit&&hit.object.userData.tuong)hit.point.y=new THREE.Box3().setFromObject(hit.object).max.y+1.2;   // nút trúng tượng: đặt trên đỉnh đầu, không che mặt tượng
+    const p=hit?hit.point.clone():(()=>{const q=d.tuAnh(h.x,h.y);return B(q.x,q.y)})();
     const a=document.createElement(h.id?'button':'a');a.className='wh'+(h.main?' main':'');if(h.id){a.type='button';a.dataset.w=h.id}else a.href=h.h;
     a.innerHTML='<i class="wh-dot"></i><span class="wh-lb"><i class="wh-ic"></i><b></b><small></small></span>';a.querySelector('b').textContent=h.short||h.t;a.querySelector('small').textContent=h.s||'';a.title=h.t+(h.s?' · '+h.s:'');
     window.ssHudIcon&&ssHudIcon(a.querySelector('.wh-ic'),h);a.style.setProperty('--d',(i*70)+'ms');hotL.appendChild(a);d.nut.push({el:a,p})})}
