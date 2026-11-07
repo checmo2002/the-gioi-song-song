@@ -3,7 +3,8 @@
  var T={phat:{c1:'255,205,110',c2:'255,240,200',c3:'255,244,220',ct:'122,70,14',t:'Phật giáo',sub:'Bước vào thế giới song song'},
         cg:{c1:'190,210,255',c2:'240,246,255',c3:'246,249,255',ct:'40,60,110',t:'Công giáo',sub:'Bước vào thế giới song song'}};
  function f(){};
- window.ssAscend=function(fa,mid){var c=T[fa]||T.phat;ssAscend.busy=true;var hl=document.getElementById('hall');hl&&hl.classList.add('no-splash');
+ window.ssAscend=function(fa,mid){if(window.ss3dPhiThang&&ss3dPhiThang(fa,mid))return;   // thế giới 3D: cột sáng và bay lên trong cảnh (js/26)
+  var c=T[fa]||T.phat;ssAscend.busy=true;var hl=document.getElementById('hall');hl&&hl.classList.add('no-splash');
   var me=document.querySelector('.hall .wa.me'),r=me?me.getBoundingClientRect():{left:innerWidth/2,top:innerHeight*.6,width:0,height:0};
   var x=r.left+r.width/2,y=r.top+r.height*.86;
   var o=document.createElement('div');o.className='asc';o.style.cssText='--x:'+x+'px;--y:'+y+'px;--c1:'+c.c1+';--c2:'+c.c2+';--c3:'+c.c3+';--ct:'+c.ct+';--bw:'+Math.max(120,r.width*1.6)+'px';
