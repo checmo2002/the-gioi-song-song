@@ -83,7 +83,9 @@ function khoi(){
   const anhTo=ten=>CAM_UNG?ten+'-2k':ten;   // ảnh 4096 chỉ cho máy tính; điện thoại dùng 2048 để không tràn bộ nhớ đồ hoạ
   const [jc,jcay,anh]=await Promise.all([dem(taiJSON(G+'canh.json')),dem(taiJSON(G+'cay.json')),Promise.all(['nen-2k',anhTo('vat-0'),'vat-1-2k',anhTo('vat-3')].map(t=>dem(taiAnh(t))))]);
   const tex={'nuong-nen':anh[0],'nuong-vat-0':anh[1],'nuong-vat-1':anh[2],'nuong-vat-3':anh[3]};
-  const g=await parse(jc),nen=[];g.scene.traverse(o=>{if(o.isMesh){o.material=new THREE.MeshBasicMaterial({map:tex[o.material.name],toneMapped:false,side:THREE.DoubleSide,fog:true});nen.push(o)}});
+  const g=await parse(jc),nen=[];g.scene.traverse(o=>{if(o.isMesh){const la=o.material.name==='nuong-nen';
+   // tấm nền phẳng nằm sát dưới cỏ và sân: đẩy lùi trong bộ đệm sâu để lớp trên luôn thắng, không chập chờn
+   o.material=new THREE.MeshBasicMaterial({map:tex[o.material.name],toneMapped:false,side:THREE.DoubleSide,fog:true,polygonOffset:la,polygonOffsetFactor:la?4:0,polygonOffsetUnits:la?16:0});nen.push(o)}});
   const gc=await parse(jcay);gc.scene.traverse(o=>{if(o.isMesh){
    const m=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9,metalness:0,envMapIntensity:0});m.onBeforeCompile=sh=>AGX(sh,true);o.material=m;nen.push(o)}});   // cây: ánh sáng trời dịu hơn người cho tán lá có khối
   canh.add(g.scene,gc.scene);
