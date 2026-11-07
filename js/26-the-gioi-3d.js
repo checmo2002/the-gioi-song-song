@@ -173,7 +173,7 @@ function khoi(){
   function doiCanh(ten){   // sang cảnh khác: bỏ người của cảnh cũ, dời vòng sáng, đặt lại camera quanh "Bạn"
    for(const id in nguoi){const q=nguoi[id];q.q&&boNguoi(q.q);q.tag&&q.tag.remove();delete nguoi[id]}
    const d=DL[ten];d.canh.add(vongVang,ping);vongVang.visible=false;pingT=9;theo=null;daDat=false;dang=ten;dungNut(ten)
-   const g=CANH[ten].goc,h=Math.hypot(DIR.x,DIR.y),t0=Math.atan2(DIR.x/h,DIR.y/h);   // hướng camera ảnh theo góc phương vị của OrbitControls
+   const g=CANH[ten].goc,h=Math.hypot(DIR.x,DIR.y),t0=Math.atan2(DIR.x/h,-DIR.y/h);   // hướng camera ảnh theo góc phương vị của OrbitControls (atan2(x, z) trong toạ độ three, z = -y Blender)
    dk.minAzimuthAngle=g?t0-g*Math.PI/180:-Infinity;dk.maxAzimuthAngle=g?t0+g*Math.PI/180:Infinity;dk.maxPolarAngle=(g?60:68)*Math.PI/180}
   let truoc=performance.now();
   ve=function(ten){const t=performance.now(),dt=Math.min(.05,(t-truoc)/1000);truoc=t;if(dang!==ten||anDi){anDi=false;doiCanh(ten)}
