@@ -222,7 +222,7 @@ def chinh():
             for _ in range(8):
                 ok, loc, nor, fi, ob, mx = sc.ray_cast(dg2, o0, fw)
                 if not ok: break
-                if ob is gc or ob in tuong or nor.z < .5 or loc.z > 3.5: o0 = loc + fw * 1e-3; continue
+                if ob is gc or ob in tuong or nor.z < .5 or loc.z > sc.get('cao_max', 3.5): o0 = loc + fw * 1e-3; continue   # cao_max: cảnh trên cao (đỉnh núi) đặt trong .blend
                 z = loc.z; break
             cao.append(round(z * 100))
     tt['cao'] = {'w': GW, 'h': GH, 'cm': cao}
