@@ -1,5 +1,6 @@
 """Một cảnh Song Song (song-song-<cảnh>-iso.blend) -> web 3D kiểu đất nặn. Dùng chung mọi cảnh (sảnh, hồ, thờ, nhà, điện, làng).
-blender -b <bản sao .blend> --python nuong-canh-3d.py -- <thư mục ra> [số mẫu=256] [ảnh nền=2048] [ảnh vật=4096]
+blender -b <bản sao .blend> --python nuong-canh-3d.py -- <thư mục ra> [số mẫu=256] [ảnh nền=2048] [ảnh vật=4096] [xuat]
+  xuat: không nướng lại, dùng ảnh .png đã có trong thư mục ra, chỉ xuất lại các tệp .glb (UV tự chia ra giống hệt lần nướng)
 Ra: canh.glb (nền + 3 khối vật, UV nướng), nen.png, vat-0.png (khu chính), vat-1.png (cảnh xa), vat-3.png (đồ nhỏ),
     tuong.glb (tượng nếu có: ảnh màu gốc, trình duyệt tự chiếu sáng), cay.glb (cây: pháp tuyến + màu đỉnh), thong-tin.json (camera ảnh iso).
 Không lưu file .blend. Bài học chân núi/sảnh: tấm nền bỏ ô nằm dưới sân/đồi, lá sen nâng so le, tượng xuất riêng."""
@@ -8,6 +9,8 @@ from mathutils import Vector
 A = sys.argv[sys.argv.index('--') + 1:]
 OUTD = A[0]; os.makedirs(OUTD, exist_ok=True)
 SM = int(A[1]) if len(A) > 1 else 256; SN = int(A[2]) if len(A) > 2 else 2048; SV = int(A[3]) if len(A) > 3 else 4096
+XUAT = len(A) > 4 and A[4] == 'xuat'
+import io_scene_gltf2.io.exp.meshopt as _mo
 sc = max(bpy.data.scenes, key=lambda s: len(s.objects))   # cảnh chính trong file (More / DienIso / LangIso)
 for s in [x for x in bpy.data.scenes if x != sc]: bpy.data.scenes.remove(s)
 CAM = next(o for o in sc.objects if o.type == 'CAMERA')
@@ -48,9 +51,15 @@ def chinh():
     dat = [o for o in sc.objects if o.type == 'MESH' and vat(o) == 'co' and max(o.dimensions) > 100]
     for o in dat: bpy.data.objects.remove(o)
 
-    # lá sen cùng độ cao chồng lên nhau: chỗ chồng nướng ra đen, nâng mỗi lá cao hơn lá trước vài mm
-    for i, o in enumerate(sorted([o for o in sc.objects if o.name.split('.')[0] in ('laSen', 'laSenP')], key=lambda o: o.name)):
-        o.location.z += .004 * (i + 1)
+    # lá sen cùng độ cao chồng lên nhau: chỗ chồng nướng ra đen. Lá nằm trên cao hơn mọi lá chồng dưới nó 2 cm
+    # (cách vài mm thì trên web bộ đệm sâu không phân biệt được, chỗ đen bên dưới lộ ra)
+    sen = sorted([o for o in sc.objects if o.name.split('.')[0] in ('laSen', 'laSenP')], key=lambda o: o.name)
+    def hop2(o):
+        ps = [o.matrix_world @ Vector(c) for c in o.bound_box]; return min(p.x for p in ps), max(p.x for p in ps), min(p.y for p in ps), max(p.y for p in ps)
+    hs, tang = {o: hop2(o) for o in sen}, {}
+    for i, o in enumerate(sen):
+        a = hs[o]; tang[o] = 1 + max([tang[p] for p in sen[:i] if hs[p][0] < a[1] and hs[p][1] > a[0] and hs[p][2] < a[3] and hs[p][3] > a[2]], default=0)
+        o.location.z += .02 * tang[o]
     # mảnh phẳng sát đất (lối đi, sân, thềm) cùng độ cao chồng lên nhau: chỗ chồng nướng ra sọc đen, nhấp nháy.
     # Xếp tầng: mảnh nhỏ nằm trên mảnh lớn chồng lên nó, mỗi tầng cao hơn 2,5 mm
     phang = [o for o in sc.objects if o.type == 'MESH' and o.dimensions.z < .25 and max(o.dimensions.x, o.dimensions.y) > 1.5
@@ -61,6 +70,7 @@ def chinh():
     for o in phang:   # nâng theo số mảnh lớn hơn đang chồng lên đúng chỗ này (không nâng dồn cả cảnh)
         a0 = hh[o]; n = sum(1 for p in phang if p is not o and dt[p] > dt[o] and hh[p][0] < a0[1] and hh[p][1] > a0[0] and hh[p][2] < a0[3] and hh[p][3] > a0[2])
         o.location.z += .0025 * n
+    bpy.context.view_layer.update()   # chạy nền không tự cập nhật matrix_world: không gọi thì lúc gộp vật (join) mọi lần nâng ở trên bị mất
     # ---- kiểu đất nặn: tượng giảm mặt, cạnh bo tròn, tán lá chia mịn, vật liệu mờ như đất sét
     for o in sc.objects:
         if o.type != 'MESH': continue
@@ -238,6 +248,8 @@ def chinh():
     khoi = [(gop(san, 'vat-0'), SV), (gop(xa, 'vat-1'), min(SV, 2048)), (gop(gan, 'vat-3'), SV)]
 
     def nuong(o, ten, size):
+        if XUAT and os.path.exists(os.path.join(OUTD, ten + '.png')):
+            log('GIU ANH', ten); return
         img = bpy.data.images.new(ten, size, size, alpha=False, float_buffer=True)
         for s in o.material_slots:
             nt = s.material.node_tree
@@ -258,6 +270,9 @@ def chinh():
         t = nt.nodes.new('ShaderNodeTexImage'); t.image = bpy.data.images.load(os.path.join(OUTD, x['ten'] + '.png')); nt.links.new(t.outputs[0], nt.nodes['Principled BSDF'].inputs['Base Color'])
         x.data.materials.clear(); x.data.materials.append(m)
     for x in sc.objects: x.select_set(x in [nen] + [k for k, _ in khoi])
+    # Meshopt của Blender nén số thực 12 bit (bước 2–3 cm trên khối vật dài 80 m): các mảnh phẳng nâng vài mm bị ép
+    # về cùng độ cao -> sọc đen nhấp nháy; UV lệch cả điểm ảnh. Khối nướng cần 24 bit (cây, tượng giữ 12 bit cho nhẹ)
+    _mo.EXP_FILTER_BITS = 24
     bpy.ops.export_scene.gltf(filepath=os.path.join(OUTD, 'canh.glb'), use_selection=True, export_format='GLB', export_apply=True,
         export_normals=False, export_image_format='NONE', export_animations=False, export_materials='EXPORT', export_meshopt_compression_enable=True)
     d = sun.matrix_world.to_quaternion() @ Vector((0, 0, 1))
