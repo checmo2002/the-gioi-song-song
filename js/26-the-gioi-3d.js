@@ -25,7 +25,7 @@ const CANH={
   le:[['BaCu','chap',-1.7,-11.45],['CoAoDai','chap',1.7,-11.45],['OngAoNau','ngoi',0,-12.05],['CuuChienBinh','dung',-3.8,-12.6]]},
  tho:{ten:'nhà thờ',tgt:[2,1.5],ow:42,tam:[2,1.5],le:[],lh:null,toc:.42,day:0,xa:30,cao:1,goc:40},
  lang:{ten:'làng tưởng niệm',tgt:[0,2],ow:118,tam:[0,2],le:[],lh:null,toc:.42,day:0,xa:55,cao:1},
- ho:{ten:'làng dòng họ',tgt:[0,6],ow:100,tam:[0,6],le:[],lh:null,toc:.42,day:0,xa:50,cao:1,goc:.5,nghieng:42,tranh:1},
+ ho:{ten:'làng dòng họ',tgt:[0,6],ow:100,tam:[0,6],le:[],lh:null,toc:.42,day:0,xa:50,cao:1,goc:30,nghieng:42,tranh:1},
  nha:{ten:'ngôi nhà',tgt:[0,-1],ow:38,tam:[0,-1],le:[],lh:null,toc:.42,day:0,xa:28,cao:1,goc:40,anh:1},
  dien:{ten:'chính điện',tgt:[0,2.5],ow:41,tam:[0,2.5],le:[],lh:null,toc:.42,day:0,xa:30,cao:1,goc:40,tuong:1}};
 const THU=t=>'img/3d/'+t+'/';
@@ -202,10 +202,13 @@ function khoi(){
    el.style.left=(x-pw/2).toFixed(1)+'px';el.style.top=(y-ph/2).toFixed(1)+'px';el.style.width=pw.toFixed(1)+'px';el.style.height=ph.toFixed(1)+'px';el._k=el.style.left+el.style.top+el.style.width+el.style.height}
   function datTranh(ten){const d=DL[ten],Wd=hall.clientWidth,Hd=hall.clientHeight;
    for(const el of stg.querySelectorAll('.ho-h,.ho-d')){el._g={L:parseFloat(el.style.left)/100,T:parseFloat(el.style.top)/100,w:parseFloat(el.style.width)/100};tranhL.appendChild(el)}
+   // tranh đứng như tấm bảng quay về camera, chân ở giữa mép dưới ô tranh trên ảnh: xoay camera thì nhà vẫn đứng đúng chỗ, không méo.
+   // Ở góc mặc định (nghiêng 42° như ảnh) khớp đúng ảnh iso: cao thật = cao trên ảnh / cos(42°)
+   const ri=new V3(1,0,0).applyQuaternion(cam.quaternion);
    for(const el of tranhL.children){const g=el._g;if(!g)continue;
-    const a=d.tuAnh(g.L,g.T),b=d.tuAnh(g.L+g.w,g.T+g.w*1.5);c1.copy(B(a.x,a.y)).project(cam);c2.copy(B(b.x,b.y)).project(cam);
-    const x1=(c1.x+1)/2*Wd,y1=(1-c1.y)/2*Hd,x2=(c2.x+1)/2*Wd,y2=(1-c2.y)/2*Hd;
-    el.style.left=x1.toFixed(1)+'px';el.style.top=y1.toFixed(1)+'px';el.style.width=(x2-x1).toFixed(1)+'px';el.style.height=(y2-y1).toFixed(1)+'px'}}
+    const a=d.tuAnh(g.L+g.w/2,g.T+g.w*1.5),p0=B(a.x,a.y),m=g.w*CANH[ten].ow;c1.copy(p0).project(cam);c2.copy(p0).addScaledVector(ri,m).project(cam);c3.copy(p0).add(new V3(0,m/Math.cos(EL),0)).project(cam);
+    const x=(c1.x+1)/2*Wd,y=(1-c1.y)/2*Hd,pw=Math.abs(c2.x-c1.x)/2*Wd,ph=Math.abs(c3.y-c1.y)/2*Hd;
+    el.style.left=(x-pw/2).toFixed(1)+'px';el.style.top=(y-ph).toFixed(1)+'px';el.style.width=pw.toFixed(1)+'px';el.style.height=ph.toFixed(1)+'px';el.style.zIndex=Math.round((1-c1.z)*1e5)}}   // nhà gần che nhà xa ở mọi góc xoay
   let truoc=performance.now();
   ve=function(ten){const t=performance.now(),dt=Math.min(.05,(t-truoc)/1000);truoc=t;if(dang!==ten||anDi){anDi=false;doiCanh(ten)}
    const d=DL[ten],w=window.ssWorld,av=w.avs?w.avs():{},thay={};
