@@ -316,6 +316,12 @@ function khoi(){
    if(q.act.Walk)q.act.Walk.timeScale=THREE.MathUtils.clamp(tc/VDI,.7,1.3);
    for(const id in nguoi){const x=nguoi[id].q;if(x)x.rig.visible=x.bo.visible=false}vongVang.visible=false;ping.material.opacity=0;
    tr.prepend(r.domElement);r.domElement.style.opacity='1';cw=-1;
+   // khung trang trí: màn ngà có logo vẽ dần và tên nơi đến hiện từng chữ, rồi mở tròn ra đoạn phim; hết phim khép tròn lại (css/29 .pu)
+   let ui=tr.querySelector('.pu');if(!ui){ui=document.createElement('div');ui.className='pu';ui.setAttribute('aria-hidden','true');
+    const LG='<path class="pu-l" d="M16 7.94A9 9 0 0 1 16 24.06A9 9 0 0 1 16 7.94Z"/><circle class="pu-c pu-c1" cx="12" cy="16" r="9" pathLength="100"/><circle class="pu-c pu-c2" cx="20" cy="16" r="9" pathLength="100"/>';
+    ui.innerHTML='<div class="pu-iris"></div><div class="pu-giua"><i class="pu-tia"></i><svg class="pu-logo" viewBox="0 0 32 32" fill="none">'+LG+'</svg><b class="pu-ten"></b><small>Thế Giới Song Song</small><span class="pu-dom">'+'<i></i>'.repeat(14)+'</span></div>'+
+     '<div class="pu-day"><svg class="pu-mini" viewBox="0 0 32 32" fill="none">'+LG+'</svg><span class="pu-nho"></span><i class="pu-tien"></i></div>';tr.appendChild(ui)}
+   tr.classList.remove('pu-chay','pu-dong');void tr.offsetWidth;tr.classList.add('pu-chay');let daTen=false;
    const tai=(x,o)=>{let i=1;while(i<Ls.length-1&&Ls[i]<x)i++;const f=THREE.MathUtils.clamp((x-Ls[i-1])/Math.max(1e-6,Ls[i]-Ls[i-1]),0,1);return o.copy(P[i-1]).lerp(P[i],f)};
    const vt=new V3(),vt2=new V3(),f=new V3(),ph=new V3(),nhin=new V3(),camM=new V3();let t=0,t0=performance.now(),dau=true,het=0,yaw=0;
    // máy quay [trước, ngang, cao, nhìn trước, nhìn cao] theo hướng đi: lên chùa -> sau chéo nhìn lên bậc; xuống núi -> phía dưới nhìn người xuống;
@@ -335,12 +341,15 @@ function khoi(){
      if(n<it){it=n;K=k}if(!n)break}
     r.setRenderTarget(null);r.setClearColor(mx0,1);d.canh.overrideMaterial=null;d.canh.background=nen0;q.rig.visible=q.bo.visible=true;RT.dispose();MD.dispose()}
    function xongPhim(){boNguoi(q);for(const id in nguoi){const x=nguoi[id].q;if(x)x.rig.visible=x.bo.visible=true}
-    box.appendChild(r.domElement);r.domElement.style.opacity='';cw=-1;anDi=true;phim=null;xong()}
+    box.appendChild(r.domElement);r.domElement.style.opacity='';cw=-1;anDi=true;phim=null;xong();setTimeout(()=>tr.classList.remove('pu-chay','pu-dong'),1000)}
    phim={buoc(){const now=performance.now(),dt=Math.min(.05,(now-t0)/1000);t0=now;t+=dt;
-    if(t>=T&&!het&&(san[s]||!CANH[s]||CANH[s].loi||hong)){het=now;r.domElement.style.opacity='0'}   // mờ về đen rồi mới đổi cảnh
-    if(het&&now-het>420){xongPhim();return}
-    if(!het&&t>=T+.5)t=0;   // cảnh đích còn đang nạp: đi lại quãng đường
-    const x=d0+Math.min(t,T+.5)*tc;tai(x,vt);tai(x+.6,vt2);f.subVectors(vt2,vt);f.y=0;if(f.lengthSq()<1e-8)f.set(Math.sin(yaw),0,Math.cos(yaw));
+    if(!daTen){daTen=true;const ten=((tr.querySelector('span')||{}).textContent||'').replace(/…$/,''),b=ui.querySelector('.pu-ten');b.textContent='';   // 04-01 đặt chữ sau khi phim nhận chiếu
+     [...ten].forEach((ch,i)=>{const e=document.createElement('i');e.textContent=ch;e.style.setProperty('--i',i);b.appendChild(e)});ui.querySelector('.pu-nho').textContent=ten}
+    const tw=t-1;   // 1 giây đầu màn ngà còn khép: chưa đi
+    if(tw>=T&&!het&&(san[s]||!CANH[s]||CANH[s].loi||hong)){het=now;tr.classList.add('pu-dong')}   // khép tròn về logo rồi mới đổi cảnh
+    if(het&&now-het>650){xongPhim();return}
+    if(!het&&tw>=T+.5)t=1;   // cảnh đích còn đang nạp: đi lại quãng đường
+    const x=d0+THREE.MathUtils.clamp(tw,0,T+.5)*tc;tai(x,vt);tai(x+.6,vt2);f.subVectors(vt2,vt);f.y=0;if(f.lengthSq()<1e-8)f.set(Math.sin(yaw),0,Math.cos(yaw));
     const y=Math.atan2(f.x,f.z);yaw=dau?y:yaw+Math.atan2(Math.sin(y-yaw),Math.cos(y-yaw))*Math.min(1,dt*6);
     q.rig.position.set(vt.x,vt.y+.03,vt.z);q.rig.rotation.y=yaw;q.bo.position.set(vt.x,vt.y+.05,vt.z);q.mx.update(dt);
     for(const z of d.tinh)z.mx.update(dt);
