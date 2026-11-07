@@ -12,3 +12,10 @@
 .w3d-tag.me .t{background:linear-gradient(180deg,#B8701A,#7A3E0A);border-color:#FFD98A}
 .w3d-tag .b{order:-1;font-size:22px;line-height:1}
 .w3d-tag .b:empty{display:none}
+/* màn chờ khi vào chân núi lúc cảnh 3D chưa nạp xong: phủ cả thanh điều hướng (240), dưới phi thăng (400) và màn tải (500) */
+.w3d-cho{position:fixed;inset:0;z-index:250;display:grid;place-content:center;justify-items:center;gap:10px;background:var(--paper,#FBF6EC);color:#2B241C;text-align:center}
+.w3d-cho[hidden]{display:none}
+.w3d-cho b{font-family:var(--f-display);font-weight:300;font-size:clamp(30px,6vw,48px)}
+.w3d-cho small{font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#6E6253}
+.w3d-cho i{display:block;width:min(220px,60vw);height:2px;margin-top:8px;background:rgba(43,36,28,.12);overflow:hidden}
+.w3d-cho s{display:block;height:100%;background:#B8862F;transform:scaleX(0);transform-origin:left;transition:transform .4s}

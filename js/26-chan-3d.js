@@ -8,7 +8,7 @@ const hall=document.getElementById('hall'),W=document.getElementById('world');
 const coWebGL=(()=>{try{const g=document.createElement('canvas').getContext('webgl2');if(!g)return false;if(new URLSearchParams(location.search).has('3d'))return true;
  const x=g.getExtension('WEBGL_debug_renderer_info'),ten=String(x?g.getParameter(x.UNMASKED_RENDERER_WEBGL):g.getParameter(g.RENDERER));g.getExtension('WEBGL_lose_context')?.loseContext();
  return !/swiftshader|llvmpipe|softpipe|software/i.test(ten)}catch(e){return false}})();
-window.ss3dXong=!coWebGL;   // kiểm tra hình ảnh chờ cờ này: cảnh 3D đã hiện hoặc chắc chắn dùng ảnh tĩnh
+window.ss3dXong=!coWebGL;   // màn tải (js/01) và kiểm tra hình ảnh chờ cờ này: cảnh 3D đã nạp xong hoặc chắc chắn dùng ảnh tĩnh
 if(hall&&W&&coWebGL)khoi();
 
 function khoi(){
@@ -16,19 +16,25 @@ function khoi(){
  const box=document.createElement('div');box.className='w3d';box.setAttribute('aria-hidden','true');
  const hotL=document.createElement('div');hotL.className='w3d-hot';const tagL=document.createElement('div');tagL.className='w3d-tags';
  const stg=document.getElementById('wStage');W.insertBefore(box,W.firstChild);stg.after(hotL);hotL.after(tagL);   // nút và tên nằm trên lớp ánh sáng theo giờ (trong wStage)
- let T=null,ve=null,dangTai=false,san=false;   // three, trình vẽ, đã nạp xong cảnh
+ let T=null,ve=null,san=false,hong=false;   // three, trình vẽ, đã nạp xong cảnh, nạp lỗi
+ // màn chờ phủ cả thanh điều hướng: vào chân núi khi 3D chưa xong thì chờ ở đây, không lộ ảnh 2D
+ const phu=document.createElement('div');phu.className='w3d-cho';phu.hidden=true;phu.setAttribute('role','status');
+ phu.innerHTML='<b>Song Song</b><small>Đang dựng cảnh chân núi</small><i><s></s></i>';document.body.appendChild(phu);
+ // nạp ngay từ lúc mở trang, màn tải đầu trang chờ xong mới mở
+ window.ss3dTien=0;nap().catch(e=>{console.warn('chân núi 3D: dùng ảnh tĩnh',e);hong=true;window.ss3dXong=true;window.ss3dTocDo=1});
 
  function bat(){const w=window.ssWorld;return !!(w&&!hall.hidden&&w.on()&&w.scene()==='chan')}
  function vong(){requestAnimationFrame(vong);const b=bat();
-  if(b&&!dangTai){dangTai=true;nap().catch(e=>{console.warn('chân núi 3D: dùng ảnh tĩnh',e);window.ss3dXong=true;window.ss3dTocDo=1})}
+  phu.hidden=!(b&&!san&&!hong);if(!phu.hidden)phu.querySelector('s').style.transform='scaleX('+(window.ss3dTien||0)+')';
   const hien=b&&san;hall.classList.toggle('w3d-on',hien);window.ss3dTocDo=hien?.42:1;if(hien)ve()}
  requestAnimationFrame(vong);
 
  async function nap(){
-  const [THREE,{OrbitControls},{GLTFLoader},{MeshoptDecoder},{EffectComposer},{RenderPass},{BokehPass},{OutputPass},SU]=await Promise.all([
+  // tiến độ cho màn tải: thư viện + cảnh + cây + 4 ảnh + 9 nhân vật
+  let xong=0;const TONG=16,dem=pr=>pr.then(v=>{xong++;window.ss3dTien=Math.min(1,xong/TONG);return v});
+  const [THREE,{OrbitControls},{GLTFLoader},{MeshoptDecoder},SU]=await dem(Promise.all([
    import('three'),import('three/addons/controls/OrbitControls.js'),import('three/addons/loaders/GLTFLoader.js'),import('three/addons/libs/meshopt_decoder.module.js'),
-   import('three/addons/postprocessing/EffectComposer.js'),import('three/addons/postprocessing/RenderPass.js'),import('three/addons/postprocessing/BokehPass.js'),
-   import('three/addons/postprocessing/OutputPass.js'),import('three/addons/utils/SkeletonUtils.js')]);
+   import('three/addons/utils/SkeletonUtils.js')]));
   T=THREE;const V3=THREE.Vector3;
   // toạ độ Blender (x, y, z lên) -> three (x, z, -y)
   const B=(x,y,z=0)=>new V3(x,z,-y);
@@ -44,25 +50,24 @@ function khoi(){
   // ---- trình vẽ
   const r=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
   r.setPixelRatio(Math.min(CAM_UNG?1.75:2,devicePixelRatio||1));r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.NoToneMapping;r.toneMappingExposure=1.08;
-  r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;box.appendChild(r.domElement);
+  // bóng thật chỉ cho cây trên máy tính (đứng yên nên vẽ một lần); người dùng bóng mềm dưới chân, đi không bị giật
+  r.shadowMap.enabled=!CAM_UNG;r.shadowMap.type=THREE.PCFSoftShadowMap;r.shadowMap.autoUpdate=false;box.appendChild(r.domElement);
   const canh=new THREE.Scene(),NEN=new THREE.Color('#b9cc8c');canh.background=NEN;canh.fog=new THREE.Fog(NEN,55,110);
   const cam=new THREE.PerspectiveCamera(35,1,.1,400);
-  const rt=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:CAM_UNG?2:4});
-  const hk=new EffectComposer(r,rt);hk.addPass(new RenderPass(canh,cam));
-  const mo=new BokehPass(canh,cam,{focus:16,aperture:.0018,maxblur:.007});if(!CAM_UNG)hk.addPass(mo);hk.addPass(new OutputPass());   // hậu cảnh mờ kiểu mô hình; điện thoại tắt cho nhẹ
   const dk=new OrbitControls(cam,r.domElement);dk.enableDamping=!GIAM;dk.dampingFactor=.08;dk.rotateSpeed=.7;dk.enableZoom=false;dk.enablePan=false;
   dk.minPolarAngle=15*Math.PI/180;dk.maxPolarAngle=68*Math.PI/180;
   const ori=()=>hall.clientWidth/Math.max(1,hall.clientHeight)<.9?'v':'h';
   const xa=()=>THREE.MathUtils.clamp(30/(window.ssZoomK?ssZoomK(ori()):1),7,42);   // nút góc nhìn, cuộn chuột, chụm ngón (js/16-goc-nhin.js) đổi khoảng cách camera
-  function co(){const w=hall.clientWidth,h=hall.clientHeight;cam.aspect=w/Math.max(1,h);cam.fov=w<h?48:35;cam.updateProjectionMatrix();r.setSize(w,h);hk.setPixelRatio(r.getPixelRatio());hk.setSize(w,h)}
+  let cw=-1,ch=-1;   // cảnh nạp sớm lúc sảnh còn ẩn (cỡ 0) nên đo lại mỗi khi hiện
+  function co(){const w=hall.clientWidth,h=hall.clientHeight;if(w===cw&&h===ch)return;cw=w;ch=h;cam.aspect=w/Math.max(1,h);cam.fov=w<h?48:35;cam.updateProjectionMatrix();r.setSize(w,h)}
   co();addEventListener('resize',co);
 
   // ---- ánh sáng cho người và cây (cảnh nền đã nướng sẵn)
   const TAM=B(0,-9),NANG=new V3(.394,.616,-.682).normalize();
   const den=new THREE.DirectionalLight(new THREE.Color(1,.9,.77),3.0);den.position.copy(TAM).addScaledVector(NANG,80);den.target.position.copy(TAM);
-  den.castShadow=true;den.shadow.mapSize.set(2048,2048);Object.assign(den.shadow.camera,{left:-40,right:40,top:40,bottom:-40,near:10,far:200});den.shadow.radius=4;den.shadow.bias=-.0004;den.shadow.normalBias=.03;
+  den.castShadow=!CAM_UNG;den.shadow.mapSize.set(2048,2048);Object.assign(den.shadow.camera,{left:-40,right:40,top:40,bottom:-40,near:10,far:200});den.shadow.radius=4;den.shadow.bias=-.0004;den.shadow.normalBias=.03;
   canh.add(den,den.target,new THREE.HemisphereLight(0xfff1dc,0xe8d2b0,4.2));
-  const bongNen=new THREE.Mesh(new THREE.PlaneGeometry(140,140),new THREE.ShadowMaterial({opacity:.24,color:0x5a4028}));bongNen.rotation.x=-Math.PI/2;bongNen.position.set(TAM.x,.045,TAM.z);bongNen.receiveShadow=true;canh.add(bongNen);
+  if(!CAM_UNG){const bongNen=new THREE.Mesh(new THREE.PlaneGeometry(140,140),new THREE.ShadowMaterial({opacity:.24,color:0x5a4028}));bongNen.rotation.x=-Math.PI/2;bongNen.position.set(TAM.x,.045,TAM.z);bongNen.receiveShadow=true;canh.add(bongNen)}
   const AGX=(sh,them)=>{sh.fragmentShader=THREE.ShaderChunk.tonemapping_pars_fragment+'\n'+sh.fragmentShader.replace('texture2D( map, vMapUv )','texture2D( map, vMapUv, -1.0 )')+'';
    if(them)sh.fragmentShader=sh.fragmentShader.replace('#include <lights_fragment_maps>','#include <lights_fragment_maps>\n irradiance *= 0.45;');
    sh.fragmentShader=sh.fragmentShader.replace('#include <tonemapping_fragment>','gl_FragColor.rgb = AgXToneMapping( gl_FragColor.rgb );')};   // tự áp AgX như ảnh Blender
@@ -78,22 +83,22 @@ function khoi(){
   const parse=j=>new Promise((ok,loi)=>ld.parse(thanhGLB(j),'',ok,loi));
   const taiAnh=ten=>new Promise((ok,loi)=>new THREE.TextureLoader().load(G+ten+'.webp',t=>{t.flipY=false;t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=r.capabilities.getMaxAnisotropy();ok(t)},undefined,loi));
   const anhTo=ten=>CAM_UNG?ten+'-2k':ten;   // ảnh 4096 chỉ cho máy tính; điện thoại dùng 2048 để không tràn bộ nhớ đồ hoạ
-  const [jc,jcay,anh]=await Promise.all([taiJSON(G+'canh.json'),taiJSON(G+'cay.json'),Promise.all(['nen-2k',anhTo('vat-0'),'vat-1-2k',anhTo('vat-3')].map(taiAnh))]);
+  const [jc,jcay,anh]=await Promise.all([dem(taiJSON(G+'canh.json')),dem(taiJSON(G+'cay.json')),Promise.all(['nen-2k',anhTo('vat-0'),'vat-1-2k',anhTo('vat-3')].map(t=>dem(taiAnh(t))))]);
   const tex={'nuong-nen':anh[0],'nuong-vat-0':anh[1],'nuong-vat-1':anh[2],'nuong-vat-3':anh[3]};
   const g=await parse(jc),nen=[];g.scene.traverse(o=>{if(o.isMesh){o.material=new THREE.MeshBasicMaterial({map:tex[o.material.name],toneMapped:false,side:THREE.DoubleSide,fog:true});nen.push(o)}});
   const gc=await parse(jcay);gc.scene.traverse(o=>{if(o.isMesh){o.receiveShadow=true;o.castShadow=!CAM_UNG;   // điện thoại: không đổ bóng cây cho nhẹ
    const m=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9,metalness:0,envMapIntensity:0});m.onBeforeCompile=sh=>AGX(sh,true);o.material=m;nen.push(o)}});   // cây: ánh sáng trời dịu hơn người cho tán lá có khối
-  canh.add(g.scene,gc.scene);
+  canh.add(g.scene,gc.scene);r.shadowMap.needsUpdate=true;
 
   // ---- nhân vật: mỗi mẫu nạp một lần, nhân bản cho từng người
   const MAU={},ANHB=r.capabilities.getMaxAnisotropy();
-  function mau(ten){return MAU[ten]||(MAU[ten]=taiJSON(G+'nv/'+ten+'.json').then(parse).then(gl=>{gl.scene.traverse(o=>{if(!o.isMesh)return;const m=o.material;m.metalness=0;m.roughness=.78;m.envMapIntensity=0;
+  function mau(ten){return MAU[ten]||(MAU[ten]=dem(taiJSON(G+'nv/'+ten+'.json')).then(parse).then(gl=>{gl.scene.traverse(o=>{if(!o.isMesh)return;const m=o.material;m.metalness=0;m.roughness=.78;m.envMapIntensity=0;
      if(m.map&&CAM_UNG&&m.map.image&&m.map.image.width>1536){const c=document.createElement('canvas');c.width=c.height=1536;c.getContext('2d').drawImage(m.map.image,0,0,1536,1536);m.map.image=c;m.map.needsUpdate=true}
      if(m.map)m.map.anisotropy=ANHB;m.onBeforeCompile=sh=>AGX(sh)});return gl}))}
   const BONG=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),gr=x.createRadialGradient(64,64,0,64,64,64);
    gr.addColorStop(0,'rgba(70,45,25,.75)');gr.addColorStop(.45,'rgba(70,45,25,.35)');gr.addColorStop(1,'rgba(70,45,25,0)');x.fillStyle=gr;x.fillRect(0,0,128,128);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t})();
   const DONG={di:'Walk',dung:'Idle',chap:'Pray',lay:'Bow',ngoi:'Kneel'},TO=1.6;   // người to hơn thật 1,6 lần như hình nhân vật trong game
-  function dung(ten,gl){const rig=SU.clone(gl.scene);rig.scale.multiplyScalar(TO);rig.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false}});
+  function dung(ten,gl){const rig=SU.clone(gl.scene);rig.scale.multiplyScalar(TO);rig.traverse(o=>{if(o.isMesh)o.frustumCulled=false});
    const bo=new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.25),new THREE.MeshBasicMaterial({map:BONG,transparent:true,depthWrite:false,toneMapped:false,opacity:.55}));bo.rotation.x=-Math.PI/2;bo.renderOrder=1;
    const q={ten,rig,bo,mx:new THREE.AnimationMixer(rig),act:{},dang:null,yaw:0};for(const c of gl.animations)q.act[c.name]=q.mx.clipAction(c);canh.add(rig,bo);return q}
   function choi(q,k){const a=q.act[k]||(k==='Bow'?q.act.Pray:null)||q.act.Idle;if(!a||q.dang===a)return;a.reset().fadeIn(.3).play();if(q.dang)q.dang.fadeOut(.3);q.dang=a;
@@ -141,7 +146,7 @@ function khoi(){
    if(ok){el.style.left=((chieu.x+1)/2*hall.clientWidth).toFixed(1)+'px';el.style.top=((1-chieu.y)/2*hall.clientHeight).toFixed(1)+'px'}}
   let truoc=performance.now();
   ve=function(){const t=performance.now(),dt=Math.min(.05,(t-truoc)/1000);truoc=t;const w=window.ssWorld,av=w.avs?w.avs():{},thay={};
-   if(nutO!==ori())dungNut();
+   co();if(nutO!==ori())dungNut();
    for(const id in av){const p=av[id];thay[id]=1;const ten=mauCua(id,p);let q=nguoi[id];
     if(q&&q.ten!==ten&&q.q){boNguoi(q.q);q.tag&&q.tag.remove();q=null}
     if(!q){q=nguoi[id]={ten,q:null,tag:null};mau(ten).then(gl=>{if(nguoi[id]!==q)return;q.q=dung(ten,gl);q.q.dangA=''}).catch(()=>{});
@@ -166,9 +171,10 @@ function khoi(){
    dk.update();
    if(pingT<1){pingT+=dt/.7;ping.material.opacity=.95*(1-pingT);ping.scale.setScalar(1+pingT*1.2)}else ping.material.opacity=0;
    for(const n of nut)nhan(n.el,n.p,0);
-   mo.uniforms.focus.value=cam.position.distanceTo(dk.target);hk.render(dt)};
+   r.render(canh,cam)};
   window.ss3dCanh={cam,dk,canh,raAnh,tuAnh,B};   // để thử nghiệm
-  // chờ người đứng lễ và "Bạn" nạp xong mới hiện, rồi đợi thêm vài khung cho ảnh ổn định
-  await Promise.all(LE.map(x=>mau(x[0]).catch(()=>{})).concat([mau('ThanhNien').catch(()=>{}),mau('ChiBaBa').catch(()=>{})]));
-  san=true;await new Promise(ok=>setTimeout(ok,600));window.ss3dXong=true}
+  // nạp đủ 9 nhân vật rồi dựng sẵn shader một lần, để lúc đi và lúc NPC xuất hiện không bị khựng
+  const ds=await Promise.all(['ThanhNien','ChiBaBa',...LE.map(x=>x[0]),...NPC].map(t=>mau(t).catch(()=>null)));
+  const tam=new THREE.Group();ds.forEach(gl=>gl&&tam.add(SU.clone(gl.scene)));canh.add(tam);datCamQuanh(B(0,-9));r.compile(canh,cam);canh.remove(tam);
+  san=true;await new Promise(ok=>setTimeout(ok,300));window.ss3dXong=true}
 }

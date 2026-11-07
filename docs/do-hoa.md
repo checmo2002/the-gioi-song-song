@@ -5,7 +5,7 @@
 - **Góc nhìn chéo từ trên xuống (isometric)**, render từ Blender. Chuẩn là ảnh làng tưởng niệm `img/lang/lang-iso.webp`.
 - **Mọi không gian dùng chung một phong cách**: đại sảnh, làng, chính điện, nhà, làng dòng họ. Không gian mới phải đặt cạnh ảnh chuẩn mà không lạc tông.
 - **Nhân vật đất nặn (clay) bán chibi**, tay tròn kiểu găng, màu phẳng sạch, không vằn, không rách. Chủ dự án chốt tháng 11/2026, thay cho nhân vật tả thực cũ.
-- **Đang chuyển dần sang 3D thời gian thực** (hướng 1: camera phối cảnh + nhoè hậu cảnh). Xong: chân núi (`js/26-chan-3d.js`). Còn lại mỗi cảnh một PR: sảnh, hồ, thờ, nhà, điện, làng. Trong lúc chuyển, cảnh chưa làm vẫn là ảnh isometric.
+- **Đang chuyển dần sang 3D thời gian thực** (hướng 1: camera phối cảnh; đã bỏ nhoè hậu cảnh vì nhìn không rõ). Xong: chân núi (`js/26-chan-3d.js`). Còn lại mỗi cảnh một PR: sảnh, hồ, thờ, nhà, điện, làng. Trong lúc chuyển, cảnh chưa làm vẫn là ảnh isometric.
 - Ánh sáng cảnh đổi theo **giờ thực Việt Nam (GMT+7)**: ngày, hoàng hôn, đêm.
 
 ## Bảng màu và chữ
