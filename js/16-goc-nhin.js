@@ -1,9 +1,12 @@
 /* Góc nhìn: mặc định điện thoại lùi xa hơn (thấy rộng đường đi); người dùng tự chỉnh, nhớ theo từng máy */
 (function(){
- var DEF={v:.6,h:1},MIN=.4,MAX=1.6,KEY='ss-zoom',z={};
+ var DEF={v:.6,h:1},MIN=.5,MAX=1.6,KEY='ss-zoom',z={};
  try{z=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
  function get(O){return z[O]||DEF[O]||1}
  window.ssZoomK=get;
+ var Ofn=function(){var h=document.getElementById('hall');return h&&h.clientWidth/Math.max(1,h.clientHeight)<.9?'v':'h'};
+ // camera tự về mặc định (js/26): người xem đã thu nhỏ để nhìn đường thì trả về độ xa mặc định; đang phóng gần thì giữ
+ window.ssZoomVe=function(){var o=Ofn();if(get(o)<(DEF[o]||1)-.001){z[o]=DEF[o];try{localStorage.setItem(KEY,JSON.stringify(z))}catch(e){}dispatchEvent(new Event('resize'))}};
  var hall=document.getElementById('hall');if(!hall)return;
  var O=function(){return hall.clientWidth/Math.max(1,hall.clientHeight)<.9?'v':'h'};
  var raf=0;function apply(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;dispatchEvent(new Event('resize'));ui()})}
