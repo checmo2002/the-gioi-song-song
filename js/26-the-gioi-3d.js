@@ -306,7 +306,7 @@ function khoi(){
   // cảnh đầu trước; sau đó lần lượt: ưu tiên cảnh người dùng đang đứng chờ, rồi theo thứ tự trong CANH
   let dau=true;
   for(;;){const s=canhNay(),ten=s&&!san[s]&&!DL[s]?s:dau?DAU:Object.keys(CANH).find(k=>!DL[k]);if(!ten)break;
-   try{await napCanh(ten);const d=DL[ten],tam=new THREE.Group();ds.forEach(gl=>gl&&tam.add(SU.clone(gl.scene)));d.canh.add(tam);datCamQuanh(B(...CANH[ten].tam));r.compile(d.canh,cam);d.canh.remove(tam);san[ten]=true}
+   try{await napCanh(ten);const d=DL[ten],tam=new THREE.Group();ds.forEach(gl=>gl&&tam.add(SU.clone(gl.scene)));d.canh.add(tam);r.compile(d.canh,cam);   /* không dời camera ở đây: cảnh nạp ngầm xong lúc người dùng đang xem cảnh khác sẽ giật camera về chỗ cũ */d.canh.remove(tam);san[ten]=true}
    catch(e){if(dau)throw e;console.warn('cảnh 3D '+ten+': dùng ảnh tĩnh',e);DL[ten]=DL[ten]||{loi:1};CANH[ten].loi=1}
    if(dau){dau=false;await new Promise(ok=>setTimeout(ok,300));window.ss3dXong=true}}}
 }
