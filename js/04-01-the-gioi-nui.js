@@ -155,7 +155,7 @@
  // ---- bật/tắt theo lối
  function refresh(){var hs=homeScene();if(scene!=='sanh'&&(hs==='tho'&&(scene==='chan'||scene==='dien'))||(hs==='chan'&&scene==='tho')){scene=hs;me.s=hs;hall.dataset.ws=hs;Object.keys(av).forEach(function(k){av[k].el.remove();delete av[k]})}var w=active()&&!hall.hidden;hall.classList.toggle('world-on',w);W.hidden=!w;if(w){if(!av.me)setScene(scene);else layout();sync();send()}}
  window.ssWorld={home:homeScene,refresh:refresh,climb:climb,descend:descend,fade:fade,set:function(s){if(!on()){scene=s;me.s=s;hall.dataset.ws=s;Object.keys(av).forEach(function(k){av[k].el.remove();delete av[k]});refresh();return}setScene(s);refresh()},scene:function(){return scene},on:function(){return on()},sync:function(){sync()},pt:function(x,y){return SC[scene].map?gridNear(x,y):clampFloor(x,y)},pray:function(){var q=SC[scene].pray;return q&&q[O]},send:function(){send()},walk:function(x,y,cb){var g=gridNear(x,y);goTo(g[0],g[1],'dung');pend=cb||null},bow:function(){var b=hall.querySelector('.w-bar [data-w="lay"]');b&&b.click()}};
- window.ssWorld.avs=function(){return av};   // chân núi 3D (js/26-chan-3d.js) đọc vị trí mọi người để vẽ lại
+ window.ssWorld.avs=function(){return av};   // thế giới 3D (js/26-the-gioi-3d.js) đọc vị trí mọi người để vẽ lại
  addEventListener('ss-lit',function(){if(on()&&SC[scene].pray){var pq=SC[scene].pray[O];goTo((av.me||me).x,pq[1],'lay')}});
  new MutationObserver(function(){if(hall.hidden)hall.classList.remove('no-splash');setTimeout(refresh,30)}).observe(hall,{attributes:true,attributeFilter:['hidden']});
  addEventListener('ss-faith',function(){setTimeout(refresh,30)});

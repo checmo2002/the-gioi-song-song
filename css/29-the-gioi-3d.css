@@ -1,4 +1,4 @@
-/* ===== Chân núi 3D (js/26-chan-3d.js): cảnh three.js thay ảnh tĩnh, nút và tên người vẽ theo vị trí 3D ===== */
+/* ===== Thế giới 3D (js/26-the-gioi-3d.js): cảnh three.js thay ảnh tĩnh, nút và tên người vẽ theo vị trí 3D ===== */
 .w3d,.w3d-hot,.w3d-tags{position:absolute;inset:0;display:none}
 .hall.w3d-on .w3d,.hall.w3d-on .w3d-hot,.hall.w3d-on .w3d-tags{display:block}
 .w3d canvas{display:block;width:100%;height:100%;touch-action:none;cursor:pointer}
