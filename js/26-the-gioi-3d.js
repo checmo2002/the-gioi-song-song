@@ -271,7 +271,7 @@ function khoi(){
    canh.add(g.scene,gc.scene);
    if(c.tuong){const gt=await parse(await dem(taiJSON(G+'tuong.json'),ten));gt.scene.traverse(o=>{if(o.isMesh){
     // giữ chất liệu gốc (tượng Phật là kim loại vàng): cho phản chiếu một phòng sáng dịu, không thì kim loại thành màu kem nhạt
-    const laMai=/^SS_Mai/.test(o.name);o.userData.tuong=!laMai;const m=o.material;m.envMap=moiTruong();m.envMapIntensity=laMai?0:.7;cy.push(m);if(m.map)m.map.anisotropy=r.capabilities.getMaxAnisotropy();m.onBeforeCompile=sh=>AGX(sh);if(!laMai)nen.push(o)}});   // mái chính điện: làm mờ khi vào điện, không chặn tia bấmcanh.add(gt.scene)}
+    const laMai=/^SS_Mai/.test(o.name);o.userData.tuong=!laMai;const m=o.material;m.envMap=moiTruong();m.envMapIntensity=laMai?0:.7;cy.push(m);if(m.map)m.map.anisotropy=r.capabilities.getMaxAnisotropy();m.onBeforeCompile=sh=>AGX(sh);if(!laMai)nen.push(o)}});/* mái chính điện: làm mờ khi vào điện, không chặn tia bấm */canh.add(gt.scene)}
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
