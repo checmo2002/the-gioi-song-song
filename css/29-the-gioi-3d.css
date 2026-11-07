@@ -30,3 +30,6 @@
 .w-trans.phim::before,.w-trans.phim::after{content:'';position:absolute;left:0;right:0;height:max(44px,8vh);background:#0d0b09;z-index:1}
 .w-trans.phim::before{top:0}.w-trans.phim::after{bottom:0}
 .w-trans.phim span{position:relative;z-index:2;height:max(44px,8vh);display:flex;align-items:center;font-size:clamp(17px,2.2vw,24px)}
+/* đang chuyển cảnh (phim hoặc màn ảnh cũ): ẩn mọi HUD, thanh điều hướng, nút nổi; lúc màn chuyển mờ dần (.out) thì hiện lại cùng cảnh mới */
+html:has(.hall>.w-trans.on:not(.out)) header.nav,html:has(.hall>.w-trans.on:not(.out)) #mainNav,
+.hall:has(>.w-trans.on:not(.out))>:not(.w-trans){visibility:hidden!important}
