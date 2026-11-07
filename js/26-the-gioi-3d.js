@@ -77,7 +77,18 @@ function khoi(){
   r.setPixelRatio(Math.min(CAM_UNG?1.75:2,devicePixelRatio||1));r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.NoToneMapping;r.toneMappingExposure=1.08;
   // không dùng bóng thời gian thực: nền cỏ dốc, mặt hứng bóng phẳng cắt qua gây vệt đen nhấp nháy; bóng cây đã nướng sẵn trong ảnh nền
   box.appendChild(r.domElement);
-  const NEN=new THREE.Color('#b9cc8c');
+  // không khí tưởng niệm: trời ngà nhạt chuyển sương vàng ấm ở chân trời (thay nền xanh cỏ phẳng), sương dày hơn cho cảnh xa mờ dần
+  const NEN=new THREE.Color('#d8cfb6');
+  const TROI=(()=>{const c=document.createElement('canvas');c.width=4;c.height=256;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,256);
+   g.addColorStop(0,'#c9c3b2');g.addColorStop(.55,'#e6dcc2');g.addColorStop(1,'#d8cfb6');x.fillStyle=g;x.fillRect(0,0,4,256);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t})();
+  // đốm sáng li ti bay lên chậm quanh người chơi, như tàn hương: thế giới bên kia, lặng và ấm
+  const DOM=(()=>{const N=CAM_UNG?45:80,g=new THREE.BufferGeometry(),p=new Float32Array(N*3),a=new Float32Array(N);for(let i=0;i<N;i++){p[i*3]=(Math.random()-.5)*44;p[i*3+1]=Math.random()*12;p[i*3+2]=(Math.random()-.5)*44;a[i]=Math.random()}
+   g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('pha',new THREE.BufferAttribute(a,1));
+   const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),gr=x.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(255,226,160,1)');gr.addColorStop(.18,'rgba(255,190,90,.6)');gr.addColorStop(.5,'rgba(255,150,60,.15)');gr.addColorStop(1,'rgba(255,140,60,0)');x.fillStyle=gr;x.fillRect(0,0,64,64);
+   const m=new THREE.PointsMaterial({map:new THREE.CanvasTexture(c),size:1.1,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.9,fog:true,toneMapped:false});
+   const o=new THREE.Points(g,m);o.frustumCulled=false;o.renderOrder=3;return o})();
+  function bayDom(dt,t){if(GIAM)return;const p=DOM.geometry.attributes.position,a=DOM.geometry.attributes.pha;for(let i=0;i<p.count;i++){let y=p.getY(i)+dt*(.25+.25*a.getX(i));if(y>12)y=0;
+   p.setXYZ(i,p.getX(i)+Math.sin(t*.0004+i)*dt*.15,y,p.getZ(i)+Math.cos(t*.0003+i*1.7)*dt*.15)}p.needsUpdate=true}
   const cam=new THREE.PerspectiveCamera(35,1,1,400);   // near 1 m (camera luôn cách đích ≥ 7 m): bộ đệm sâu mịn hơn 10 lần, các mảnh phẳng cách nhau vài mm không còn sọc nhấp nháy
   const dk=new OrbitControls(cam,r.domElement);dk.enableDamping=!GIAM;dk.dampingFactor=.08;dk.rotateSpeed=.7;dk.enableZoom=false;dk.enablePan=false;
   dk.minPolarAngle=15*Math.PI/180;dk.maxPolarAngle=68*Math.PI/180;
@@ -129,7 +140,7 @@ function khoi(){
   // ---- mỗi cảnh: nền nướng + cây + người lễ cố định
   const DL={};
   async function napCanh(ten){
-   const c=CANH[ten],G=THU(ten),a=anhCua(c),canh=new THREE.Scene();canh.background=NEN;canh.fog=new THREE.Fog(NEN,55,110);
+   const c=CANH[ten],G=THU(ten),a=anhCua(c),canh=new THREE.Scene();canh.background=TROI;canh.fog=new THREE.Fog(NEN,55,110);
    const TAM=B(c.tam[0],c.tam[1]),den=new THREE.DirectionalLight(new THREE.Color(1,.9,.77),3.0);den.position.copy(TAM).addScaledVector(NANG,80);den.target.position.copy(TAM);
    canh.add(den,den.target,new THREE.HemisphereLight(0xfff1dc,0xe8d2b0,4.2));
    const [jc,jcay,anh,tt]=await Promise.all([dem(taiJSON(G+'canh.json'),ten),dem(taiJSON(G+'cay.json'),ten),Promise.all(['nen-2k',anhTo('vat-0'),'vat-1-2k',anhTo('vat-3')].map(t=>dem(taiAnh(G+t+'.webp'),ten))),
@@ -181,7 +192,7 @@ function khoi(){
   const nguoi={};
   function doiCanh(ten){   // sang cảnh khác: bỏ người của cảnh cũ, dời vòng sáng, đặt lại camera quanh "Bạn"
    for(const id in nguoi){const q=nguoi[id];q.q&&boNguoi(q.q);q.tag&&q.tag.remove();delete nguoi[id]}
-   const d=DL[ten];d.canh.add(vongVang,ping);vongVang.visible=false;pingT=9;theo=null;daDat=false;dang=ten;dungNut(ten)
+   const d=DL[ten];d.canh.add(vongVang,ping,DOM);vongVang.visible=false;pingT=9;theo=null;daDat=false;dang=ten;dungNut(ten)
    const g=CANH[ten].goc,h=Math.hypot(DIR.x,DIR.y),t0=Math.atan2(DIR.x/h,-DIR.y/h);   // hướng camera ảnh theo góc phương vị của OrbitControls (atan2(x, z) trong toạ độ three, z = -y Blender)
    dk.minAzimuthAngle=g?t0-g*Math.PI/180:-Infinity;dk.maxAzimuthAngle=g?t0+g*Math.PI/180:Infinity;
    const ng=CANH[ten].nghieng;dk.minPolarAngle=(ng?90-ng:15)*Math.PI/180;dk.maxPolarAngle=(ng?90-ng:g?60:68)*Math.PI/180}
@@ -235,7 +246,8 @@ function khoi(){
     if(!daDat){datCamQuanh(tam2);daDat=true}   // vào cảnh: đặt lại camera quanh "Bạn" (trước đây dòng này lỡ nằm trong chú thích nên camera giữ góc của cảnh trước)
     const k=GIAM?1:1-Math.exp(-dt*3),dv=tam2.clone().sub(dk.target).multiplyScalar(k);dk.target.add(dv);cam.position.add(dv)}
    const v=cam.position.clone().sub(dk.target),R=v.length(),Rm=xa();if(Math.abs(R-Rm)>.01)cam.position.copy(dk.target).addScaledVector(v,(R+(Rm-R)*(GIAM?1:Math.min(1,dt*6)))/R);
-   d.canh.fog.near=Rm+25;d.canh.fog.far=Rm+80;   // sương lùi theo khoảng cách camera
+   d.canh.fog.near=Rm+8;d.canh.fog.far=Rm+75;   // sương lùi theo khoảng cách camera; bắt đầu sát sau người cho cảnh xa mờ dần
+   DOM.position.set(dk.target.x,dk.target.y-2,dk.target.z);bayDom(dt,t);
    dk.update();cam.updateMatrixWorld();   // nhãn tên và nút tính theo camera của khung này, không trễ một nhịp
    for(const id in nguoi){const q=nguoi[id];if(q.tag&&q.wp)nhan(q.tag,q.wp,TO*1.45)}
    if(pingT<1){pingT+=dt/.7;ping.material.opacity=.95*(1-pingT);ping.scale.setScalar(1+pingT*1.2)}else ping.material.opacity=0;
