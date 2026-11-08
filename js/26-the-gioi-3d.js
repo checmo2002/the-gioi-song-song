@@ -170,14 +170,10 @@ function khoi(){
    function mo(){if(ac)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ac=new AC();g=ac.createGain();g.gain.value=0;g.connect(ac.destination);
     const nb=ac.createBuffer(1,ac.sampleRate*3,ac.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
     const ns=(f,q,loai)=>{const s=ac.createBufferSource();s.buffer=nb;s.loop=true;s.playbackRate.value=.9+Math.random()*.2;const b=ac.createBiquadFilter();b.type=loai;b.frequency.value=f;b.Q.value=q;s.connect(b);s.start();return b};
-    // suối róc rách: nước chảy qua đá là hàng trăm bọt khí nhỏ vỡ mỗi giây, mỗi bọt một tiếng "tóc" cao dần rồi tắt rất nhanh
-    // (không phải tiếng xì của nhiễu trắng). Dựng sẵn 6 giây bọt rồi phát lặp hai lớp lệch tốc độ, thêm nền nước trầm thật nhỏ.
-    const R=ac.sampleRate,bb=ac.createBuffer(2,R*6,R);
-    for(let c=0;c<2;c++){const d=bb.getChannelData(c);for(let k=0;k<6*170;k++){const t0=Math.random()*(d.length-R*.2)|0,f0=420*Math.pow(5,Math.random()),tau=.006+Math.random()*.02,A=(.08+Math.random()*.22)*Math.pow(600/f0,.4),n=tau*5*R|0;let ph=0;
-     for(let i=0;i<n;i++){const t=i/R;ph+=2*Math.PI*f0*(1+t/tau*.35)/R;d[t0+i]+=A*Math.sin(ph)*Math.exp(-t/tau)*Math.min(1,i/(R*.0015))}}}
+    // tiếng suối thật (img/am/suoi.mp3: 42 giây cắt từ bản ghi tiengdong.com chủ dự án gửi, đuôi đã hoà vào đầu để lặp liền mạch)
     nuocG=ac.createGain();nuocG.gain.value=0;nuocG.connect(g);
-    for(const tocDo of [1,.87]){const b=ac.createBufferSource();b.buffer=bb;b.loop=true;b.playbackRate.value=tocDo;const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=260;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=5200;b.connect(hp);hp.connect(lp);lp.connect(nuocG);b.start(ac.currentTime+tocDo*.37)}
-    const nen=ns(420,.4,'lowpass'),ng=ac.createGain();ng.gain.value=.18;nen.connect(ng);ng.connect(nuocG);
+    fetch('img/am/suoi.mp3'+BAN).then(q=>q.arrayBuffer()).then(x=>ac.decodeAudioData(x)).then(buf=>{const b=ac.createBufferSource();b.buffer=buf;b.loop=true;
+     b.loopStart=.06;b.loopEnd=buf.duration-.06;b.connect(nuocG);b.start(0,.06)}).catch(()=>{});   // bỏ khoảng lặng đầu/cuối của mp3
     gioG=ac.createGain();gioG.gain.value=.12;ns(320,.7,'bandpass').connect(gioG);gioG.connect(g);const l2=ac.createOscillator(),l2g=ac.createGain();l2.frequency.value=.07;l2g.gain.value=.07;l2.connect(l2g);l2g.connect(gioG.gain);l2.start()}
    function chim(){if(!ac)return;const t=ac.currentTime+.05,pan=ac.createStereoPanner?ac.createStereoPanner():null,o=ac.createGain();o.gain.value=.5;if(pan){pan.pan.value=Math.random()*1.6-.8;o.connect(pan);pan.connect(g)}else o.connect(g);
     const goc=2600+Math.random()*1800,n=2+Math.floor(Math.random()*4);
