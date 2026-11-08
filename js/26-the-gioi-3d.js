@@ -286,7 +286,8 @@ function khoi(){
   function mauCua(id,p){if(id.indexOf('npc-')===0)return NPC[(+id.split('-').pop()||0)%NPC.length];return p.k===1?'ThanhNien':'ChiBaBa'}
 
   // ---- vòng ring vàng dưới chân "Bạn" và vòng chạm đất khi bấm: dời sang cảnh đang xem
-  const vongVang=new THREE.Mesh(new THREE.RingGeometry(.42,.6,48),new THREE.MeshBasicMaterial({color:0xFFD98A,transparent:true,opacity:.85,toneMapped:false,depthWrite:false}));vongVang.rotation.x=-Math.PI/2;vongVang.renderOrder=2;vongVang.visible=false;
+  const vongVang=new THREE.Mesh(new THREE.RingGeometry(.42,.6,48),new THREE.MeshBasicMaterial({color:0xFFD98A,transparent:true,opacity:.85,toneMapped:false,depthWrite:false,depthTest:false}));vongVang.rotation.x=-Math.PI/2;vongVang.renderOrder=9;   // không thử chiều sâu: đứng sát bậc, mép bệ thì vòng không bị mặt đá che nửa chừng
+  vongVang.visible=false;
   const ping=new THREE.Mesh(new THREE.RingGeometry(.3,.42,40),new THREE.MeshBasicMaterial({color:0xFFE7A8,transparent:true,opacity:0,toneMapped:false,depthWrite:false}));ping.rotation.x=-Math.PI/2;ping.renderOrder=2;let pingT=9;
 
   // ---- mỗi cảnh: nền nướng + cây + người lễ cố định
