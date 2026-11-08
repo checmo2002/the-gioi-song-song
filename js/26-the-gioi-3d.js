@@ -27,7 +27,7 @@ const CANH={
  lang:{ten:'làng tưởng niệm',tgt:[0,2],ow:118,tam:[0,2],le:[],lh:null,toc:.42,day:0,xa:55,cao:1},
  ho:{ten:'làng dòng họ',tgt:[0,6],ow:100,tam:[0,6],le:[],lh:null,toc:.42,day:0,xa:50,cao:1,goc:30,nghieng:42,tranh:1},
  nha:{ten:'ngôi nhà',tgt:[0,-1],ow:38,tam:[0,-1],le:[],lh:null,toc:.42,day:0,xa:28,cao:1,goc:40,anh:1},
- dien:{ten:'chính điện',tgt:[0,-2.5],ow:66,tam:[0,-2.5],le:[],lh:null,toc:.42,day:0,xa:32,cao:1,goc:55,tuong:1}};
+ dien:{ten:'chính điện',tgt:[0,-2.5],ow:66,tam:[0,-2.5],le:[],lh:null,toc:.42,day:0,xa:32,cao:1,tuong:1}};   // chùa có mái, tường đủ bốn phía: xoay tự do 360°
 // chùa đỉnh núi (tools/blender/sua-dien-v2.py): độ cao đỉnh, hồ, suối, thác, lư hương, cội bồ đề, bồn hoa, vùng mái chính điện (toạ độ Blender)
 const CHUA={"P":6.0,"ho":[21.0,9.0,5.4,4.2,6.07],"suoi":[[24.6,5.4,6.1],[25.0,1.2,6.1],[24.0,-3.2,6.1],[25.8,-7.8,6.1],[28.2,-12.5,6.1],[30.5,-15.5,5.27]],"thac":[[21.0,13.4,13.2,6.2,2.4],[31.6,-17.0,6.3,0.2,1.6]],"lh":[0,-12,8.1],"bd":[-19.0,5.5,11.0],"hoa":[[-8,-16.6],[8,-16.6],[-16.4,-7],[16.4,-7],[21.0,9.0]],"mai":{"x":[-13.6,13.6],"y":[-6.8,14.2]}};
 const THU=t=>'img/3d/'+t+'/';
@@ -164,6 +164,25 @@ function khoi(){
   const vetGon=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.strokeStyle='rgba(255,255,255,.55)';x.lineWidth=2;
    for(let i=0;i<26;i++){x.beginPath();const cx=Math.random()*256,cy=Math.random()*256,r=8+Math.random()*30;x.ellipse(cx,cy,r,r*.55,0,Math.random()*3,Math.random()*3+2.4);x.stroke()}
    const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t})();
+  // tiếng cảnh chùa (Web Audio, tự tổng hợp): thác và suối to dần khi lại gần, gió qua rừng thông, chim hót lác đác.
+  // Theo mục "Âm thanh không gian" trong Cài đặt (ssAmbient); rời chùa hoặc ẩn trang thì lặng dần.
+  const amChua=(()=>{let ac=null,g,nuocG,gioG,hen=0,songT=0,vi=null;
+   function mo(){if(ac)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ac=new AC();g=ac.createGain();g.gain.value=0;g.connect(ac.destination);
+    const nb=ac.createBuffer(1,ac.sampleRate*3,ac.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+    const ns=(f,q,loai)=>{const s=ac.createBufferSource();s.buffer=nb;s.loop=true;s.playbackRate.value=.9+Math.random()*.2;const b=ac.createBiquadFilter();b.type=loai;b.frequency.value=f;b.Q.value=q;s.connect(b);s.start();return b};
+    nuocG=ac.createGain();nuocG.gain.value=0;const n1=ns(700,.6,'bandpass'),n2=ns(2400,.9,'bandpass'),lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=3200;n1.connect(lp);n2.connect(lp);lp.connect(nuocG);nuocG.connect(g);
+    const lfo=ac.createOscillator(),lg=ac.createGain();lfo.frequency.value=.7;lg.gain.value=.08;lfo.connect(lg);lg.connect(nuocG.gain);lfo.start();
+    gioG=ac.createGain();gioG.gain.value=.12;ns(320,.7,'bandpass').connect(gioG);gioG.connect(g);const l2=ac.createOscillator(),l2g=ac.createGain();l2.frequency.value=.07;l2g.gain.value=.07;l2.connect(l2g);l2g.connect(gioG.gain);l2.start()}
+   function chim(){if(!ac)return;const t=ac.currentTime+.05,pan=ac.createStereoPanner?ac.createStereoPanner():null,o=ac.createGain();o.gain.value=.5;if(pan){pan.pan.value=Math.random()*1.6-.8;o.connect(pan);pan.connect(g)}else o.connect(g);
+    const goc=2600+Math.random()*1800,n=2+Math.floor(Math.random()*4);
+    for(let i=0;i<n;i++){const tt=t+i*(.09+Math.random()*.08),s=ac.createOscillator(),e=ac.createGain(),f=goc*(1+(Math.random()-.5)*.25);s.type='sine';
+     s.frequency.setValueAtTime(f,tt);s.frequency.exponentialRampToValueAtTime(f*(Math.random()<.5?1.35:.7),tt+.07);e.gain.setValueAtTime(0,tt);e.gain.linearRampToValueAtTime(.05,tt+.01);e.gain.exponentialRampToValueAtTime(.0001,tt+.11);
+     s.connect(e);e.connect(o);s.start(tt);s.stop(tt+.13)}}
+   addEventListener('pointerdown',mo,{passive:true});
+   setInterval(()=>{if(!ac)return;const am=window.ssAmbient,bat=performance.now()-songT<700&&!document.hidden&&(!am||am.on()),dich=bat?(am?.25+.75*am.vol():.6):0;
+    g.gain.setTargetAtTime(dich,ac.currentTime,.6);if(bat&&ac.state==='suspended')ac.resume();
+    if(bat&&!GIAM&&performance.now()>hen){chim();hen=performance.now()+2500+Math.random()*6500}},300);
+   return {song(gan){songT=performance.now();if(nuocG)nuocG.gain.setTargetAtTime(.04+.36*Math.max(0,1-gan/28),ac.currentTime,.3)}}})();
   function trangTriDien(d){
    const C=CHUA,P=C.P,cn=[],them=o=>{d.canh.add(o);return o},TB={transparent:true,depthWrite:false,toneMapped:false};
    // mặt hồ: gợn sóng trôi chậm
@@ -195,7 +214,9 @@ function khoi(){
    // mái chính điện (tượng/tuong.json, tên SS_Mai*): mờ khi "Bạn" ở trong điện
    const mai=[];d.canh.traverse(o=>{if(o.isMesh&&/^SS_Mai/.test(o.name)){o.material.transparent=true;mai.push(o)}});let maiK=1;
    const tmp=new V3(),lhP=B(...C.lh),bdP=B(...C.bd);
+   const nuocP=[...C.thac.map(q=>B(q[0],q[1],q[3])),...C.suoi.map(q=>B(...q))];
    d.capNhat=(t,dt)=>{const s=t/1000;
+    if(theo){let gan=1e9;for(const p of nuocP)gan=Math.min(gan,p.distanceTo(theo));amChua.song(gan)}else amChua.song(99)
     // mái: vào trong điện thì mờ hẳn, ra sân thì hiện lại
     const vao=theo&&theo.x>C.mai.x[0]&&theo.x<C.mai.x[1]&&-theo.z>C.mai.y[0]&&-theo.z<C.mai.y[1],dich=vao?0:1;maiK+=(dich-maiK)*Math.min(1,dt*(GIAM?99:3));
     for(const o of mai){o.material.opacity=maiK;o.material.depthWrite=maiK>.98;o.visible=maiK>.02}
