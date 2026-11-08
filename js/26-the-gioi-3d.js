@@ -24,15 +24,15 @@ const CANH={
  chan:{ten:'chân núi',tgt:[3,13],ow:132,tam:[0,-9],lh:[0,-8],toc:.42,day:0,xa:30,
   le:[['BaCu','chap',-1.7,-11.45],['CoAoDai','chap',1.7,-11.45],['OngAoNau','ngoi',0,-12.05],['CuuChienBinh','dung',-3.8,-12.6]]},
  tho:{ten:'nhà thờ',tgt:[2,1.5],ow:42,tam:[2,1.5],le:[],lh:null,toc:.42,day:0,xa:30,cao:1,goc:40},
- lang:{ten:'làng tưởng niệm',tgt:[0,2],ow:118,tam:[0,2],le:[],lh:null,toc:.42,day:0,xa:55,cao:1},
+ lang:{ten:'làng tưởng niệm',tgt:[0,2],ow:118,tam:[0,2],le:[],lh:null,toc:.42,day:0,xa:55,cao:1,tuong:1},
  ho:{ten:'làng dòng họ',tgt:[0,6],ow:100,tam:[0,6],le:[],lh:null,toc:.42,day:0,xa:50,cao:1,goc:30,nghieng:42,tranh:1},
  nha:{ten:'ngôi nhà',tgt:[0,-1],ow:38,tam:[0,-1],le:[],lh:null,toc:.42,day:0,xa:28,cao:1,goc:40,anh:1},
  dien:{ten:'chính điện',tgt:[0,-2.5],ow:66,tam:[0,-2.5],le:[],lh:null,toc:.42,day:0,xa:32,cao:1,tuong:1}};   // chùa có mái, tường đủ bốn phía: xoay tự do 360°
 // chùa đỉnh núi (tools/blender/sua-dien-v2.py): độ cao đỉnh, hồ, suối, thác, lư hương, cội bồ đề, bồn hoa, vùng mái chính điện (toạ độ Blender)
 // cảnh động + tiếng từng nơi (toạ độ Blender; P = độ cao mặt đất). ho: hồ [x,y,bán kính x,y,z]; suoi/thac: nước chảy (chùa);
-// lh: lư hương (khói); la: chỗ lá/hoa rơi [x,y,z] (roi:'dao' cánh đào hồng); hoa: chỗ bướm bay; chim: [bán kính vòng, độ cao]; may: [bán kính, z];
+// thac: [x,y,đỉnh,chân,rộng,góc xoay?]; lh: lư hương (khói); la: chỗ lá/hoa rơi [x,y,z] (roi:'dao' cánh đào hồng); hoa: chỗ bướm bay; chim: [bán kính vòng, độ cao]; may: [bán kính, z];
 // mai: vùng mái chính điện mờ khi vào; amNuoc: độ to tiếng nước khi đứng sát; ngoai: độ to gió + chim (trong nhà nhỏ hơn)
-const TT={"dien":{"P":6.0,"ho":[[21.0,9.0,5.4,4.2,6.07]],"suoi":[[24.6,5.4,6.1],[25.0,1.2,6.1],[24.0,-3.2,6.1],[25.8,-7.8,6.1],[28.2,-12.5,6.1],[30.5,-15.5,5.27]],"thac":[[21.0,13.4,13.2,6.2,2.4],[31.6,-17.0,6.3,0.2,1.6]],"lh":[0,-12,8.1],"hoa":[[-8,-16.6],[8,-16.6],[-16.4,-7],[16.4,-7],[21.0,9.0]],"mai":{"x":[-13.6,13.6],"y":[-6.8,14.2]},"la":[[-19.0,5.5,11.0]],"tam":[0,-2],"chim":[16,11],"may":[36,1],"amNuoc":0.5},"sanh":{"ho":[[0,4,6,6,0.47],[-19,-4,5,3.4,0.12]],"lh":[-10,-6,1.5],"hoa":[[12,-6],[20,0],[14,10],[20,16],[-40,-31],[40,-31],[-12,-31],[12,-31],[-19,-4]],"tam":[0,8],"chim":[22,13],"may":[66,2],"amNuoc":0.2},"chan":{"ho":[[-36,-38,10,7,0.02]],"lh":[0,-8,3.0],"hoa":[[0,-10.6],[-4.6,-24],[4.6,-24],[-4.2,-18],[4.2,-12],[-9.6,-4],[9.6,2],[-36,-38]],"la":[[-11,-21,6.5],[11,-21,6.5]],"tam":[0,-5],"chim":[28,16],"may":[70,2],"amNuoc":0.25},"lang":{"ho":[[14.3,-22.9,8,5.5,0.02]],"hoa":[[28,-13],[22,-20],[34,-8],[14.3,-22.9]],"la":[[28,-13,4.5]],"roi":"dao","tam":[0,2],"chim":[30,15],"may":[75,2],"amNuoc":0.25},"ho":{"ho":[[-22,-24,7,4.2,0.12]],"hoa":[[-22,-24],[-15,-20]],"tam":[0,6],"chim":[26,14],"may":[65,2],"amNuoc":0.2},"tho":{"hoa":[[-8,-15.5],[8,-15.5]],"tam":[2,1.5],"chim":[18,13],"ngoai":0.5},"nha":{"hoa":[[6.5,-12.3],[0,9]],"tam":[0,-1],"chim":[16,12],"ngoai":0.5}};
+const TT={"dien":{"P":6.0,"ho":[[21.0,9.0,5.4,4.2,6.07]],"suoi":[[24.6,5.4,6.1],[25.0,1.2,6.1],[24.0,-3.2,6.1],[25.8,-7.8,6.1],[28.2,-12.5,6.1],[30.5,-15.5,5.27]],"thac":[[21.0,13.4,13.2,6.2,2.4],[31.6,-17.0,6.3,0.2,1.6]],"lh":[0,-12,8.1],"hoa":[[-8,-16.6],[8,-16.6],[-16.4,-7],[16.4,-7],[21.0,9.0]],"mai":{"x":[-13.6,13.6],"y":[-6.8,14.2]},"la":[[-19.0,5.5,11.0]],"tam":[0,-2],"chim":[16,11],"may":[36,1],"amNuoc":0.5},"sanh":{"ho":[[0,4,6,6,0.47],[-19,-4,5,3.4,0.12]],"lh":[-10,-6,1.5],"hoa":[[12,-6],[20,0],[14,10],[20,16],[-40,-31],[40,-31],[-12,-31],[12,-31],[-19,-4]],"tam":[0,8],"chim":[22,13],"may":[66,2],"amNuoc":0.2},"chan":{"ho":[[-36,-38,10,7,0.02]],"lh":[0,-8,3.0],"hoa":[[0,-10.6],[-4.6,-24],[4.6,-24],[-4.2,-18],[4.2,-12],[-9.6,-4],[9.6,2],[-36,-38]],"la":[[-11,-21,6.5],[11,-21,6.5]],"tam":[0,-5],"chim":[28,16],"may":[70,2],"amNuoc":0.25},"lang":{"ho":[[14.3,-22.9,8,5.5,0.02],[36.0,45.5,7.5,5.0,0.07]],"thac":[[38.54,49.33,20.13,0.3,4.8,2.48]],"suoi":[[41.5,43.5,-0.15],[48,37,0.55],[56,30,2.74],[63,20,3.04],[70,8,3.91],[80,-5,7.48]],"hoa":[[28,-13],[22,-8],[34,-18],[24,-19],[14.3,-22.9],[23,23.5],[25.5,21],[36,45.5]],"la":[[28,-13,4.5]],"roi":"dao","tam":[0,4],"chim":[34,16],"may":[80,3],"amNuoc":0.55},"ho":{"ho":[[-22,-24,7,4.2,0.12]],"hoa":[[-22,-24],[-15,-20]],"tam":[0,6],"chim":[26,14],"may":[65,2],"amNuoc":0.2},"tho":{"hoa":[[-8,-15.5],[8,-15.5]],"tam":[2,1.5],"chim":[18,13],"ngoai":0.5},"nha":{"hoa":[[6.5,-12.3],[0,9]],"tam":[0,-1],"chim":[16,12],"ngoai":0.5}};
 const THU=t=>'img/3d/'+t+'/';
 if(hall&&W&&coWebGL)khoi();
 // trình duyệt chưa dùng card đồ hoạ: đang xem ảnh tĩnh, nhắc cách bật để xem 3D (tắt được, nhớ trên máy)
@@ -202,9 +202,10 @@ function khoi(){
    const suoi=[],SU=C.suoi||[];for(let i=0;i+1<SU.length;i++){const a=B(...SU[i]),b=B(...SU[i+1]),L=a.distanceTo(b),m=new THREE.Mesh(new THREE.PlaneGeometry(1.6,L+.4),new THREE.MeshBasicMaterial({...TB,map:vetSoc.clone(),color:0xffffff,opacity:.5}));
     m.material.map.needsUpdate=true;m.material.map.repeat.set(1,L/4);m.position.copy(a).lerp(b,.5);m.position.y+=.04;m.lookAt(b.x,m.position.y,b.z);m.rotateX(-Math.PI/2);them(m);suoi.push(m)}
    // thác: tấm nước dựng đứng trôi xuống + bọt dưới chân
-   const thac=(C.thac||[]).map(([x,y,z1,z0,w])=>{const h=z1-z0,m=them(new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({...TB,map:vetSoc.clone(),color:0xffffff,opacity:.75,side:THREE.DoubleSide})));
-    m.material.map.needsUpdate=true;m.material.map.repeat.set(w/2,h/5);m.position.copy(B(x,y-.35,(z1+z0)/2));
-    const bot=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xffffff,opacity:.7})));bot.position.copy(B(x,y-.8,z0+.4));bot.scale.set(w*1.8,1.2,1);return {m,bot}});
+   const thac=(C.thac||[]).map(([x,y,z1,z0,w,rz])=>{const xoay=rz!=null;   // rz: thác không quay mặt về nam (làng: vách đá đông bắc)
+   const h=z1-z0,m=them(new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({...TB,map:vetSoc.clone(),color:0xffffff,opacity:.75,side:THREE.DoubleSide})));
+    m.material.map.needsUpdate=true;m.material.map.repeat.set(w/2,h/5);m.position.copy(B(x,xoay?y:y-.35,(z1+z0)/2));if(xoay)m.rotation.y=rz;
+    const bot=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xffffff,opacity:.7})));bot.position.copy(B(x,xoay?y:y-.8,z0+.4));bot.scale.set(w*1.8,1.2,1);return {m,bot}});
    // khói hương bay lên từ lư hương giữa sân
    const NK=16,khoi=[];for(let i=0;C.lh&&i<NK;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xf4efe6,opacity:0})));s.userData.t=i/NK;khoi.push(s)}
    // mây trôi quanh chân núi
@@ -253,7 +254,7 @@ function khoi(){
 
   // ---- nạp: glTF nhúng sẵn dữ liệu (JSON + base64, chạy được cả trên bản thử claude.ai)
   const ld=new GLTFLoader();ld.setMeshoptDecoder(MeshoptDecoder);
-  const BAN='?v=2';   // đổi URL một lần: trình duyệt đang giữ canh.json cũ (cache cũ cho phép dùng bản cũ tới 30 ngày)
+  const BAN='?v=3';   // đổi URL một lần: trình duyệt đang giữ canh.json cũ (cache cũ cho phép dùng bản cũ tới 30 ngày)
   async function taiJSON(url){const q=await fetch(url+BAN);if(!q.ok)throw new Error(url+' '+q.status);return q.json()}
   function thanhGLB(j){const b64=j.buffers[0].uri.split(',')[1];delete j.buffers[0].uri;const s=atob(b64),bin=new Uint8Array(s.length);for(let i=0;i<s.length;i++)bin[i]=s.charCodeAt(i);
    const js=new TextEncoder().encode(JSON.stringify(j)),pj=(4-js.length%4)%4,pb=(4-bin.length%4)%4,L=12+8+js.length+pj+8+bin.length+pb;

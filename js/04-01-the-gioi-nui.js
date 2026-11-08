@@ -136,7 +136,8 @@
  hall.addEventListener('click',function(ev){var b=ev.target.closest('[data-w]');if(!b||!on())return;ev.preventDefault();ev.stopPropagation();var w=b.dataset.w;
   if(w==='len')climb();else if(w==='xuong')descend();
   else if(w==='lang')fade('lang','Về làng…');else if(w==='ralang'){var pp=window.ssPerson&&ssPerson.get();if(window.ssHo&&ssHo.from()){var hd2=ssHo.door(ssHo.from());ssHo.from(null);fade('ho','Về làng nhà…',hd2?gridNear(hd2[0],hd2[1]):null)}else{var dd=pp&&doorOf(pp.id);fade('lang','Ra làng…',dd||null)}}else if(w==='venui'){if(homeScene()==='tho')fade('tho','Về nhà thờ…',SC.tho.fromLang);else fade('chan','Về chân núi…',SC.chan.fromLang)}
-  else if(w.indexOf('xom-')===0){window.ssXom&&ssXom(w.slice(4))}
+  else if(w.indexOf('xom-')===0||w.indexOf('khu-')===0){var kz=w.slice(4),gz=scene==='lang'&&SC.lang.gates[kz],mo=function(){kz==='bac'||kz==='vua'?window.ssLichSu&&ssLichSu(kz):window.ssXom&&ssXom(kz)};   // làng chung: đi tới cổng khu rồi mở
+   if(gz){var gg=gridNear(gz[0],gz[1]);goTo(gg[0],gg[1],'dung');pend=mo}else mo()}
   else if(w==='g-phat'||w==='g-cg'){var fa=w.slice(2),dr=gridNear(SC.sanh.door[fa][0],SC.sanh.door[fa][1]),ok=0,go=function(){if(ok)return;ok=1;window.ssChonLoi&&ssChonLoi(fa)};goTo(dr[0],dr[1],'dung');pend=go;setTimeout(function(){if(!ok&&scene==='sanh'){pend=null;go()}},4000)}
   else if(w==='g-tt'){window.ssChonLoi&&ssChonLoi('tt')}
   else if(w==='g-logo'){window.toast&&toast('Đi tới một trong hai cổng để chọn lối vào')}
@@ -147,7 +148,6 @@
   else if(w==='sanh-lang'){var sd=SC.lang.sanhDoor,gs=gridNear(sd[0],sd[1]);goTo(gs[0],gs[1],'dung');pend=function(){window.ssLangMap&&ssLangMap()}}
   else if(w==='dai-ls'){var dd3=SC.lang.daiDoor,gd=gridNear(dd3[0],dd3[1]);goTo(gd[0],gd[1],'chap');pend=function(){if(av.me){av.me.d=4;av.me.faceUp=true}window.ssDai?ssDai():window.toast&&toast('Đài tưởng niệm · Tổ quốc ghi công các anh hùng liệt sĩ')}}
   else if(w==='ao-sen'){var ad=SC.lang.aoDoor,ga=gridNear(ad[0],ad[1]);goTo(ga[0],ga[1],'ngoi');pend=function(){window.toast&&toast('Ao sen · ngồi tĩnh tâm một lát')}}
-  else if(w==='dinh'){window.toast&&toast('Đình làng · nơi cả làng tụ họp ngày giỗ chung')}
   else if(w.indexOf('p:')===0){var pid=w.slice(2),dr=doorOf(pid);if(dr){goTo(dr[0],dr[1],'dung');pend=function(){window.ssVaoNha&&ssVaoNha(pid)}}else window.ssVaoNha&&ssVaoNha(pid)}
   else if(w==='lay'&&SC[scene].lePhat){var lq=SC[scene].lePhat,gq=gridNear(lq[0],lq[1]);goTo(gq[0],gq[1],'lay');if(av.me)av.me.faceUp=true}   // chùa: vái lạy là đến chiếu lễ trước tượng Phật
   else if(w==='chap'||w==='lay'){if(SC[scene].pray){var pp=SC[scene].pray[O];goTo(pp[0]+(Math.random()-.5)*.12,pp[1]+Math.random()*.03,w)}else goTo((av.me||me).x,(av.me||me).y,w);if(av.me){av.me.faceUp=true}}

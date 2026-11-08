@@ -53,7 +53,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `08-icon-bien-hinh.js` | Icon biến hình (morphicons, tải từ jsdelivr) |
 | `09-trang-nguoi-than.js` | Trang Người thân |
 | `10-thap-nhang.js` | Thắp nhang chỉ ở một nơi: chính điện / nhà thờ |
-| `11-lang-tuong-niem.js` | Làng tưởng niệm: chọn xóm → chọn người → vào gian thờ |
+| `11-lang-tuong-niem.js` | Làng tưởng niệm: chọn khu (Liệt sĩ, Thiên thần nhỏ) → chọn người → vào gian thờ |
 | `12-chon-loi.js` | Sảnh chọn lối, đi tới cổng để chọn |
 | `13-hud.js` | HUD bằng biểu tượng |
 | `14-phi-thang.js` | Hiệu ứng phi thăng chuyển cảnh |
@@ -64,6 +64,8 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `19-mot-cho-thap-nhang.js` | Mọi nút thắp đều dẫn về nghi thức trong chính điện |
 | `20-lang-rieng.js` | Làng riêng dựng từ gia phả |
 | `21-ban-do-lang.js` | Bản đồ các khu quanh Sảnh Song Song |
+| `26` · làng chung | Chủ dự án chốt 08/11/2026: bốn khu quanh Sảnh Song Song: **Liệt sĩ** (Đồi Tri Ân, đài tưởng niệm), **Bác Hồ và các tướng** (quảng trường tượng đài đông bắc, tượng đồng tạo bằng Meshy, bia các tướng), **Gia phả các đời vua** (đình cũ thành đền, bia triều đại trên rùa đá), **Thiên thần nhỏ** (vườn hoa, nhà vòm trắng mái hồng). Bỏ Xóm Đồng Đội, Xóm Dòng Họ, Xóm Bình Yên, Đình làng (người thân, dòng họ ở Làng nhà tôi). Quanh làng: đồi, rừng, vách đá có thác lớn đổ xuống hồ sau tượng Bác, suối chảy về đông nam. Dựng bằng `tools/blender/sua-lang-v2.py` (ra lưới đi, cổng khu, vị trí nút, toạ độ nước) |
+| `28-khu-lich-su.js` | Bảng gia phả các đời vua (từng triều, ai là con ai) và Bác Hồ cùng các tướng, lãnh đạo tiêu biểu. Dữ liệu `data/lich-su.js` (`window.SS_LICHSU`) tra từ nguồn công khai, **chờ chủ dự án duyệt**; mục có `chuY` là chỗ các nguồn lệch nhau |
 | `22-nhan-ban-do.js` | Xếp nhãn trên bản đồ, tránh chồng chéo |
 | `23-dai-tuong-niem-liet-si.js` | Đài tưởng niệm liệt sĩ: nhang tri ân, lời tri ân |
 | `24-bay-to.js` | Một nút "Bày tỏ", bấm mới mở 4 cách bày tỏ (chắp tay, thương nhớ, dâng hoa, cầu an) |
