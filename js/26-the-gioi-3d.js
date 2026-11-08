@@ -372,7 +372,9 @@ function khoi(){
     const x=(c1.x+1)/2*Wd,y=(1-c1.y)/2*Hd,pw=Math.abs(c2.x-c1.x)/2*Wd,ph=Math.abs(c3.y-c1.y)/2*Hd;
     el.style.left=(x-pw/2).toFixed(1)+'px';el.style.top=(y-ph).toFixed(1)+'px';el.style.width=pw.toFixed(1)+'px';el.style.height=ph.toFixed(1)+'px';el.style.zIndex=Math.round((1-c1.z)*1e5)}}   // nhà gần che nhà xa ở mọi góc xoay
   let truoc=performance.now();
-  ve=function(ten){const t=performance.now(),dt=Math.min(.05,(t-truoc)/1000);truoc=t;if(dang!==ten||anDi){anDi=false;doiCanh(ten)}
+  // máy yếu (trình duyệt vẽ bằng CPU, điện thoại cũ): khung hình chậm kéo dài thì hạ dần độ phân giải vẽ, thấp nhất 0.5. Vừa vào cảnh chờ 2.5 s cho nạp xong
+  let khTB=16,haT=0;function hieuNang(ms,t){if(ms>500)return;khTB+=(ms-khTB)*.05;const pr=r.getPixelRatio();if(khTB>40&&pr>.5&&t-haT>2500){haT=t;r.setPixelRatio(Math.max(.5,pr*.8));khTB=30}}
+  ve=function(ten){const t=performance.now(),ms=t-truoc,dt=Math.min(.05,ms/1000);truoc=t;if(dang!==ten||anDi){anDi=false;doiCanh(ten);haT=t}else hieuNang(ms,t);
    const d=DL[ten],w=window.ssWorld,av=w.avs?w.avs():{},thay={};
    co();if(d.nutO!==ori())dungNut(ten);
    for(const id in av){const p=av[id];thay[id]=1;const m0=mauCua(id,p);let q=nguoi[id];
