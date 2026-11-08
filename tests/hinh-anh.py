@@ -63,7 +63,7 @@ with sync_playwright() as p:
             elif cach.startswith('#'):
                 # trang mục mở đè lên thế giới; ẩn thế giới để chụp riêng trang
                 pg.evaluate(f"location.hash='{cach[1:]}'"); pg.wait_for_timeout(1200)
-                pg.evaluate("['gate','hall','world'].forEach(i=>{const e=document.getElementById(i);if(e)e.hidden=true});scrollTo(0,0)")
+                pg.evaluate("['gate','hall','world'].forEach(i=>{const e=document.getElementById(i);if(e)e.hidden=true});document.documentElement.classList.remove('hall-on');scrollTo(0,0)")  # như ssHall.close() khi bấm sang trang
                 pg.wait_for_timeout(600)
             pg.wait_for_timeout(300)        # cho ảnh nền tải xong
             pg.evaluate("Promise.all([...document.images].map(i=>i.complete||new Promise(r=>{i.onload=i.onerror=r})))")
