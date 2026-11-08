@@ -83,7 +83,8 @@
  function los(a,b){var g=SC[scene].grid,n=Math.ceil(Math.hypot((b[0]-a[0])*g.w,(b[1]-a[1])*g.h)*2)+1;for(var i=0;i<=n;i++){var u=i/n;if(!walk(Math.floor((a[0]+(b[0]-a[0])*u)*g.w),Math.floor((a[1]+(b[1]-a[1])*u)*g.h)))return false}return true}
  function pathTo(x0,y0,x1,y1){var g=SC[scene].grid,W=g.w,Hh=g.h,s0=cellOf(x0,y0),t=cellOf(x1,y1),S=s0[1]*W+s0[0],T=t[1]*W+t[0],prev=new Int32Array(W*Hh).fill(-1),q=[S],h=0;prev[S]=S;
   var D=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];while(h<q.length){var c=q[h++];if(c===T)break;var cx=c%W,cy=(c/W)|0;for(var k=0;k<8;k++){var nx=cx+D[k][0],ny=cy+D[k][1];if(!walk(nx,ny))continue;if(k>3&&(!walk(cx+D[k][0],cy)||!walk(cx,cy+D[k][1])))continue;var ni=ny*W+nx;if(prev[ni]<0){prev[ni]=c;q.push(ni)}}}
-  var end=[x1,y1];if(prev[T]<0)return [end];var pts=[],c=T;while(c!==S){pts.push([(c%W+.5)/W,(((c/W)|0)+.5)/Hh]);c=prev[c]}pts.reverse();pts[pts.length-1]=end;
+  var end=[x1,y1];if(prev[T]<0){var bd=1e9;for(var k2=0;k2<q.length;k2++){var c2=q[k2],d2=Math.pow(c2%W-t[0],2)+Math.pow(((c2/W)|0)-t[1],2);if(d2<bd){bd=d2;T=c2}}end=[(T%W+.5)/W,(((T/W)|0)+.5)/Hh]}   // đích không tới được (bấm ra cỏ, mái, vùng rời): đi tới ô gần đích nhất trong vùng đang đứng, không đi thẳng xuyên địa hình
+  if(T===S)return [end];var pts=[],c=T;while(c!==S){pts.push([(c%W+.5)/W,(((c/W)|0)+.5)/Hh]);c=prev[c]}pts.reverse();pts[pts.length-1]=end;
   var out=[],cur=[x0,y0],i=0;while(i<pts.length){var j=pts.length-1;while(j>i&&!los(cur,pts[j]))j--;out.push(pts[j]);cur=pts[j];i=j+1}return out}
  // ---- nhân vật
  function mk(id,isMe){var el=document.createElement('div');el.className='wa arrive'+(isMe?' me':'');el.innerHTML='<span class="wa-sh"></span><span class="wa-spr"></span><span class="wa-tag"></span>';fl.appendChild(el);setTimeout(function(){el.classList.remove('arrive')},900);
