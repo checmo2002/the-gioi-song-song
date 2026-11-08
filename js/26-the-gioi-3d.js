@@ -68,7 +68,7 @@ function khoi(){
    import('three/addons/utils/SkeletonUtils.js'),import('three/addons/environments/RoomEnvironment.js')]));
   const V3=THREE.Vector3;
   // toạ độ Blender (x, y, z lên) -> three (x, z, -y)
-  const B=(x,y,z=0)=>new V3(x,z,-y);
+  const B=(x,y,z=0)=>new V3(x,z,-y),dB=(v,x,y,z)=>v.set(x,z,-y);   // dB: ghi vào vector có sẵn, khỏi tạo mới mỗi khung
   const EL=42*Math.PI/180,AZ=-38*Math.PI/180,DIR=new V3(Math.sin(AZ)*Math.cos(EL),-Math.cos(AZ)*Math.cos(EL),Math.sin(EL));
   const FW=DIR.clone().negate(),RI=new V3().crossVectors(FW,new V3(0,0,1)).normalize(),UP=new V3().crossVectors(RI,FW).normalize();
   function anhCua(c){   // đổi toạ độ ảnh iso (0..1) <-> Blender theo camera ảnh của cảnh
@@ -201,21 +201,20 @@ function khoi(){
     m.material.map.needsUpdate=true;m.material.map.repeat.set(w/2,h/5);m.position.copy(B(x,y-.35,(z1+z0)/2));
     const bot=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xffffff,opacity:.7})));bot.position.copy(B(x,y-.8,z0+.4));bot.scale.set(w*1.8,1.2,1);return {m,bot}});
    // khói hương bay lên từ lư hương giữa sân
-   const khoi=[];for(let i=0;C.lh&&i<16;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xf4efe6,opacity:0})));s.userData.t=i/16;khoi.push(s)}
+   const NK=CAM_UNG?10:16,khoi=[];for(let i=0;C.lh&&i<NK;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xf4efe6,opacity:0})));s.userData.t=i/NK;khoi.push(s)}
    // mây trôi quanh chân núi
-   const may=[];for(let i=0;C.may&&i<12;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({map:vetTron,color:0xffffff,transparent:true,depthWrite:false,opacity:.5,fog:true})));
-    const a=i/12*6.283+Math.random()*.3,r=C.may[0]+Math.random()*12;s.userData={a,r,z:C.may[1]+Math.random()*3,v:(Math.random()<.5?-1:1)*(.006+Math.random()*.006)};s.scale.set(18+Math.random()*10,7+Math.random()*3,1);may.push(s)}
+   const NM=CAM_UNG?6:12,may=[];for(let i=0;C.may&&i<NM;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({map:vetTron,color:0xffffff,transparent:true,depthWrite:false,opacity:.5,fog:true})));
+    const a=i/NM*6.283+Math.random()*.3,r=C.may[0]+Math.random()*12;s.userData={a,r,z:C.may[1]+Math.random()*3,v:(Math.random()<.5?-1:1)*(.006+Math.random()*.006)};s.scale.set(18+Math.random()*10,7+Math.random()*3,1);may.push(s)}
    // cò trắng bay vòng trên đỉnh núi: thân + hai cánh vỗ chậm
    const trang=new THREE.MeshLambertMaterial({color:0xfbfaf6,side:THREE.DoubleSide});d.cy.push(trang);
    const canhG=new THREE.BufferGeometry();canhG.setAttribute('position',new THREE.Float32BufferAttribute([0,0,-.25,0,0,.3,1.25,0,.05],3));canhG.computeVertexNormals();
-   const co=[],[tx,ty]=C.tam,[cr,chh]=C.chim||[0,0];for(let i=0;C.chim&&i<7;i++){const g=new THREE.Group(),than=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),trang);than.scale.set(1,.8,2.4);
-    const mo=new THREE.Mesh(new THREE.ConeGeometry(.05,.5,6),new THREE.MeshLambertMaterial({color:0xe3b150}));mo.rotation.x=Math.PI/2;mo.position.z=.7;
-    const t1=new THREE.Mesh(canhG,trang),t2=new THREE.Mesh(canhG,trang);t2.scale.x=-1;g.add(than,mo,t1,t2);g.userData={t1,t2,r:cr+i*3.2,a:i*.9,h:P+chh+(i%3)*2.2,v:.05+(i%4)*.012,p:Math.random()*6};them(g);co.push(g)}
+   const co=[],[tx,ty]=C.tam,[cr,chh]=C.chim||[0,0];for(let i=0;C.chim&&i<(CAM_UNG?4:6);i++){const g=new THREE.Group(),than=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),trang);than.scale.set(1,.8,2.4);
+    const t1=new THREE.Mesh(canhG,trang),t2=new THREE.Mesh(canhG,trang);t2.scale.x=-1;g.add(than,t1,t2);g.userData={t1,t2,r:cr+i*3.2,a:i*.9,h:P+chh+(i%3)*2.2,v:.05+(i%4)*.012,p:Math.random()*6};them(g);co.push(g)}
    // bướm quanh bồn hoa và hồ sen
-   const buom=[];(C.hoa||[]).forEach(([x,y],k)=>{for(let j=0;j<2;j++){const mau=[0xffd27a,0xf6a6bf,0xffffff,0xb8d8ff][(k+j)%4],m=new THREE.MeshBasicMaterial({color:mau,side:THREE.DoubleSide,toneMapped:false}),g=new THREE.Group();
-    const w1=new THREE.Mesh(new THREE.PlaneGeometry(.22,.16),m),w2=w1.clone();w1.position.x=.11;w2.position.x=-.11;g.add(w1,w2);g.userData={w1,w2,x,y,p:Math.random()*6,v:.6+Math.random()*.5};them(g);buom.push(g)}});
+   const bG=new THREE.PlaneGeometry(.44,.16),bM=[0xffd27a,0xf6a6bf,0xffffff,0xb8d8ff].map(c=>new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide,toneMapped:false}));
+   const buom=[];(C.hoa||[]).forEach(([x,y],k)=>{for(let j=0;j<(CAM_UNG?1:2);j++){const g=them(new THREE.Mesh(bG,bM[(k+j)%4]));g.userData={x,y,p:Math.random()*6,v:.6+Math.random()*.5};buom.push(g)}});
    // lá bồ đề rơi
-   const la=[],LA=(C.la||[]).map(q=>B(...q)),dao=C.roi==='dao';for(let i=0;i<12*LA.length;i++){const m=them(new THREE.Mesh(new THREE.PlaneGeometry(dao?.14:.22,dao?.14:.3),new THREE.MeshBasicMaterial({color:dao?(i%2?0xf6b8c8:0xfbd9e1):i%3?0x9cbf62:0xe3c35a,side:THREE.DoubleSide})));m.userData={t:Math.random(),o:LA[i%LA.length]};la.push(m)}
+   const la=[],LA=(C.la||[]).map(q=>B(...q)),dao=C.roi==='dao';for(let i=0;i<(CAM_UNG?6:10)*LA.length;i++){const m=them(new THREE.Mesh(new THREE.PlaneGeometry(dao?.14:.22,dao?.14:.3),new THREE.MeshBasicMaterial({color:dao?(i%2?0xf6b8c8:0xfbd9e1):i%3?0x9cbf62:0xe3c35a,side:THREE.DoubleSide})));m.userData={t:Math.random(),o:LA[i%LA.length]};la.push(m)}
    // mái chính điện (tượng/tuong.json, tên SS_Mai*): mờ khi "Bạn" ở trong điện
    const mai=[];d.canh.traverse(o=>{if(o.isMesh&&/^SS_Mai/.test(o.name)){o.material.transparent=true;mai.push(o)}});let maiK=1;
    const tmp=new V3(),lhP=C.lh?B(...C.lh):null;
@@ -229,11 +228,11 @@ function khoi(){
     if(GIAM)return;
     vetGon.offset.set(s*.012,s*.008);for(const m of suoi)m.material.map.offset.y=-s*.35;for(const q of thac){q.m.material.map.offset.y=s*.9;q.bot.material.opacity=.55+.2*Math.sin(s*3)}
     for(const k of khoi){const u=(k.userData.t+s*.07)%1;k.position.set(lhP.x+Math.sin(u*9+k.id)*.5*u,lhP.y+u*7,lhP.z+Math.cos(u*7+k.id)*.4*u);k.scale.setScalar(.5+u*2.6);k.material.opacity=.32*Math.sin(Math.PI*u)}
-    for(const m of may){const u=m.userData;u.a+=u.v*dt;m.position.copy(B(tx+Math.cos(u.a)*u.r*1.15,ty+Math.sin(u.a)*u.r,u.z));m.material.opacity=.42+.12*Math.sin(s*.3+u.a)}
-    for(const g of co){const u=g.userData;u.a+=u.v*dt;const x=tx+Math.cos(u.a)*u.r,y=ty+Math.sin(u.a)*u.r*.8;g.position.copy(B(x,y,u.h+Math.sin(s*.4+u.p)*.8));g.visible=g.position.distanceTo(cam.position)>14;   // bay sát ống kính trông to bè: ẩn
+    for(const m of may){const u=m.userData;u.a+=u.v*dt;dB(m.position,tx+Math.cos(u.a)*u.r*1.15,ty+Math.sin(u.a)*u.r,u.z);m.material.opacity=.42+.12*Math.sin(s*.3+u.a)}
+    for(const g of co){const u=g.userData;u.a+=u.v*dt;const x=tx+Math.cos(u.a)*u.r,y=ty+Math.sin(u.a)*u.r*.8;dB(g.position,x,y,u.h+Math.sin(s*.4+u.p)*.8);g.visible=g.position.distanceTo(cam.position)>14;   // bay sát ống kính trông to bè: ẩn
 
-     tmp.copy(B(tx+Math.cos(u.a+.05)*u.r,ty+Math.sin(u.a+.05)*u.r*.8,u.h));g.lookAt(tmp.x,g.position.y,tmp.z);const v=Math.sin(s*2.6+u.p)*.55;u.t1.rotation.z=v;u.t2.rotation.z=-v;g.rotation.z=-.15}
-    for(const g of buom){const u=g.userData,a=s*u.v+u.p;g.position.copy(B(u.x+Math.cos(a)*1.3+Math.sin(a*2.3)*.4,u.y+Math.sin(a*1.3)*1.1,P+.9+Math.sin(a*3)*.35));g.rotation.y=a;const v=Math.sin(s*14+u.p)*1.1;u.w1.rotation.y=v;u.w2.rotation.y=-v}
+     dB(tmp,tx+Math.cos(u.a+.05)*u.r,ty+Math.sin(u.a+.05)*u.r*.8,u.h);g.lookAt(tmp.x,g.position.y,tmp.z);const v=Math.sin(s*2.6+u.p)*.55;u.t1.rotation.z=v;u.t2.rotation.z=-v;g.rotation.z=-.15}
+    for(const g of buom){const u=g.userData,a=s*u.v+u.p;dB(g.position,u.x+Math.cos(a)*1.3+Math.sin(a*2.3)*.4,u.y+Math.sin(a*1.3)*1.1,P+.9+Math.sin(a*3)*.35);g.rotation.y=a;g.scale.x=.2+.8*Math.abs(Math.cos(s*14+u.p))}
     for(const m of la){const u=m.userData,o=u.o;u.t=(u.t+dt*.07)%1;m.position.set(o.x+Math.sin(m.id*7.1)*3.4+Math.sin(u.t*9+m.id)*.6,o.y+2.5-u.t*(o.y+2.4-P),o.z+Math.cos(m.id*3.3)*3+Math.cos(u.t*7)*.5);m.rotation.set(u.t*9,u.t*6+m.id,0)}}}
   // ---- phi thăng khi chọn lối (thay hoạt ảnh 2D cũ): cột sáng hạ xuống chỗ "Bạn", người bay lên tan vào ánh sáng, màn chuyển ngà nối tiếp
   let nangMe=null;
