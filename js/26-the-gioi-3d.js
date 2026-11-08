@@ -436,7 +436,7 @@ function khoi(){
      if(n<it){it=n;K=k}if(!n)break}
     r.setRenderTarget(null);r.setClearColor(mx0,1);d.canh.overrideMaterial=null;d.canh.background=nen0;q.rig.visible=q.bo.visible=true;RT.dispose();MD.dispose()}
    function xongPhim(){boNguoi(q);for(const id in nguoi){const x=nguoi[id].q;if(x)x.rig.visible=x.bo.visible=true}
-    box.appendChild(r.domElement);r.domElement.style.opacity='';cw=-1;anDi=true;phim=null;xong();setTimeout(()=>tr.classList.remove('pu-chay','pu-dong'),1000)}
+    box.appendChild(r.domElement);r.domElement.style.opacity='';cw=-1;anDi=true;phim=null;daDat=false;raT=0;xong();/* máy quay của phim (thấp, sát người) không được ở lại: đặt lại góc chuẩn quanh "Bạn" dù cảnh đã đổi trước khi phim chạy */setTimeout(()=>tr.classList.remove('pu-chay','pu-dong'),1000)}
    phim={buoc(){const now=performance.now(),dt=Math.min(.05,(now-t0)/1000);t0=now;t+=dt;
     if(!daTen){daTen=true;const ten=((tr.querySelector('span')||{}).textContent||'').replace(/…$/,''),b=ui.querySelector('.pu-ten');b.textContent='';   // 04-01 đặt chữ sau khi phim nhận chiếu
      [...ten].forEach((ch,i)=>{const e=document.createElement('i');e.textContent=ch;e.style.setProperty('--i',i);b.appendChild(e)});ui.querySelector('.pu-nho').textContent=ten}
