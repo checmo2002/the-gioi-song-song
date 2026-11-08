@@ -51,14 +51,14 @@ with sync_playwright() as p:
                            "try{localStorage.clear()}catch(e){}")
         pg.clock.set_fixed_time(GIO)   # chỉ đóng băng giờ hiển thị, hẹn giờ và hoạt ảnh vẫn chạy
         pg.goto(url)
-        pg.wait_for_function("!document.getElementById('loader')", timeout=30000)  # qua màn chờ
+        pg.wait_for_function("!document.getElementById('loader')", timeout=300000)  # qua màn chờ (chỉ còn 3D: máy kiểm tra vẽ bằng CPU, nạp lâu)
         pg.wait_for_timeout(1500)
         pg.evaluate('document.fonts.ready')
         for ten, cach in MAN:
             if ten == 'the-gioi':
                 pg.click('.sanh-tip [data-sp="g-phat"]')  # đúng nút người dùng bấm
                 # nhân vật đi tới cổng rồi phi thăng sang cảnh khác
-                pg.wait_for_function("(document.getElementById('hall').dataset.ws||'sanh')!=='sanh'", timeout=30000)
+                pg.wait_for_function("(document.getElementById('hall').dataset.ws||'sanh')!=='sanh'", timeout=180000)
                 pg.wait_for_timeout(2500)
             elif cach.startswith('#'):
                 # trang mục mở đè lên thế giới; ẩn thế giới để chụp riêng trang
