@@ -219,6 +219,33 @@ while n < 230 and tries < 5000:
     (thong if random.random() < .45 else cay_tron)(x, y, z - .1, random.uniform(.9, 1.5)); n += 1
 print('RUNG', n)
 
+# ---- 6a. bệ đá đen như tượng đài Bác trước UBND TP.HCM: mặt trước khắc "CHỦ TỊCH HỒ CHÍ MINH" và "(1890 - 1969)", phiến đồng dưới chân tượng.
+# Xuất riêng (SS_) cho chữ sắc nét (nướng vào ảnh đồ nhỏ thì chữ nhoè); vỏ bệ trùm kín bệ trắng cũ nên không phải nướng lại.
+DEN_B, CHU_V, DONG_B = mat('daDenBong', '1A1A1C'), mat('chuKhac', 'E9DDB4'), mat('dongBe', 'A8743A')
+for m_, r_ in ((DEN_B, .32), (CHU_V, .5), (DONG_B, .4)):
+    b_ = next(n for n in m_.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'); b_.inputs['Roughness'].default_value = r_
+    if m_ is DONG_B: b_.inputs['Metallic'].default_value = .6
+BW, BH = 3.8, 3.3; ZBE = .66 + BH
+hop('SS_BeBac', DEN_B, (BX, BY, .66 + BH / 2), (BW, BW, BH), HUONG)
+hop('SS_BeBac', DEN_B, (BX, BY, .66 + .12), (BW + .3, BW + .3, .24), HUONG)
+hop('SS_BeBac', DONG_B, (BX, BY, ZBE + .08), (2.6, 2.6, .16), HUONG)
+FONT = None
+for f_ in (r'C:\Windows\Fonts\timesbd.ttf', r'C:\Windows\Fonts\times.ttf'):
+    if os.path.exists(f_): FONT = bpy.data.fonts.load(f_); break
+def khac(chu, z, cao_chu):
+    cu = bpy.data.curves.new('chu', 'FONT'); cu.body = chu; cu.align_x = 'CENTER'; cu.align_y = 'CENTER'; cu.extrude = .015; cu.size = cao_chu
+    if FONT: cu.font = FONT
+    t = bpy.data.objects.new('chu', cu); col.objects.link(t); bpy.context.view_layer.update()
+    me = bpy.data.meshes.new_from_object(t.evaluated_get(bpy.context.evaluated_depsgraph_get())); bpy.data.objects.remove(t); bpy.data.curves.remove(cu)
+    rong = max(v.co.x for v in me.vertices) - min(v.co.x for v in me.vertices)
+    if rong > BW * .86:
+        for v in me.vertices: v.co *= BW * .86 / rong
+    me.materials.append(CHU_V); o_ = bpy.data.objects.new('SS_ChuBac', me); col.objects.link(o_)
+    d_ = Vector((math.cos(HUONG), math.sin(HUONG), 0)); p_ = Vector((BX, BY, z)) + d_ * (BW / 2 + .012)
+    o_.location = p_; o_.rotation_euler = (math.pi / 2, 0, HUONG + math.pi / 2); return o_
+khac('CHỦ TỊCH HỒ CHÍ MINH', .66 + BH * .66, .38)
+khac('(1890 - 1969)', .66 + BH * .46, .3)
+
 # ---- 6. tượng Bác (Meshy, phong cách tượng đồng) đặt lên bệ, quay về sảnh
 if TUONG and os.path.exists(TUONG):
     with bpy.data.libraries.load(TUONG, link=False) as (src, dst): dst.objects = [x for x in src.objects if x.startswith('SS_TuongBac')]
@@ -226,10 +253,10 @@ if TUONG and os.path.exists(TUONG):
         if o is None: continue
         col.objects.link(o); o.parent = None; o.rotation_euler.z = HUONG + math.pi / 2   # mẫu Meshy nhìn về -Y: xoay cho nhìn về sảnh
         bpy.context.view_layer.update(); bb = [o.matrix_world @ Vector(b) for b in o.bound_box]
-        h = max(p.z for p in bb) - min(p.z for p in bb); k = 3.3 / h; o.scale = (o.scale.x * k, o.scale.y * k, o.scale.z * k)
+        h = max(p.z for p in bb) - min(p.z for p in bb); k = 4.2 / h; o.scale = (o.scale.x * k, o.scale.y * k, o.scale.z * k)
         bpy.context.view_layer.update(); bb = [o.matrix_world @ Vector(b) for b in o.bound_box]
         cx, cy, z0 = sum(p.x for p in bb) / 8, sum(p.y for p in bb) / 8, min(p.z for p in bb)
-        o.location += Vector((BX - cx, BY - cy, .66 + 2.51 - z0)); o.name = 'SS_TuongBac'
+        o.location += Vector((BX - cx, BY - cy, ZBE + .16 - z0)); o.name = 'SS_TuongBac'
         print('TUONG', o.name, round(h, 2))
 
 # ---- 7. lưới đi 144x96 theo ảnh iso (camera giữ nguyên ảnh cũ) + vị trí nút
