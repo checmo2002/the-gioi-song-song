@@ -29,7 +29,10 @@ const CANH={
  nha:{ten:'ngôi nhà',tgt:[0,-1],ow:38,tam:[0,-1],le:[],lh:null,toc:.42,day:0,xa:28,cao:1,goc:40,anh:1},
  dien:{ten:'chính điện',tgt:[0,-2.5],ow:66,tam:[0,-2.5],le:[],lh:null,toc:.42,day:0,xa:32,cao:1,tuong:1}};   // chùa có mái, tường đủ bốn phía: xoay tự do 360°
 // chùa đỉnh núi (tools/blender/sua-dien-v2.py): độ cao đỉnh, hồ, suối, thác, lư hương, cội bồ đề, bồn hoa, vùng mái chính điện (toạ độ Blender)
-const CHUA={"P":6.0,"ho":[21.0,9.0,5.4,4.2,6.07],"suoi":[[24.6,5.4,6.1],[25.0,1.2,6.1],[24.0,-3.2,6.1],[25.8,-7.8,6.1],[28.2,-12.5,6.1],[30.5,-15.5,5.27]],"thac":[[21.0,13.4,13.2,6.2,2.4],[31.6,-17.0,6.3,0.2,1.6]],"lh":[0,-12,8.1],"bd":[-19.0,5.5,11.0],"hoa":[[-8,-16.6],[8,-16.6],[-16.4,-7],[16.4,-7],[21.0,9.0]],"mai":{"x":[-13.6,13.6],"y":[-6.8,14.2]}};
+// cảnh động + tiếng từng nơi (toạ độ Blender; P = độ cao mặt đất). ho: hồ [x,y,bán kính x,y,z]; suoi/thac: nước chảy (chùa);
+// lh: lư hương (khói); la: chỗ lá/hoa rơi [x,y,z] (roi:'dao' cánh đào hồng); hoa: chỗ bướm bay; chim: [bán kính vòng, độ cao]; may: [bán kính, z];
+// mai: vùng mái chính điện mờ khi vào; amNuoc: độ to tiếng nước khi đứng sát; ngoai: độ to gió + chim (trong nhà nhỏ hơn)
+const TT={"dien":{"P":6.0,"ho":[[21.0,9.0,5.4,4.2,6.07]],"suoi":[[24.6,5.4,6.1],[25.0,1.2,6.1],[24.0,-3.2,6.1],[25.8,-7.8,6.1],[28.2,-12.5,6.1],[30.5,-15.5,5.27]],"thac":[[21.0,13.4,13.2,6.2,2.4],[31.6,-17.0,6.3,0.2,1.6]],"lh":[0,-12,8.1],"hoa":[[-8,-16.6],[8,-16.6],[-16.4,-7],[16.4,-7],[21.0,9.0]],"mai":{"x":[-13.6,13.6],"y":[-6.8,14.2]},"la":[[-19.0,5.5,11.0]],"tam":[0,-2],"chim":[16,11],"may":[36,1],"amNuoc":0.5},"sanh":{"ho":[[0,4,6,6,0.47],[-19,-4,5,3.4,0.12]],"lh":[-10,-6,1.5],"hoa":[[12,-6],[20,0],[14,10],[20,16],[-40,-31],[40,-31],[-12,-31],[12,-31],[-19,-4]],"tam":[0,8],"chim":[22,13],"may":[66,2],"amNuoc":0.2},"chan":{"ho":[[-36,-38,10,7,0.02]],"lh":[0,-8,3.0],"hoa":[[0,-10.6],[-4.6,-24],[4.6,-24],[-4.2,-18],[4.2,-12],[-9.6,-4],[9.6,2],[-36,-38]],"la":[[-11,-21,6.5],[11,-21,6.5]],"tam":[0,-5],"chim":[28,16],"may":[70,2],"amNuoc":0.25},"lang":{"ho":[[14.3,-22.9,8,5.5,0.02]],"hoa":[[28,-13],[22,-20],[34,-8],[14.3,-22.9]],"la":[[28,-13,4.5]],"roi":"dao","tam":[0,2],"chim":[30,15],"may":[75,2],"amNuoc":0.25},"ho":{"ho":[[-22,-24,7,4.2,0.12]],"hoa":[[-22,-24],[-15,-20]],"tam":[0,6],"chim":[26,14],"may":[65,2],"amNuoc":0.2},"tho":{"hoa":[[-8,-15.5],[8,-15.5]],"tam":[2,1.5],"chim":[18,13],"ngoai":0.5},"nha":{"hoa":[[6.5,-12.3],[0,9]],"tam":[0,-1],"chim":[16,12],"ngoai":0.5}};
 const THU=t=>'img/3d/'+t+'/';
 if(hall&&W&&coWebGL)khoi();
 
@@ -164,9 +167,9 @@ function khoi(){
   const vetGon=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.strokeStyle='rgba(255,255,255,.55)';x.lineWidth=2;
    for(let i=0;i<26;i++){x.beginPath();const cx=Math.random()*256,cy=Math.random()*256,r=8+Math.random()*30;x.ellipse(cx,cy,r,r*.55,0,Math.random()*3,Math.random()*3+2.4);x.stroke()}
    const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t})();
-  // tiếng cảnh chùa (Web Audio, tự tổng hợp): thác và suối to dần khi lại gần, gió qua rừng thông, chim hót lác đác.
-  // Theo mục "Âm thanh không gian" trong Cài đặt (ssAmbient); rời chùa hoặc ẩn trang thì lặng dần.
-  const amChua=(()=>{let ac=null,g,nuocG,gioG,hen=0,songT=0,vi=null;
+  // tiếng cảnh mọi nơi: nước (bản ghi suối) to dần khi lại gần hồ / suối / thác, gió, chim hót lác đác.
+  // Theo mục "Âm thanh không gian" trong Cài đặt (ssAmbient); rời cảnh 3D hoặc ẩn trang thì lặng dần.
+  const amCanh=(()=>{let ac=null,g,nuocG,gioG,hen=0,songT=0,vi=null;
    function mo(){if(ac)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ac=new AC();g=ac.createGain();g.gain.value=0;g.connect(ac.destination);
     const nb=ac.createBuffer(1,ac.sampleRate*3,ac.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
     const ns=(f,q,loai)=>{const s=ac.createBufferSource();s.buffer=nb;s.loop=true;s.playbackRate.value=.9+Math.random()*.2;const b=ac.createBiquadFilter();b.type=loai;b.frequency.value=f;b.Q.value=q;s.connect(b);s.start();return b};
@@ -181,55 +184,57 @@ function khoi(){
      s.frequency.setValueAtTime(f,tt);s.frequency.exponentialRampToValueAtTime(f*(Math.random()<.5?1.35:.7),tt+.07);e.gain.setValueAtTime(0,tt);e.gain.linearRampToValueAtTime(.05,tt+.01);e.gain.exponentialRampToValueAtTime(.0001,tt+.11);
      s.connect(e);e.connect(o);s.start(tt);s.stop(tt+.13)}}
    addEventListener('pointerdown',mo,{passive:true});
-   setInterval(()=>{if(!ac)return;const am=window.ssAmbient,bat=performance.now()-songT<700&&!document.hidden&&(!am||am.on()),dich=bat?(am?.25+.75*am.vol():.6):0;
+   setInterval(()=>{if(!ac)return;const am=window.ssAmbient,bat=performance.now()-songT<700&&!document.hidden&&(!am||am.on()),dich=bat?(am?.25+.75*am.vol():.6)*(vi||1):0;
     g.gain.setTargetAtTime(dich,ac.currentTime,.6);if(bat&&ac.state==='suspended')ac.resume();
     if(bat&&!GIAM&&performance.now()>hen){chim();hen=performance.now()+2500+Math.random()*6500}},300);
-   return {song(gan){songT=performance.now();if(nuocG)nuocG.gain.setTargetAtTime(.05+.45*Math.max(0,1-gan/28),ac.currentTime,.3)}}})();
-  function trangTriDien(d){
-   const C=CHUA,P=C.P,cn=[],them=o=>{d.canh.add(o);return o},TB={transparent:true,depthWrite:false,toneMapped:false};
+   return {song(gan,nuoc,ngoai){songT=performance.now();vi=ngoai;if(nuocG)nuocG.gain.setTargetAtTime(nuoc*(.1+.9*Math.max(0,1-gan/28)),ac.currentTime,.3)}}})();
+  function trangTriCanh(d,C){
+   const P=C.P||0,cn=[],cu=d.capNhat,them=o=>{d.canh.add(o);return o},TB={transparent:true,depthWrite:false,toneMapped:false};
    // mặt hồ: gợn sóng trôi chậm
-   const [hx,hy,rx,ry,hz]=C.ho,ho=them(new THREE.Mesh(new THREE.CircleGeometry(1,48),new THREE.MeshBasicMaterial({...TB,map:vetGon,color:0xeaf6f4,opacity:.45,blending:THREE.AdditiveBlending})));
-   ho.rotation.x=-Math.PI/2;ho.scale.set(rx*.95,ry*.95,1);ho.position.copy(B(hx,hy,hz+.03));vetGon.repeat.set(2,2);
+   for(const [hx,hy,rx,ry,hz] of C.ho||[]){const ho=them(new THREE.Mesh(new THREE.CircleGeometry(1,48),new THREE.MeshBasicMaterial({...TB,map:vetGon,color:0xeaf6f4,opacity:.45,blending:THREE.AdditiveBlending})));
+    ho.rotation.x=-Math.PI/2;ho.scale.set(rx*.95,ry*.95,1);ho.position.copy(B(hx,hy,hz+.03))}vetGon.repeat.set(2,2);
    // suối: dải nước chảy theo từng đoạn
-   const suoi=[];for(let i=0;i+1<C.suoi.length;i++){const a=B(...C.suoi[i]),b=B(...C.suoi[i+1]),L=a.distanceTo(b),m=new THREE.Mesh(new THREE.PlaneGeometry(1.6,L+.4),new THREE.MeshBasicMaterial({...TB,map:vetSoc.clone(),color:0xffffff,opacity:.5}));
+   const suoi=[],SU=C.suoi||[];for(let i=0;i+1<SU.length;i++){const a=B(...SU[i]),b=B(...SU[i+1]),L=a.distanceTo(b),m=new THREE.Mesh(new THREE.PlaneGeometry(1.6,L+.4),new THREE.MeshBasicMaterial({...TB,map:vetSoc.clone(),color:0xffffff,opacity:.5}));
     m.material.map.needsUpdate=true;m.material.map.repeat.set(1,L/4);m.position.copy(a).lerp(b,.5);m.position.y+=.04;m.lookAt(b.x,m.position.y,b.z);m.rotateX(-Math.PI/2);them(m);suoi.push(m)}
    // thác: tấm nước dựng đứng trôi xuống + bọt dưới chân
-   const thac=C.thac.map(([x,y,z1,z0,w])=>{const h=z1-z0,m=them(new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({...TB,map:vetSoc.clone(),color:0xffffff,opacity:.75,side:THREE.DoubleSide})));
+   const thac=(C.thac||[]).map(([x,y,z1,z0,w])=>{const h=z1-z0,m=them(new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({...TB,map:vetSoc.clone(),color:0xffffff,opacity:.75,side:THREE.DoubleSide})));
     m.material.map.needsUpdate=true;m.material.map.repeat.set(w/2,h/5);m.position.copy(B(x,y-.35,(z1+z0)/2));
     const bot=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xffffff,opacity:.7})));bot.position.copy(B(x,y-.8,z0+.4));bot.scale.set(w*1.8,1.2,1);return {m,bot}});
    // khói hương bay lên từ lư hương giữa sân
-   const khoi=[];for(let i=0;i<16;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xf4efe6,opacity:0})));s.userData.t=i/16;khoi.push(s)}
+   const khoi=[];for(let i=0;C.lh&&i<16;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({...TB,map:vetTron,color:0xf4efe6,opacity:0})));s.userData.t=i/16;khoi.push(s)}
    // mây trôi quanh chân núi
-   const may=[];for(let i=0;i<12;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({map:vetTron,color:0xffffff,transparent:true,depthWrite:false,opacity:.5,fog:true})));
-    const a=i/12*6.283+Math.random()*.3,r=36+Math.random()*12;s.userData={a,r,z:1+Math.random()*3,v:(Math.random()<.5?-1:1)*(.006+Math.random()*.006)};s.scale.set(18+Math.random()*10,7+Math.random()*3,1);may.push(s)}
+   const may=[];for(let i=0;C.may&&i<12;i++){const s=them(new THREE.Sprite(new THREE.SpriteMaterial({map:vetTron,color:0xffffff,transparent:true,depthWrite:false,opacity:.5,fog:true})));
+    const a=i/12*6.283+Math.random()*.3,r=C.may[0]+Math.random()*12;s.userData={a,r,z:C.may[1]+Math.random()*3,v:(Math.random()<.5?-1:1)*(.006+Math.random()*.006)};s.scale.set(18+Math.random()*10,7+Math.random()*3,1);may.push(s)}
    // cò trắng bay vòng trên đỉnh núi: thân + hai cánh vỗ chậm
    const trang=new THREE.MeshLambertMaterial({color:0xfbfaf6,side:THREE.DoubleSide});d.cy.push(trang);
    const canhG=new THREE.BufferGeometry();canhG.setAttribute('position',new THREE.Float32BufferAttribute([0,0,-.25,0,0,.3,1.25,0,.05],3));canhG.computeVertexNormals();
-   const co=[];for(let i=0;i<7;i++){const g=new THREE.Group(),than=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),trang);than.scale.set(1,.8,2.4);
+   const co=[],[tx,ty]=C.tam,[cr,chh]=C.chim||[0,0];for(let i=0;C.chim&&i<7;i++){const g=new THREE.Group(),than=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),trang);than.scale.set(1,.8,2.4);
     const mo=new THREE.Mesh(new THREE.ConeGeometry(.05,.5,6),new THREE.MeshLambertMaterial({color:0xe3b150}));mo.rotation.x=Math.PI/2;mo.position.z=.7;
-    const t1=new THREE.Mesh(canhG,trang),t2=new THREE.Mesh(canhG,trang);t2.scale.x=-1;g.add(than,mo,t1,t2);g.userData={t1,t2,r:16+i*3.2,a:i*.9,h:P+11+(i%3)*2.2,v:.05+(i%4)*.012,p:Math.random()*6};them(g);co.push(g)}
+    const t1=new THREE.Mesh(canhG,trang),t2=new THREE.Mesh(canhG,trang);t2.scale.x=-1;g.add(than,mo,t1,t2);g.userData={t1,t2,r:cr+i*3.2,a:i*.9,h:P+chh+(i%3)*2.2,v:.05+(i%4)*.012,p:Math.random()*6};them(g);co.push(g)}
    // bướm quanh bồn hoa và hồ sen
-   const buom=[];C.hoa.forEach(([x,y],k)=>{for(let j=0;j<2;j++){const mau=[0xffd27a,0xf6a6bf,0xffffff,0xb8d8ff][(k+j)%4],m=new THREE.MeshBasicMaterial({color:mau,side:THREE.DoubleSide,toneMapped:false}),g=new THREE.Group();
+   const buom=[];(C.hoa||[]).forEach(([x,y],k)=>{for(let j=0;j<2;j++){const mau=[0xffd27a,0xf6a6bf,0xffffff,0xb8d8ff][(k+j)%4],m=new THREE.MeshBasicMaterial({color:mau,side:THREE.DoubleSide,toneMapped:false}),g=new THREE.Group();
     const w1=new THREE.Mesh(new THREE.PlaneGeometry(.22,.16),m),w2=w1.clone();w1.position.x=.11;w2.position.x=-.11;g.add(w1,w2);g.userData={w1,w2,x,y,p:Math.random()*6,v:.6+Math.random()*.5};them(g);buom.push(g)}});
    // lá bồ đề rơi
-   const la=[];for(let i=0;i<12;i++){const m=them(new THREE.Mesh(new THREE.PlaneGeometry(.22,.3),new THREE.MeshBasicMaterial({color:i%3?0x9cbf62:0xe3c35a,side:THREE.DoubleSide})));m.userData={t:Math.random()};la.push(m)}
+   const la=[],LA=(C.la||[]).map(q=>B(...q)),dao=C.roi==='dao';for(let i=0;i<12*LA.length;i++){const m=them(new THREE.Mesh(new THREE.PlaneGeometry(dao?.14:.22,dao?.14:.3),new THREE.MeshBasicMaterial({color:dao?(i%2?0xf6b8c8:0xfbd9e1):i%3?0x9cbf62:0xe3c35a,side:THREE.DoubleSide})));m.userData={t:Math.random(),o:LA[i%LA.length]};la.push(m)}
    // mái chính điện (tượng/tuong.json, tên SS_Mai*): mờ khi "Bạn" ở trong điện
    const mai=[];d.canh.traverse(o=>{if(o.isMesh&&/^SS_Mai/.test(o.name)){o.material.transparent=true;mai.push(o)}});let maiK=1;
-   const tmp=new V3(),lhP=B(...C.lh),bdP=B(...C.bd);
-   const nuocP=[...C.thac.map(q=>B(q[0],q[1],q[3])),...C.suoi.map(q=>B(...q))];
+   const tmp=new V3(),lhP=C.lh?B(...C.lh):null;
+   // chỗ có nước (hồ tính tới mép): đo khoảng cách cho tiếng nước
+   const nuocP=[...(C.thac||[]).map(q=>[B(q[0],q[1],q[3]),0]),...SU.map(q=>[B(...q),0]),...(C.ho||[]).map(q=>[B(q[0],q[1],q[4]),Math.min(q[2],q[3])])];
    d.capNhat=(t,dt)=>{const s=t/1000;
-    if(theo){let gan=1e9;for(const p of nuocP)gan=Math.min(gan,p.distanceTo(theo));amChua.song(gan)}else amChua.song(99)
+    cu&&cu(t,dt);let gan=99;if(theo)for(const [p,rr] of nuocP)gan=Math.min(gan,Math.max(0,p.distanceTo(theo)-rr));amCanh.song(gan,C.amNuoc||0,C.ngoai||1)
     // mái: vào trong điện thì mờ hẳn, ra sân thì hiện lại
-    const vao=theo&&theo.x>C.mai.x[0]&&theo.x<C.mai.x[1]&&-theo.z>C.mai.y[0]&&-theo.z<C.mai.y[1],dich=vao?0:1;maiK+=(dich-maiK)*Math.min(1,dt*(GIAM?99:3));
+    const vao=C.mai&&theo&&theo.x>C.mai.x[0]&&theo.x<C.mai.x[1]&&-theo.z>C.mai.y[0]&&-theo.z<C.mai.y[1],dich=vao?0:1;maiK+=(dich-maiK)*Math.min(1,dt*(GIAM?99:3));
     for(const o of mai){o.material.opacity=maiK;o.material.depthWrite=maiK>.98;o.visible=maiK>.02}
     if(GIAM)return;
     vetGon.offset.set(s*.012,s*.008);for(const m of suoi)m.material.map.offset.y=-s*.35;for(const q of thac){q.m.material.map.offset.y=s*.9;q.bot.material.opacity=.55+.2*Math.sin(s*3)}
     for(const k of khoi){const u=(k.userData.t+s*.07)%1;k.position.set(lhP.x+Math.sin(u*9+k.id)*.5*u,lhP.y+u*7,lhP.z+Math.cos(u*7+k.id)*.4*u);k.scale.setScalar(.5+u*2.6);k.material.opacity=.32*Math.sin(Math.PI*u)}
-    for(const m of may){const u=m.userData;u.a+=u.v*dt;m.position.copy(B(Math.cos(u.a)*u.r*1.15,Math.sin(u.a)*u.r,u.z));m.material.opacity=.42+.12*Math.sin(s*.3+u.a)}
-    for(const g of co){const u=g.userData;u.a+=u.v*dt;const x=Math.cos(u.a)*u.r,y=Math.sin(u.a)*u.r*.8-2;g.position.copy(B(x,y,u.h+Math.sin(s*.4+u.p)*.8));
-     tmp.copy(B(Math.cos(u.a+.05)*u.r,Math.sin(u.a+.05)*u.r*.8-2,u.h));g.lookAt(tmp.x,g.position.y,tmp.z);const v=Math.sin(s*2.6+u.p)*.55;u.t1.rotation.z=v;u.t2.rotation.z=-v;g.rotation.z=-.15}
+    for(const m of may){const u=m.userData;u.a+=u.v*dt;m.position.copy(B(tx+Math.cos(u.a)*u.r*1.15,ty+Math.sin(u.a)*u.r,u.z));m.material.opacity=.42+.12*Math.sin(s*.3+u.a)}
+    for(const g of co){const u=g.userData;u.a+=u.v*dt;const x=tx+Math.cos(u.a)*u.r,y=ty+Math.sin(u.a)*u.r*.8;g.position.copy(B(x,y,u.h+Math.sin(s*.4+u.p)*.8));g.visible=g.position.distanceTo(cam.position)>14;   // bay sát ống kính trông to bè: ẩn
+
+     tmp.copy(B(tx+Math.cos(u.a+.05)*u.r,ty+Math.sin(u.a+.05)*u.r*.8,u.h));g.lookAt(tmp.x,g.position.y,tmp.z);const v=Math.sin(s*2.6+u.p)*.55;u.t1.rotation.z=v;u.t2.rotation.z=-v;g.rotation.z=-.15}
     for(const g of buom){const u=g.userData,a=s*u.v+u.p;g.position.copy(B(u.x+Math.cos(a)*1.3+Math.sin(a*2.3)*.4,u.y+Math.sin(a*1.3)*1.1,P+.9+Math.sin(a*3)*.35));g.rotation.y=a;const v=Math.sin(s*14+u.p)*1.1;u.w1.rotation.y=v;u.w2.rotation.y=-v}
-    for(const m of la){const u=m.userData;u.t=(u.t+dt*.07)%1;m.position.set(bdP.x+Math.sin(m.id*7.1)*3.4+Math.sin(u.t*9+m.id)*.6,bdP.y+2.5-u.t*7.6,bdP.z+Math.cos(m.id*3.3)*3+Math.cos(u.t*7)*.5);m.rotation.set(u.t*9,u.t*6+m.id,0)}}}
+    for(const m of la){const u=m.userData,o=u.o;u.t=(u.t+dt*.07)%1;m.position.set(o.x+Math.sin(m.id*7.1)*3.4+Math.sin(u.t*9+m.id)*.6,o.y+2.5-u.t*(o.y+2.4-P),o.z+Math.cos(m.id*3.3)*3+Math.cos(u.t*7)*.5);m.rotation.set(u.t*9,u.t*6+m.id,0)}}}
   // ---- phi thăng khi chọn lối (thay hoạt ảnh 2D cũ): cột sáng hạ xuống chỗ "Bạn", người bay lên tan vào ánh sáng, màn chuyển ngà nối tiếp
   let nangMe=null;
   window.ss3dPhiThang=function(fa,xong){if(hong||GIAM||dang!=='sanh'||phim||!theo)return false;
@@ -299,7 +304,7 @@ function khoi(){
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
-   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(ten==='dien')trangTriDien(DL[ten])}
+   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(TT[ten])trangTriCanh(DL[ten],TT[ten])}   // sảnh: cột sáng, logo trước; cảnh động chung nối sau
   function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn
    const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
    return (z(i,j)*(1-fx)+z(i+1,j)*fx)*(1-fy)+(z(i,j+1)*(1-fx)+z(i+1,j+1)*fx)*fy}
