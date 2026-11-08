@@ -17,9 +17,7 @@
  function count(c){return window.ssPerson?ssPerson.all().filter(function(p){return p.c===c}).length:0}
  function target(k){var c=window.__SC_LANG_REF;if(!c)return null;if(k==='ao')return c.aoDoor;if(k==='ho')return c.forkDoor;if(k==='cong')return c.spawn;if(k==='ls')return c.gates.ls;return c.gates[k]}
  window.ssLangMap=function(){var c=window.__SC_LANG_REF,me=document.querySelector('.hall .wa.me');
-  var mini='<div class="lm-mini"><img src="img/lang/lang-iso.webp" alt="Toàn cảnh làng tưởng niệm">';
-  if(c){Z.forEach(function(z){var t=target(z[0]);if(t)mini+='<span style="left:'+(t[0]*100)+'%;top:'+(t[1]*100)+'%;background:'+z[3]+'" title="'+z[1]+'"></span>'})}
-  mini+='</div>';
+  var mini='';   // ảnh toàn cảnh 2D đã bỏ (chỉ còn 3D)
   sh.innerHTML='<div class="hos-c"><div class="hos-h"><i style="background:#C9892E">'+sv('<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>')+'</i><div><b>Bản đồ làng tưởng niệm</b><small>Sảnh Song Song ở giữa · bấm một khu để đi tới</small></div><button type="button" class="hos-x" aria-label="Đóng">×</button></div>'+mini+
    '<div class="lm-z">'+Z.map(function(z){var n=(['ls','tt'].indexOf(z[0])>=0)?count(z[0]):null;return '<button type="button" data-z="'+z[0]+'"><i style="background:'+z[3]+'">'+sv(z[4])+'</i><span><b>'+z[1]+'</b><small>'+z[2]+'</small></span>'+(n!=null?'<em>'+n+' người</em>':'')+'</button>'}).join('')+'</div></div>';
   sh.hidden=false}
