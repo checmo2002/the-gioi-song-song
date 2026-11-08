@@ -101,3 +101,8 @@ html:has(.hall>.w-trans.on:not(.out)) header.nav,html:has(.hall>.w-trans.on:not(
 /* phi thăng 3D khi chọn lối (js/26 ss3dPhiThang): loé sáng màu lối rồi phủ màu ngà, nối liền màn chuyển cảnh */
 .asc3{position:fixed;inset:0;z-index:300;pointer-events:none;background:radial-gradient(circle at 50% 55%,rgba(var(--m),.9),rgba(244,234,214,.95) 60%);opacity:0;animation:asc3 2.9s ease forwards}
 @keyframes asc3{0%,30%{opacity:0}50%{opacity:1}75%{opacity:1}100%{opacity:0}}
+
+/* nhắc bật tăng tốc phần cứng (máy đang xem ảnh tĩnh) */
+.nhac-3d{position:absolute;z-index:30;left:50%;top:124px;transform:translateX(-50%);width:min(560px,calc(100% - 32px));display:flex;gap:10px;align-items:flex-start;padding:10px 12px 10px 16px;border-radius:14px;background:rgba(20,12,8,.86);color:#FBF1DC;font-size:13px;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.nhac-3d b{color:#F2C46D}.nhac-3d button{flex:none;width:28px;height:28px;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:inherit;font-size:18px;line-height:1;cursor:pointer}
+.hall:not(.world-on) .nhac-3d{display:none}

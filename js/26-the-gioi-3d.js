@@ -8,7 +8,7 @@ const hall=document.getElementById('hall'),W=document.getElementById('world');
 // Thử trên máy không có card: thêm ?3d vào địa chỉ.
 const coWebGL=(()=>{try{const g=document.createElement('canvas').getContext('webgl2');if(!g)return false;if(new URLSearchParams(location.search).has('3d'))return true;
  const x=g.getExtension('WEBGL_debug_renderer_info'),ten=String(x?g.getParameter(x.UNMASKED_RENDERER_WEBGL):g.getParameter(g.RENDERER));g.getExtension('WEBGL_lose_context')?.loseContext();
- return !/swiftshader|llvmpipe|softpipe|software/i.test(ten)}catch(e){return false}})();
+ const cpu=/swiftshader|llvmpipe|softpipe|software|basic render|microsoft basic/i.test(ten);window.ss3dCPU=cpu;return !cpu}catch(e){return false}})();
 window.ss3dXong=!coWebGL;   // màn tải (js/01) và kiểm tra hình ảnh chờ cờ này: các cảnh 3D đã nạp xong hoặc chắc chắn dùng ảnh tĩnh
 
 // camera của ảnh iso từng cảnh (thong-tin.json khi nướng): trực giao, rộng ow mét, nghiêng 42°, phương vị -38°, nhìn vào tgt (toạ độ Blender)
@@ -35,6 +35,11 @@ const CANH={
 const TT={"dien":{"P":6.0,"ho":[[21.0,9.0,5.4,4.2,6.07]],"suoi":[[24.6,5.4,6.1],[25.0,1.2,6.1],[24.0,-3.2,6.1],[25.8,-7.8,6.1],[28.2,-12.5,6.1],[30.5,-15.5,5.27]],"thac":[[21.0,13.4,13.2,6.2,2.4],[31.6,-17.0,6.3,0.2,1.6]],"lh":[0,-12,8.1],"hoa":[[-8,-16.6],[8,-16.6],[-16.4,-7],[16.4,-7],[21.0,9.0]],"mai":{"x":[-13.6,13.6],"y":[-6.8,14.2]},"la":[[-19.0,5.5,11.0]],"tam":[0,-2],"chim":[16,11],"may":[36,1],"amNuoc":0.5},"sanh":{"ho":[[0,4,6,6,0.47],[-19,-4,5,3.4,0.12]],"lh":[-10,-6,1.5],"hoa":[[12,-6],[20,0],[14,10],[20,16],[-40,-31],[40,-31],[-12,-31],[12,-31],[-19,-4]],"tam":[0,8],"chim":[22,13],"may":[66,2],"amNuoc":0.2},"chan":{"ho":[[-36,-38,10,7,0.02]],"lh":[0,-8,3.0],"hoa":[[0,-10.6],[-4.6,-24],[4.6,-24],[-4.2,-18],[4.2,-12],[-9.6,-4],[9.6,2],[-36,-38]],"la":[[-11,-21,6.5],[11,-21,6.5]],"tam":[0,-5],"chim":[28,16],"may":[70,2],"amNuoc":0.25},"lang":{"ho":[[14.3,-22.9,8,5.5,0.02]],"hoa":[[28,-13],[22,-20],[34,-8],[14.3,-22.9]],"la":[[28,-13,4.5]],"roi":"dao","tam":[0,2],"chim":[30,15],"may":[75,2],"amNuoc":0.25},"ho":{"ho":[[-22,-24,7,4.2,0.12]],"hoa":[[-22,-24],[-15,-20]],"tam":[0,6],"chim":[26,14],"may":[65,2],"amNuoc":0.2},"tho":{"hoa":[[-8,-15.5],[8,-15.5]],"tam":[2,1.5],"chim":[18,13],"ngoai":0.5},"nha":{"hoa":[[6.5,-12.3],[0,9]],"tam":[0,-1],"chim":[16,12],"ngoai":0.5}};
 const THU=t=>'img/3d/'+t+'/';
 if(hall&&W&&coWebGL)khoi();
+// trình duyệt chưa dùng card đồ hoạ: đang xem ảnh tĩnh, nhắc cách bật để xem 3D (tắt được, nhớ trên máy)
+else if(hall&&window.ss3dCPU){let tat=false;try{tat=localStorage.getItem('ss-nhac-3d')==='1'}catch(e){}
+ if(!tat&&!navigator.webdriver){const n=document.createElement('div');n.className='nhac-3d';n.setAttribute('role','note');
+  n.innerHTML='<span>Đang xem dạng ảnh vì trình duyệt chưa dùng card đồ hoạ. Bật <b>Tăng tốc phần cứng</b> trong Cài đặt → Hệ thống của trình duyệt rồi mở lại để xem thế giới 3D.</span><button type="button" aria-label="Đóng">×</button>';
+  n.querySelector('button').onclick=()=>{n.remove();try{localStorage.setItem('ss-nhac-3d','1')}catch(e){}};hall.appendChild(n)}}
 
 function khoi(){
  const GIAM=matchMedia('(prefers-reduced-motion: reduce)').matches,CAM_UNG=matchMedia('(pointer:coarse)').matches;
