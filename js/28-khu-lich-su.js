@@ -1,4 +1,4 @@
-/* Làng chung: hai khu lịch sử. ssLichSu('vua') mở gia phả các đời vua (data/lich-su.js), ssLichSu('bac') mở Bác Hồ và các tướng.
+/* Làng chung: các khu lịch sử. ssLichSu('vua') gia phả các đời vua (data/lich-su.js), ssLichSu('bac') Chủ tịch Hồ Chí Minh, ssLichSu('tuong') các tướng (chủ dự án: tách riêng hai khu).
    Dùng khung bảng dưới .hos như Bản đồ làng (js/21). Mọi chữ qua esc(). */
 (function(){
  var L=window.SS_LICHSU;if(!L)return;
@@ -17,9 +17,12 @@
       var qh=v.cha&&ten[v.cha]?'Con '+ten[v.cha]:(v.quanHe||'');
       return '<li'+(v.cha?' class="con"':'')+'><b>'+esc(v.ten)+'</b>'+(v.hieu?' <em>'+esc(v.hieu)+'</em>':'')+'<span>'+esc(nam(v.nam))+(qh?' · '+esc(qh):'')+'</span>'+(v.ghiChu?'<small>'+esc(v.ghiChu)+'</small>':'')+'</li>'}).join('')+'</ol></div></div>'}).join('')+nguon(V.nguon)}
  function bac(){var T=L.tuong,b=T.bac;
-  return dau('#9A3B2B','★','Bác Hồ và các tướng','Những người có công tiêu biểu với cách mạng')+
-   '<div class="ls-bac"><b>Chủ tịch '+esc(b.ten)+'</b><span>'+esc(nam(b.nam))+(b.queQuan?' · '+esc(b.queQuan):'')+'</span>'+(b.tenKhac&&b.tenKhac.length?'<small>Tên khác: '+esc(b.tenKhac.join(', '))+'</small>':'')+'<p>'+esc(b.tomTat)+'</p></div>'+
-   '<h4>Tướng lĩnh, lãnh đạo tiêu biểu</h4><ul class="ls-tg">'+(T.nguoi||[]).map(function(p){
+  return dau('#9A3B2B','★','Chủ tịch Hồ Chí Minh','Tượng đài Bác giữa làng')+
+   '<div class="ls-bac"><b>Chủ tịch '+esc(b.ten)+'</b><span>'+esc(nam(b.nam))+(b.queQuan?' · '+esc(b.queQuan):'')+'</span>'+(b.tenKhac&&b.tenKhac.length?'<small>Tên khác: '+esc(b.tenKhac.join(', '))+'</small>':'')+'<p>'+esc(b.tomTat)+'</p></div>'+nguon(T.nguon)}
+ function tuong(){var T=L.tuong;
+  return dau('#2F5D8A','✪','Các tướng','Tướng lĩnh, lãnh đạo tiêu biểu có công với cách mạng')+
+   '<ul class="ls-tg">'+(T.nguoi||[]).map(function(p){
     return '<li><b>'+esc(p.ten)+'</b><span>'+esc([p.capBac,nam(p.nam),p.queQuan].filter(Boolean).join(' · '))+'</span>'+(p.congLao?'<small>'+esc(p.congLao)+'</small>':'')+'</li>'}).join('')+'</ul>'+nguon(T.nguon)}
- window.ssLichSu=function(k){sh.setAttribute('aria-label',k==='vua'?'Gia phả các đời vua':'Bác Hồ và các tướng');sh.innerHTML='<div class="hos-c ls-c">'+(k==='vua'?vua():bac())+'</div>';sh.hidden=false;var c=sh.querySelector('.hos-c');if(c)c.scrollTop=0};
+ var TEN={vua:'Gia phả các đời vua',bac:'Chủ tịch Hồ Chí Minh',tuong:'Các tướng'},VE={vua:vua,bac:bac,tuong:tuong};
+ window.ssLichSu=function(k){if(!VE[k])return;sh.setAttribute('aria-label',TEN[k]);sh.innerHTML='<div class="hos-c ls-c">'+VE[k]()+'</div>';sh.hidden=false;var c=sh.querySelector('.hos-c');if(c)c.scrollTop=0};
 })();

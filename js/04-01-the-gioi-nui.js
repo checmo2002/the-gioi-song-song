@@ -136,7 +136,7 @@
  hall.addEventListener('click',function(ev){var b=ev.target.closest('[data-w]');if(!b||!on())return;ev.preventDefault();ev.stopPropagation();var w=b.dataset.w;
   if(w==='len')climb();else if(w==='xuong')descend();
   else if(w==='lang')fade('lang','Về làng…');else if(w==='ralang'){var pp=window.ssPerson&&ssPerson.get();if(window.ssHo&&ssHo.from()){var hd2=ssHo.door(ssHo.from());ssHo.from(null);fade('ho','Về làng nhà…',hd2?gridNear(hd2[0],hd2[1]):null)}else{var dd=pp&&doorOf(pp.id);fade('lang','Ra làng…',dd||null)}}else if(w==='venui'){if(homeScene()==='tho')fade('tho','Về nhà thờ…',SC.tho.fromLang);else fade('chan','Về chân núi…',SC.chan.fromLang)}
-  else if(w.indexOf('xom-')===0||w.indexOf('khu-')===0){var kz=w.slice(4),gz=scene==='lang'&&SC.lang.gates[kz],mo=function(){kz==='bac'||kz==='vua'?window.ssLichSu&&ssLichSu(kz):window.ssXom&&ssXom(kz)};   // làng chung: đi tới cổng khu rồi mở
+  else if(w.indexOf('xom-')===0||w.indexOf('khu-')===0){var kz=w.slice(4),gz=scene==='lang'&&SC.lang.gates[kz],mo=function(){kz==='bac'||kz==='vua'||kz==='tuong'?window.ssLichSu&&ssLichSu(kz):window.ssXom&&ssXom(kz)};   // làng chung: đi tới cổng khu rồi mở
    if(gz){var gg=gridNear(gz[0],gz[1]);goTo(gg[0],gg[1],'dung');pend=mo}else mo()}
   else if(w==='g-phat'||w==='g-cg'){var fa=w.slice(2),dr=gridNear(SC.sanh.door[fa][0],SC.sanh.door[fa][1]),ok=0,go=function(){if(ok)return;ok=1;window.ssChonLoi&&ssChonLoi(fa)};goTo(dr[0],dr[1],'dung');pend=go;setTimeout(function(){if(!ok&&scene==='sanh'){pend=null;go()}},4000)}
   else if(w==='g-tt'){window.ssChonLoi&&ssChonLoi('tt')}
