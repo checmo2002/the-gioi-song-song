@@ -20,7 +20,7 @@ body.paged:not([data-pg="dau-trang"]) section.pg-on .wrap{padding-top:28px;paddi
 /* thắp hương chỉ ở chính điện */
 #incBtn,#pcIncense,#homeInc{display:none!important}
 /* đầu trang + thanh người: sơn then, chữ vàng */
-body.paged:not([data-pg="dau-trang"]) .nav{background:rgba(28,17,11,.72)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-color:rgba(212,162,76,.18)!important;color:var(--do)}
+html:not(.hall-on) body.paged:not([data-pg="dau-trang"]) .nav{background:rgba(28,17,11,.72)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-color:rgba(212,162,76,.18)!important;color:var(--do)}
 body.paged:not([data-pg="dau-trang"]) .nav .brand,body.paged:not([data-pg="dau-trang"]) .nav .brand *{color:var(--do)!important}
 body.paged:not([data-pg="dau-trang"]) .pgbar{background:transparent!important;border:0!important;color:var(--do)}
 body.paged:not([data-pg="dau-trang"]) .pgbar .pg-title{color:#FFF6E4}
