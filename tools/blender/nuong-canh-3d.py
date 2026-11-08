@@ -92,6 +92,7 @@ def chinh():
         if not m.node_tree: continue
         mau = BANG.get(m.name.split('.')[0])
         for n in m.node_tree.nodes:
+            if n.type == 'BSDF_PRINCIPLED' and m.name.startswith('dongVang'): continue   # tượng đồng vàng (tượng Bác): giữ kim loại bóng, không làm mờ như đất nặn
             if n.type == 'BSDF_PRINCIPLED':
                 n.inputs['Roughness'].default_value = .8; n.inputs['Metallic'].default_value = min(.25, n.inputs['Metallic'].default_value)
                 n.inputs['Sheen Weight'].default_value = .25; n.inputs['Subsurface Weight'].default_value = .06; n.inputs['Specular IOR Level'].default_value = .3
