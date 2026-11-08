@@ -45,8 +45,8 @@ def mai(ten, m, c, w, d, h, over, ridge=.55, rz=0, cong=.3):   # mái chồng di
     bm = bmesh.new(); W, D, R = w / 2 + over, d / 2 + over, w / 2 * ridge
     v = [bm.verts.new(p) for p in [(-W, -D, cong), (W, -D, cong), (W, D, cong), (-W, D, cong), (-R, 0, h), (R, 0, h)]]
     for f in [(0, 1, 5, 4), (2, 3, 4, 5), (1, 2, 5), (3, 0, 4)]: bm.faces.new([v[i] for i in f])
-    bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=.22)
-    return them(ten, bm, m, c, rz)
+    o = them(ten, bm, m, c, rz); o.modifiers.new('day', 'SOLIDIFY').thickness = .22   # bmesh.ops.solidify để lại mặt trùng nhau -> mái nhấp nháy trên web
+    return o
 
 # ---- vật liệu (tên theo bảng màu nướng BANG trong nuong-canh-3d.py)
 DA, DAT, NGOI, SON, VANG, GO = mat('da'), mat('daTrang', 'ECE6DA'), mat('ngoi', 'C87458'), mat('sonDo', 'B9483A'), mat('vangKim', 'E3B150'), mat('goDien', '8E3F2E')
@@ -288,14 +288,14 @@ for j in range(GH):
 def anh(p):
     v = w2c(sc, cam, Vector(p)); return [round(v.x, 4), round(1 - v.y, 4)]
 D = {'tgt': [TG.x, TG.y], 'ow': OW, 'P': P, 'grid': {'w': GW, 'h': GH, 'rows': rows},
-     'spawn': anh((0, -16.9, P)), 'pray': anh((0, -15.0, P)), 'mo': anh((-9.6, 6.1, P + .54)), 'lePhat': anh((0, 4.6, P + .54)),
+     'spawn': anh((0, -14.6, P)), 'pray': anh((0, -15.0, P)), 'mo': anh((-9.6, 6.1, P + .54)), 'lePhat': anh((0, 4.6, P + .54)),
      'chuongDoor': anh((10.4, -15.6, P)), 'thienDoor': anh((BX + .4, BY - 4.9, P)), 'vao': anh((0, -31.0, zbac(-31.0))),
      'hot': [{'p': anh((0, -12, P + 2.7)), 'id': 'nhang', 't': 'Thắp nhang', 's': 'Lư hương đỉnh đồng giữa sân', 'main': 1},
              {'p': anh((0, 12.2, P + 6.5)), 'id': 'le-phat', 't': 'Lễ Phật', 's': 'Đảnh lễ trước tượng Đức Phật'},
              {'p': anh((-9.6, 7.6, P + 2.4)), 'id': 'gomo', 't': 'Gõ mõ', 's': 'Góc tụng kinh trong chính điện'},
              {'p': anh((12.5, -12.0, P + 3.6)), 'id': 'chuong', 't': 'Thỉnh chuông', 's': 'Lầu chuông bên phải sân'},
              {'p': anh((BX + .4, BY - 3.6, P + 1.4)), 'id': 'thien', 't': 'Tĩnh tâm', 's': 'Ngồi thiền dưới cội bồ đề'},
-             {'p': anh((0, -21.5, zbac(-21.5) + .6)), 'id': 'xuong', 't': 'Xuống núi', 's': 'Bậc đá'}],
+             {'p': anh((0, -24.0, zbac(-24.0) + .6)), 'id': 'xuong', 't': 'Xuống núi', 's': 'Bậc đá'}],
      'mai': {'x': [-13.6, 13.6], 'y': [-6.8, 14.2]},
      'ps': round(1.78 / OW, 4),
      'nuoc': {'ho': [HX, HY, 5.4, 4.2, P + .07], 'suoi': [[x, y, Hn(x, y) + .1] for x, y in SUOI], 'thac': [[21.0, 13.4, P + 7.2, P + .2, 2.4], [31.6, -17.0, P * 1.05, .2, 1.6]]},
