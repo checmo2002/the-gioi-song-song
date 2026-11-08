@@ -8,15 +8,15 @@ GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RA = os.path.join(GOC, 'dist', 'cloudflare')
 CAN = ['index.html', 'css', 'js', 'data', 'img']
 
-# Ảnh, mô hình 3D dùng tên cố định (không có mã băm), nên không cache vĩnh viễn: dùng ngay bản đã có,
-# rồi hỏi lại máy chủ ở nền; nướng lại cảnh thì người dùng thấy bản mới ở lần mở sau. html, css, js luôn hỏi lại (ETag, gần như không tốn).
+# Ảnh, mô hình 3D dùng tên cố định (không có mã băm): luôn hỏi lại máy chủ (ETag, chưa đổi thì 304, gần như không tốn).
+# Không dùng stale-while-revalidate: nướng lại cảnh mà trình duyệt lấy canh.json cũ ghép với ảnh webp mới là cảnh vỡ nát.
 HEADERS = """/*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: SAMEORIGIN
 
 /img/*
-  Cache-Control: public, max-age=3600, stale-while-revalidate=2592000
+  Cache-Control: public, max-age=0, must-revalidate
 
 /js/vendor/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=2592000

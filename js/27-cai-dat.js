@@ -30,5 +30,9 @@
  function dong(){bg.hidden=true;truoc&&truoc.focus&&truoc.focus()}
  nut.addEventListener('click',function(e){e.stopPropagation();mo()});
  document.addEventListener('keydown',function(e){if(!bg.hidden&&e.key==='Escape')dong()});
+ // máy tính: thanh trên của trang (Đăng nhập / Đăng ký) nằm đè góc phải trên của thế giới -> hạ nút xuống dưới thanh đó
+ function choNut(){var a=document.querySelector('.nav-auth'),b=a&&a.getBoundingClientRect(),h=hall.getBoundingClientRect();
+  nut.style.top=b&&b.width&&b.bottom>h.top&&b.right>h.right-120?(b.bottom-h.top+10)+'px':''}
+ addEventListener('resize',choNut);new MutationObserver(choNut).observe(document.documentElement,{attributes:true,attributeFilter:['class']});new MutationObserver(choNut).observe(hall,{attributes:true,attributeFilter:['data-ws','hidden']});choNut();
  window.ssCaiDat={mo:mo,dong:dong};
 })();
