@@ -96,7 +96,7 @@
  function tick(t){var dt=Math.min(.1,(t-(last||t))/1000);last=t;
   Object.keys(av).forEach(function(k){var p=av[k],dx=p.tx-p.x,dy=p.ty-p.y,dpx=Math.hypot(dx*st.sw,dy*st.sh);
    if(dpx<=1.5&&p.path&&p.path.length){var nq=p.path.shift();p.tx=nq[0];p.ty=nq[1];dx=p.tx-p.x;dy=p.ty-p.y;dpx=Math.hypot(dx*st.sw,dy*st.sh)}
-   if(dpx>1.5){var sp=scaleAt(p.y)*st.sh*(st.map?3.0*(window.ss3dTocDo||1):.8)*dt,u=Math.min(1,sp/dpx),nx=p.x+dx*u,ny=p.y+dy*u;if(st.map){var g=SC[scene].grid;if(!walk(Math.floor(nx*g.w),Math.floor(ny*g.h))){if(walk(Math.floor(nx*g.w),Math.floor(p.y*g.h)))ny=p.y;else if(walk(Math.floor(p.x*g.w),Math.floor(ny*g.h)))nx=p.x}}p.x=nx;p.y=ny;p.d=dirOf(dx,dy);if(p.a!=='di'){p.a='di';p.f=0}p.f+=dt*10;p.arr=0}
+   if(dpx>1.5){var sp=scaleAt(p.y)*st.sh*(st.map?3.0*(window.ss3dTocDo||1)*(k==='me'?1.7:1):.8)*dt,u=Math.min(1,sp/dpx),nx=p.x+dx*u,ny=p.y+dy*u;if(st.map){var g=SC[scene].grid;if(!walk(Math.floor(nx*g.w),Math.floor(ny*g.h))){if(walk(Math.floor(nx*g.w),Math.floor(p.y*g.h)))ny=p.y;else if(walk(Math.floor(p.x*g.w),Math.floor(ny*g.h)))nx=p.x}}p.x=nx;p.y=ny;p.d=dirOf(dx,dy);if(p.a!=='di'){p.a='di';p.f=0}p.f+=dt*10;p.arr=0}
    else{if(p.a==='di'){p.a=p.want||'dung';p.f=0;if(p.faceUp)p.d=4}
     if(p.a==='lay'){p.f+=dt*2.6;if(p.f>=5.99){p.a='chap';p.f=0}}}
    if(p.me&&pend&&dpx<=1.5&&!(p.path&&p.path.length)){var q=pend;pend=null;q()}
@@ -149,6 +149,7 @@
   else if(w==='ao-sen'){var ad=SC.lang.aoDoor,ga=gridNear(ad[0],ad[1]);goTo(ga[0],ga[1],'ngoi');pend=function(){window.toast&&toast('Ao sen · ngồi tĩnh tâm một lát')}}
   else if(w==='dinh'){window.toast&&toast('Đình làng · nơi cả làng tụ họp ngày giỗ chung')}
   else if(w.indexOf('p:')===0){var pid=w.slice(2),dr=doorOf(pid);if(dr){goTo(dr[0],dr[1],'dung');pend=function(){window.ssVaoNha&&ssVaoNha(pid)}}else window.ssVaoNha&&ssVaoNha(pid)}
+  else if(w==='lay'&&SC[scene].lePhat){var lq=SC[scene].lePhat,gq=gridNear(lq[0],lq[1]);goTo(gq[0],gq[1],'lay');if(av.me)av.me.faceUp=true}   // chùa: vái lạy là đến chiếu lễ trước tượng Phật
   else if(w==='chap'||w==='lay'){if(SC[scene].pray){var pp=SC[scene].pray[O];goTo(pp[0]+(Math.random()-.5)*.12,pp[1]+Math.random()*.03,w)}else goTo((av.me||me).x,(av.me||me).y,w);if(av.me){av.me.faceUp=true}}
   else if(w==='gomo'){var ms=SC.dien.mo,gm=gridNear(ms[0],ms[1]);goTo(gm[0],gm[1],'ngoi');pend=function(){if(av.me){av.me.d=4;av.me.faceUp=true}window.ssMo&&ssMo.open()}}
   else if(w==='chuong'){var cd=SC[scene].chuongDoor,ring=function(){window.ssBell&&ssBell();window.toast&&toast('Một hồi chuông ngân vang')};if(cd){var gc=gridNear(cd[0],cd[1]);goTo(gc[0],gc[1],'chap');pend=ring}else ring()}
