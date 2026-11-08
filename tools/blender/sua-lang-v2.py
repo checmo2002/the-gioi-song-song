@@ -264,7 +264,7 @@ if TUONG and os.path.exists(TUONG):
     with bpy.data.libraries.load(TUONG, link=False) as (src, dst): dst.objects = [x for x in src.objects if x.startswith('SS_TuongBac')]
     for o in dst.objects:
         if o is None: continue
-        col.objects.link(o); o.parent = None; o.rotation_euler.z = HUONG + math.pi / 2   # mẫu Meshy nhìn về -Y: xoay cho nhìn về sảnh
+        col.objects.link(o); o.parent = None; o.rotation_mode = 'XYZ'; o.rotation_euler = (0, 0, HUONG + math.pi / 2)   # mẫu Meshy nạp vào ở chế độ quaternion: không đổi thì xoay euler không ăn, tượng đứng chéo bệ   # mẫu Meshy nhìn về -Y: xoay cho nhìn về sảnh
         bpy.context.view_layer.update(); bb = [o.matrix_world @ Vector(b) for b in o.bound_box]
         h = max(p.z for p in bb) - min(p.z for p in bb); k = 4.2 / h; o.scale = (o.scale.x * k, o.scale.y * k, o.scale.z * k)
         bpy.context.view_layer.update(); bb = [o.matrix_world @ Vector(b) for b in o.bound_box]
@@ -277,7 +277,7 @@ cam = next(o for o in sc.objects if o.type == 'CAMERA'); sc.camera = cam
 bpy.context.view_layer.update()
 fw = (cam.rotation_euler.to_matrix() @ Vector((0, 0, -1))).normalized(); OW = cam.data.ortho_scale; OH = OW * sc.render.resolution_y / sc.render.resolution_x
 DI = {'quangTruong', 'vienQT', 'duong', 'dn', 'cuoiXom', 'loi', 'sanDinh', 'benAo', 'doi', 'daiNen', 'sanBac', 'vienBac', 'nenBac', 'sanTT', 'nenTT', 'sanhNen', 'san'}
-BO_QUA = {'cay', 'tre', 'cau', 'sanhMai', 'sanhMai2', 'maiTT', 'co', 'coXom'}
+BO_QUA = {'cay', 'tre', 'cau', 'sanhMai', 'sanhMai2', 'maiTT', 'co', 'coXom', 'xaXom', 'maiXom', 'bienXom', 'cMai', 'cDam', 'cBien', 'cBienV', 'xaNha', 'bienNha', 'bangChi'}   # mái, xà cổng: người đi bên dưới (không bỏ qua thì thành tường vô hình dưới cổng)
 dg = bpy.context.evaluated_depsgraph_get()
 RI = fw.cross(Vector((0, 0, 1))).normalized(); UP = RI.cross(fw).normalized(); C0 = cam.location
 GW, GH = 144, 96; rows = []
