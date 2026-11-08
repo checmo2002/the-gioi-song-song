@@ -71,7 +71,7 @@ for o in sc.objects:
     elif b in ('cay', 'tre', 'cau') and r > 50: xoa.add(o)
     elif c.x < -7 and c.y > 5 and math.hypot(c.x, c.y - 34) > 14 and b not in ('cay', 'tre', 'cau'): xoa.add(o)   # Xóm Đồng Đội: lối, cổng, sân cuối
     elif b in ('cuoiXom',) and c.x > 25 and c.y > 25: xoa.add(o)   # sân cuối Xóm Dòng Họ: thành quảng trường tượng đài
-    elif b in ('cay', 'tre', 'cau') and (math.hypot(c.x - 29, c.y - 29) < 11.5 or math.hypot(c.x - 28, c.y + 13) < 5): xoa.add(o)
+    elif b in ('cay', 'tre', 'cau') and (math.hypot(c.x - 29, c.y - 29) < 11.5 or math.hypot(c.x - 28, c.y + 13) < 5 or math.hypot(c.x + 24, c.y - 19) < 12.5 or (c.x < -7 and c.y > 4 and abs(c.x * .62 + c.y * .785) < 3.2)): xoa.add(o)   # sân tượng Bác, vườn Thiên thần, sân các tướng và lối tới
 kept = [o for o in sc.objects if o not in xoa and o.parent in xoa]
 for o in kept:
     mw = o.matrix_world.copy(); o.parent = None; o.matrix_world = mw
@@ -89,20 +89,33 @@ hop('beBac', DAT, (BX, BY, .66 + 1.2), (2.3, 2.3, 2.4), HUONG + math.pi / 4); ho
 for k in range(15):
     a = HUONG + math.pi + (k - 7) * .105; x, y = BX + math.cos(a) * 8.2, BY + math.sin(a) * 8.2
     hop('tuongBac', TT, (x, y, 1.5), (.9, .45, 3.0), a + math.pi / 2); hop('tuongBac', DA, (x, y, 3.08), (.95, .55, .16), a + math.pi / 2)
-# bia các tướng: hai vòng cung hai bên lối vào, mặt bia nhìn vào tượng
+def thong(x, y, z=0.0, s=1.0):
+    tru('cay', THAN, (x, y, z), .25 * s, 2.0 * s, 8, .18 * s)
+    for k in range(3): tru('cay', LA[2], (x, y, z + (1.4 + k * 1.15) * s), (1.7 - k * .45) * s, 1.8 * s, 10, .05)
+# ---- 2b. Các tướng (chủ dự án 08/11/2026: tách khỏi khu Bác): quảng trường riêng phía tây bắc, lối đi riêng từ quảng trường sảnh,
+# 14 bia vòng quanh (một bia một người, js/28), giữa là bệ tròn có ngôi sao đồng
+GX, GY = -24.0, 19.0; HG = math.atan2(-GY, -GX)
+A0 = Vector((math.cos(HG + math.pi) * 13, math.sin(HG + math.pi) * 13, 0)); A1 = Vector((GX, GY, 0)) + Vector((math.cos(HG), math.sin(HG), 0)) * 8.0
+dv_ = A1 - A0; hop('duong', mat('gach2', 'DDB284'), ((A0.x + A1.x) / 2, (A0.y + A1.y) / 2, .02), (dv_.length, 3.4, .04), math.atan2(dv_.y, dv_.x))
+tru('sanTuong', GACH, (GX, GY, 0), 8.6, .06, 48); tru('vienTuong', DA, (GX, GY, 0), 9.0, .04, 48)
+tru('nenTuong', DA, (GX, GY, .06), 2.6, .35, 32); tru('nenTuong', DAT, (GX, GY, .41), 1.8, .3, 32)
+hop('truSao', VANG, (GX, GY, .71 + .8), (.22, .22, 1.6), HG)   # trụ đồng thấp đỡ sao
+bm = bmesh.new(); vs = []   # ngôi sao năm cánh dựng đứng (mặt phẳng XZ), quay về lối vào
+for k in range(10):
+    a = math.pi / 2 + k * math.pi / 5; r = 1.1 if k % 2 == 0 else .45; vs.append(bm.verts.new((math.cos(a) * r, 0, math.sin(a) * r)))
+bm.faces.new(vs)
+sao = them('saoTuong', bm, VANG, (GX, GY, 3.25), HG - math.pi / 2); sao.modifiers.new('day', 'SOLIDIFY').thickness = .18
 BIA = []
-for s in (-1, 1):
-    for k in range(6):
-        a = HUONG + s * (.62 + k * .26); x, y = BX + math.cos(a) * 6.6, BY + math.sin(a) * 6.6; rz = a + math.pi / 2
-        hop('chanBia', DA, (x, y, .2), (1.1, .55, .4), rz); hop('biaTuong', DAT, (x, y, .4 + .75), (.85, .18, 1.5), rz); BIA.append((x, y))
+for k in range(14):
+    a = HG + .62 + k * (2 * math.pi - 1.24) / 13; x, y = GX + math.cos(a) * 6.4, GY + math.sin(a) * 6.4; rz = a + math.pi / 2
+    hop('chanBia', DA, (x, y, .2), (1.1, .55, .4), rz); hop('biaTuong', DAT, (x, y, .4 + .75), (.85, .18, 1.5), rz); BIA.append((x, y))
+for k in range(10):   # thông quanh sân, chừa lối vào
+    a = HG + .9 + k * (2 * math.pi - 1.8) / 9; thong(GX + math.cos(a) * 11, GY + math.sin(a) * 11, 0, 1.15)
 # bồn hoa đỏ vàng hai bên lối vào
 for s in (-1, 1):
     a = HUONG + s * .3; x, y = BX + math.cos(a) * 8.6, BY + math.sin(a) * 8.6
     tru('bonHoa', DA, (x, y, 0), 1.3, .35, 16)
     for k in range(7): b = k / 7 * 6.283; cau('hoaBon', HONGP if k % 2 else VANG, (x + math.cos(b) * .75, y + math.sin(b) * .75, .55), .3, 1)
-def thong(x, y, z=0.0, s=1.0):
-    tru('cay', THAN, (x, y, z), .25 * s, 2.0 * s, 8, .18 * s)
-    for k in range(3): tru('cay', LA[2], (x, y, z + (1.4 + k * 1.15) * s), (1.7 - k * .45) * s, 1.8 * s, 10, .05)
 for k in range(9):   # hàng thông sau tường
     a = HUONG + math.pi + (k - 4) * .2; thong(BX + math.cos(a) * 11, BY + math.sin(a) * 11, 0, 1.25)
 
@@ -285,8 +298,9 @@ def anh(p):
     v = w2c(sc, cam, Vector(p)); return [round(v.x, 4), round(1 - v.y, 4)]
 cua_bac = (BX + math.cos(HUONG) * 7.2, BY + math.sin(HUONG) * 7.2, 0)
 D = {'grid': {'w': GW, 'h': GH, 'rows': rows},
-     'gates': {'bac': anh(cua_bac), 'tt': anh((TX_ - 4.6, TY_ + 1.2, 0)), 'vua': anh((VUA_CUA.x + NV.x * 9, VUA_CUA.y + NV.y * 9, 0))},
-     'hot': {'bac': anh((BX, BY, 6.8)), 'vua': anh((F.x - NV.x * 2, F.y - NV.y * 2, 8.5)), 'tt': anh((TX_, TY_, 5.6)), 'thac': anh((*doc(65).xy, H(*doc(65).xy) + 3))},
+     'gates': {'bac': anh(cua_bac), 'tuong': anh((A1.x, A1.y, 0)), 'tt': anh((TX_ - 4.6, TY_ + 1.2, 0)), 'vua': anh((VUA_CUA.x + NV.x * 9, VUA_CUA.y + NV.y * 9, 0))},
+     'hot': {'bac': anh((BX, BY, 6.8)),   # web dùng p3 trong js/04-00 (trên đầu tượng)
+            'tuong': anh((GX, GY, 3.6)), 'vua': anh((F.x - NV.x * 2, F.y - NV.y * 2, 8.5)), 'tt': anh((TX_, TY_, 5.6)), 'thac': anh((*doc(65).xy, H(*doc(65).xy) + 3))},
      'bia': [anh((x, y, 1.6)) for x, y in BIA],
      'nuoc': {'ho': [HO[0], HO[1], HO[2], HO[3], .07], 'thac': [list((doc(TH - .4)).xy) + [ZTOP, .3, 2 * W, round(GOC_NUI + math.pi / 2, 3)]],
               'suoi': [[x, y, H(x, y) + .15] for x, y in SUOI]},

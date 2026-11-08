@@ -320,9 +320,11 @@ function khoi(){
   function dungNut(ten){const d=DL[ten],O=ori();d.nutO=O;hotL.innerHTML='';d.nut=[];
    const ds=(window.SS_CANH&&SS_CANH[ten]&&SS_CANH[ten].hot&&SS_CANH[ten].hot[O])||[];
    ds.forEach((h,i)=>{ray.ray.copy(d.tiaAnh(h.x,h.y));const hit=ray.intersectObjects(d.nen,false)[0];
-    if(hit&&hit.object.userData.tuong)hit.point.y=new THREE.Box3().setFromObject(hit.object).max.y+1.2;   // nút trúng tượng: đặt trên đỉnh đầu, không che mặt tượng
-    const p=hit?hit.point.clone():(()=>{const q=d.tuAnh(h.x,h.y);return B(q.x,q.y)})();
-    const a=document.createElement(h.id?'button':'a');a.className='wh'+(h.main?' main':'');if(h.id){a.type='button';a.dataset.w=h.id}else a.href=h.h;
+    if(hit&&hit.object.userData.tuong){const bh=new THREE.Box3().setFromObject(hit.object),c=new THREE.Vector3();let top=bh.max.y;   // nút trúng tượng hoặc bệ: đặt trên đỉnh đầu tượng đứng trên đó, không che mặt
+     for(const o of d.nen)if(o.userData.tuong){const b=new THREE.Box3().setFromObject(o);b.getCenter(c);if(c.x>=bh.min.x-.3&&c.x<=bh.max.x+.3&&c.z>=bh.min.z-.3&&c.z<=bh.max.z+.3)top=Math.max(top,b.max.y)}
+     hit.point.set(bh.min.x/2+bh.max.x/2,top+1.2,bh.min.z/2+bh.max.z/2)}
+    const p=h.p3?B(...h.p3):hit?hit.point.clone():(()=>{const q=d.tuAnh(h.x,h.y);return B(q.x,q.y)})();   // p3: toạ độ 3D cố định (Blender) cho nút trên đỉnh tượng đài
+    const a=document.createElement(h.id?'button':'a');a.className='wh'+(h.main?' main':'')+(h.z?' zn':'');if(h.id){a.type='button';a.dataset.w=h.id}else a.href=h.h;
     a.innerHTML='<i class="wh-dot"></i><span class="wh-lb"><i class="wh-ic"></i><b></b><small></small></span>';a.querySelector('b').textContent=h.short||h.t;a.querySelector('small').textContent=h.s||'';a.title=h.t+(h.s?' · '+h.s:'');
     window.ssHudIcon&&ssHudIcon(a.querySelector('.wh-ic'),h);a.style.setProperty('--d',(i*70)+'ms');hotL.appendChild(a);d.nut.push({el:a,p})})}
 

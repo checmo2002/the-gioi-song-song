@@ -78,7 +78,7 @@
   const spark=(px,py,r)=>`<path class="wf" d="M${px} ${py-r}Q${px} ${py} ${px+r} ${py}Q${px} ${py} ${px} ${py+r}Q${px} ${py} ${px-r} ${py}Q${px} ${py} ${px} ${py-r}Z"/>`;
 
   const D=[
-   {t:'Làng tưởng niệm',d:'Ngôi làng 3D giữa núi rừng, bốn khu: liệt sĩ, thiên thần nhỏ, gia phả các đời vua, Bác Hồ và các tướng.',h:'#cong-vien',svg:()=>{
+   {t:'Làng tưởng niệm',d:'Ngôi làng 3D giữa núi rừng: liệt sĩ, thiên thần nhỏ, gia phả các đời vua, tượng đài Bác Hồ, các tướng.',h:'#cong-vien',svg:()=>{
       const R=4.4;let g=puff(-6,0.5,-2.2,1.1)+puff(0.5,-6.5,-1.2,.9);
       g+=poly([...arc(0,0,0,R,-Math.PI/4,3*Math.PI/4),[0,0,-3.6]],'fb3 ln');
       g+=disc(0,0,0,R,'faint ln')+disc(0,0,0,1.5,'ln2');
