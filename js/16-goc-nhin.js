@@ -1,12 +1,17 @@
 /* Góc nhìn: mặc định điện thoại lùi xa hơn (thấy rộng đường đi); người dùng tự chỉnh, nhớ theo từng máy */
 (function(){
- var DEF={v:.6,h:1},MIN=.4,MAX=1.6,KEY='ss-zoom',z={};
+ var DEF={v:.6,h:1},MIN=.5,MAX=1.6,KEY='ss-zoom',z={};
  try{z=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
  function get(O){return z[O]||DEF[O]||1}
  window.ssZoomK=get;
+ var Ofn=function(){var h=document.getElementById('hall');return h&&h.clientWidth/Math.max(1,h.clientHeight)<.9?'v':'h'};
+ // camera tự về mặc định (js/26): người xem đã thu nhỏ để nhìn đường thì trả về độ xa mặc định; đang phóng gần thì giữ
+ window.ssZoomVe=function(){var o=Ofn();if(get(o)<(DEF[o]||1)-.001){z[o]=DEF[o];try{localStorage.setItem(KEY,JSON.stringify(z))}catch(e){}phat()}};
  var hall=document.getElementById('hall');if(!hall)return;
+ // 3D (js/26) đọc ssZoomK mỗi khung: phát resize (dựng lại cả bản đồ 2D, rất nặng) từng nấc cuộn làm giật, nên đợi ngừng zoom mới phát
+ var tre=0;function phat(){clearTimeout(tre);if(hall.classList.contains('w3d-on'))tre=setTimeout(function(){dispatchEvent(new Event('resize'))},400);else dispatchEvent(new Event('resize'))}
  var O=function(){return hall.clientWidth/Math.max(1,hall.clientHeight)<.9?'v':'h'};
- var raf=0;function apply(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;dispatchEvent(new Event('resize'));ui()})}
+ var raf=0;function apply(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;ui();phat()})}
  function set(v,O_){O_=O_||O();z[O_]=Math.max(MIN,Math.min(MAX,+v.toFixed(3)));try{localStorage.setItem(KEY,JSON.stringify(z))}catch(e){}apply();hint()}
  var box=document.createElement('div');box.className='zm';box.setAttribute('role','group');box.setAttribute('aria-label','Góc nhìn');
  box.innerHTML='<button type="button" data-z="in" aria-label="Phóng to (nhìn gần)" title="Nhìn gần"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2M11 8v6M8 11h6"/></svg></button><small>Góc nhìn</small><button type="button" data-z="out" aria-label="Thu nhỏ (nhìn rộng)" title="Nhìn rộng"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2M8 11h6"/></svg></button>';

@@ -45,7 +45,8 @@
   items.forEach(it=>{io.observe(it.cv);new ResizeObserver(()=>{build(it);if(reduce)draw(it,null)}).observe(it.cv)});
   if(reduce)return;
   const logo=$('.hero-mark .logo');const t0=performance.now();
-  (function loop(now){const t=(now-t0)/1000;items.forEach(it=>{if(!it.vis||!it.W)return;const dur=Math.max(2.4,(it.W/(it.beats.length?Math.max(1,(it.beats[it.beats.length-1]-it.beats[0])/Math.max(1,it.beats.length-1)):200))*BEAT);
+  const HE=document.documentElement;   // đại sảnh / thế giới phủ kín trang giới thiệu (hall-on): thôi vẽ nhịp tim cho đỡ nặng
+  (function loop(now){const t=(now-t0)/1000;if(!HE.classList.contains('hall-on'))items.forEach(it=>{if(!it.vis||!it.W)return;const dur=Math.max(2.4,(it.W/(it.beats.length?Math.max(1,(it.beats[it.beats.length-1]-it.beats[0])/Math.max(1,it.beats.length-1)):200))*BEAT);
       const head=((t+(it.hero?0:1.3))/dur%1)*it.W;
       if(it.hero&&logo&&t>1.6&&it.prev!=null){const crossed=it.beats.some(b=>it.prev<b&&head>=b)||(it.prev<it.heart.hl&&head>=it.heart.hl);if(crossed){logo.classList.remove('beat');void logo.getBoundingClientRect();logo.classList.add('beat')}}
       it.prev=head;draw(it,head)});
@@ -77,7 +78,7 @@
   const spark=(px,py,r)=>`<path class="wf" d="M${px} ${py-r}Q${px} ${py} ${px+r} ${py}Q${px} ${py} ${px} ${py+r}Q${px} ${py} ${px-r} ${py}Q${px} ${py} ${px} ${py-r}Z"/>`;
 
   const D=[
-   {t:'Làng tưởng niệm',d:'Ngôi làng 3D trên mây chia năm khu: liệt sĩ, thương binh, dòng họ, người thân, thiên thần nhỏ.',h:'#cong-vien',svg:()=>{
+   {t:'Làng tưởng niệm',d:'Ngôi làng 3D giữa núi rừng: liệt sĩ, thiên thần nhỏ, gia phả các đời vua, tượng đài Bác Hồ, các tướng.',h:'#cong-vien',svg:()=>{
       const R=4.4;let g=puff(-6,0.5,-2.2,1.1)+puff(0.5,-6.5,-1.2,.9);
       g+=poly([...arc(0,0,0,R,-Math.PI/4,3*Math.PI/4),[0,0,-3.6]],'fb3 ln');
       g+=disc(0,0,0,R,'faint ln')+disc(0,0,0,1.5,'ln2');
