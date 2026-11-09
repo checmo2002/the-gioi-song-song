@@ -1,0 +1,42 @@
+/* Công đức chung: các trò nhỏ trên chùa (js/29), dựa trên khung .mo của Gõ mõ (css/27-07) */
+.cdg-h{display:flex;align-items:center;gap:10px;padding-right:44px}
+.cdg-h svg{width:40px;height:40px;flex:none;filter:drop-shadow(0 0 8px rgba(255,190,120,.5))}
+.cdg-h b{display:block;font-family:var(--f-display);font-weight:500;font-size:19px}
+.cdg-h small{font-size:12px;opacity:.7;letter-spacing:.04em}
+.cdg-s{position:relative;display:grid;justify-items:center;gap:10px;margin-top:8px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.cdg-s .mo-plus{top:22%}
+.cdg-vg{width:240px;height:240px;max-width:100%}
+.cdg-dich{fill:none;stroke:rgba(255,210,122,.55);stroke-width:12}
+.cdg-ngan{fill:none;stroke:#FFE9A8;stroke-width:3}
+.cdg-chuong{fill:#C9973F;stroke:#7A4A16;stroke-width:2;transform-origin:120px 70px}
+.cdg-chuong.rung{animation:cdgRung .6s ease-out}
+@keyframes cdgRung{25%{transform:rotate(7deg)}55%{transform:rotate(-5deg)}80%{transform:rotate(2deg)}}
+.cdg-sen{filter:drop-shadow(0 0 10px rgba(255,190,120,.45))}
+.cdg-dom{fill:#784028;filter:drop-shadow(0 0 6px rgba(255,140,60,.7))}
+.cdg-khoi path{fill:none;stroke:rgba(255,255,255,.65);stroke-width:3;stroke-linecap:round;opacity:0}
+.cdg-khoi.len path{animation:cdgKhoi 2.4s ease-out}
+@keyframes cdgKhoi{0%{opacity:.9;transform:translateY(8px)}100%{opacity:0;transform:translateY(-24px)}}
+.cdg-th{fill:rgba(255,255,255,.12)}
+.cdg-xanh{fill:rgba(120,200,120,.55)}
+.cdg-lua{fill:#F2994A}
+.cdg-tho{fill:rgba(243,166,190,.18);stroke:#F3A6BE;stroke-width:2}
+.cdg-ta{fill:rgba(255,210,122,.45)}
+.cdg-dem{fill:#FBF1DC;font:500 16px var(--f-body,sans-serif);text-anchor:middle}
+.cdg-nut{min-width:180px;min-height:48px;padding:0 22px;border-radius:999px;border:1px solid rgba(255,210,122,.6);background:linear-gradient(180deg,#E8BE5A,#C98A2E);color:#2B1606;font:600 15px var(--f-body,inherit);cursor:pointer;touch-action:none}
+.cdg-nut:active{transform:translateY(1px);filter:brightness(.95)}
+.cdg-nut:focus-visible{outline:3px solid #FFE9A8;outline-offset:3px}
+.cdg-chon{margin:24px 0 0;font-size:15px}
+.cdg-phut{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.cdg-phut .cdg-nut{min-width:92px}
+.cdg-f{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;font-size:12.5px;opacity:.85}
+.cdg-bang{border:0;background:none;color:#FFD27A;font:inherit;cursor:pointer;padding:8px 0;min-height:40px}
+.cdg-tab{display:flex;gap:6px;margin-bottom:10px}
+.cdg-tab button{flex:1;min-height:40px;border-radius:999px;border:1px solid rgba(255,210,122,.4);background:none;color:inherit;font:inherit;cursor:pointer}
+.cdg-tab button[aria-pressed="true"]{background:rgba(255,210,122,.2);color:#FFE9A8}
+.cdg-ds{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.cdg-ds li{display:grid;grid-template-columns:92px 1fr auto;align-items:center;gap:10px;font-size:14px}
+.cdg-ds i{height:8px;border-radius:9px;background:rgba(255,255,255,.1);position:relative;overflow:hidden}
+.cdg-ds i::after{content:'';position:absolute;inset:0;width:var(--w);border-radius:9px;background:linear-gradient(90deg,#F3A6BE,#FFD27A)}
+.cdg-ds b{min-width:44px;text-align:right}
+.cdg-tg{margin:14px 0 0;font-size:14px}
+.cdg-gc{margin:8px 0 0;font-size:12px;opacity:.7;line-height:1.45}

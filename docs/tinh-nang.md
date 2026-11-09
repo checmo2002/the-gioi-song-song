@@ -58,6 +58,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `13-hud.js` | HUD bằng biểu tượng |
 | `14-phi-thang.js` | Hiệu ứng phi thăng chuyển cảnh |
 | `15-go-mo.js` | Gõ mõ tích công đức, 108 tiếng, 9 phẩm sen |
+| `29-cong-duc.js` | Trò nhỏ trên chùa: Thắp nhang, Thỉnh chuông, Vái lạy, Tĩnh tâm; cộng chung công đức Gõ mõ, Bảng công đức (`css/32`) |
 | `16-goc-nhin.js` | Phóng to / thu nhỏ góc nhìn, nhớ theo máy |
 | `17-nghi-thuc.js` | Nghi thức Phật giáo 5 bước, Công giáo 5 bước |
 | `18-thoi-gian-thuc.js` | Đồng hồ, lịch âm, ánh sáng theo giờ, thời tiết (Open-Meteo) |
