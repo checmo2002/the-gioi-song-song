@@ -2,7 +2,10 @@
 (function(){
  var KEY='ss-music',ctx=null,master=null,wet=null,timer=null,cur=null,nextT=0,st={},on=true;
  try{on=localStorage.getItem(KEY)!=='off'}catch(e){}
- var VOL=.16;
+ var VOL=.16,MV=1;try{var _mv=parseFloat(localStorage.getItem('ss-music-vol'));if(_mv>=0&&_mv<=1)MV=_mv}catch(e){}
+ // hiệu ứng (chuông, mõ, nến, bay lên): âm lượng chung 0..1 do bảng cài đặt (js/27) chỉnh; mỗi AudioContext đi qua một nút gain riêng
+ window.ssSfx=function(){try{var v=parseFloat(localStorage.getItem('ss-sfx'));if(v>=0&&v<=1)return v}catch(e){}return 1};
+ window.ssRa=function(ac){if(!ac._sfx){ac._sfx=ac.createGain();ac._sfx.connect(ac.destination)}ac._sfx.gain.value=ssSfx();return ac._sfx};
  function mk(){if(ctx)return;var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=ssAm();
   master=ctx.createGain();master.gain.value=0;master.connect(ctx.destination);
   // vang: tiếng dội của chính điện / thánh đường
@@ -49,13 +52,15 @@
  function loop(){if(!ctx||!cur)return;var now=ctx.currentTime;while(nextT<now+2){nextT+=cur==='cg'?cgStep(nextT):phatStep(nextT)}}
  function play(fa){mk();if(!ctx)return;if(ctx.state==='suspended')ctx.resume();var t=ctx.currentTime;
   if(cur===fa&&timer)return;if(st.d){st.d.stop(t)}st={};cur=fa;nextT=t+.3;st.d=drone(fa);
-  master.gain.cancelScheduledValues(t);master.gain.setValueAtTime(master.gain.value,t);master.gain.linearRampToValueAtTime(on?VOL:0,t+3);
+  master.gain.cancelScheduledValues(t);master.gain.setValueAtTime(master.gain.value,t);master.gain.linearRampToValueAtTime(on?VOL*MV:0,t+3);
   clearInterval(timer);timer=setInterval(loop,400);loop()}
  function sync(){[].forEach.call(document.querySelectorAll('[data-music]'),function(b){b.setAttribute('aria-pressed',on?'true':'false');b.title=on?'Tắt nhạc nền':'Bật nhạc nền'})}
  function setOn(v){on=v;try{localStorage.setItem(KEY,v?'on':'off')}catch(e){}sync();
   if(!v){if(ctx){var t=ctx.currentTime;master.gain.cancelScheduledValues(t);master.gain.setValueAtTime(master.gain.value,t);master.gain.linearRampToValueAtTime(0,t+.8);setTimeout(function(){if(!on){clearInterval(timer);timer=null;ctx.suspend()}},900)}}
   else play(cur||(window.ssFaith==='cg'?'cg':'phat'))}
- window.ssMusic={start:function(fa){if(on)play(fa==='cg'?'cg':'phat')},faith:function(fa){if(timer&&on)play(fa)},toggle:function(){setOn(!on)}};
+ window.ssMusic={start:function(fa){if(on)play(fa==='cg'?'cg':'phat')},faith:function(fa){if(timer&&on)play(fa)},toggle:function(){setOn(!on)},
+  on:function(){return on},set:function(v){if(!!v!==on)setOn(!!v)},vol:function(v){if(v==null)return MV;MV=Math.max(0,Math.min(1,+v));try{localStorage.setItem('ss-music-vol',String(MV))}catch(e){}
+   if(ctx&&on&&timer){var t=ctx.currentTime;master.gain.cancelScheduledValues(t);master.gain.setTargetAtTime(VOL*MV,t,.15)}}};
  document.addEventListener('click',function(e){if(e.target.closest('[data-music]')){e.preventDefault();e.stopPropagation();setOn(!on)}},true);
  // khách quay lại (không qua cổng): trình duyệt chỉ cho phát nhạc sau lần chạm đầu tiên
  function first(){removeEventListener('pointerdown',first,true);if(on&&!timer&&!(window.ssGate&&ssGate.pending))play(window.ssFaith==='cg'?'cg':'phat')}

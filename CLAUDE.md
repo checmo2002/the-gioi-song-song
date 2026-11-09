@@ -21,7 +21,7 @@ index.html      Khung trang: toàn bộ HTML, nạp CSS và JS theo đúng thứ
 css/NN-*.css    Giao diện, mỗi file một khu. Thứ tự số = thứ tự nạp (quan trọng vì CSS đè nhau)
 js/NN-*.js      Mỗi file một tính năng, đa số là IIFE độc lập. Thứ tự số = thứ tự chạy
 data/           Dữ liệu mẫu (JSON thuần trong window.SS_DATA), nạp ngay trước js/07-*
-img/            Ảnh render isometric (lang/), nhân vật (nv/), đồ trong nhà (ho/)
+img/            Cảnh và nhân vật 3D (3d/), tranh nhà gia phả (ho/), âm thanh (am/). Không còn bản 2D
 tests/smoke.py  Kiểm tra nhanh, bắt buộc ĐẠT trước khi gộp
 tests/hinh-anh.py  So ảnh chụp 6 màn × 2 cỡ với tests/anh-chuan/, bắt buộc ĐẠT
 docs/           Tầm nhìn, bản đồ tính năng, chuẩn đồ hoạ, danh sách việc
@@ -57,6 +57,10 @@ python3 -m http.server 8000
 Chưa có hosting. Bản thử là một trang riêng tư trên claude.ai tên "Song Song bản thử", dựng lại từ `main` sau mỗi lần gộp:
 `python3 tools/ban-thu.py` rồi đăng `dist/ban-thu/index.html` kèm `css/`, `js/`, `data/`, `img/` lên đúng artifact đó (giữ link cũ).
 Chủ dự án mở link này trên điện thoại thật để thử.
+
+Hosting thử (Cloudflare Pages, miễn phí): `songsong.bandolietsi.vn`, tự dựng lại mỗi lần `main` đổi, mỗi PR có link xem trước riêng.
+Cài đặt trang Pages: Build command `python3 tools/cloudflare.py`, Build output directory `dist/cloudflare`, nhánh `main`.
+Script chỉ đưa lên `index.html`, `css/`, `js/`, `data/`, `img/` và thêm `_headers` (cache, bảo mật). Thêm thư mục mới mà trang cần thì sửa danh sách `CAN` trong script.
 
 ## Cần chủ dự án duyệt (agent không tự quyết)
 

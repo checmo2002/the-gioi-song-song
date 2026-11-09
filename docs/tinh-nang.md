@@ -5,7 +5,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 ## Luồng chính
 
 1. **Màn chờ** → **sảnh chọn lối** (`#gate`): nhân vật đi tới cổng Phật giáo hoặc Công giáo.
-2. **Phi thăng** (hiệu ứng chuyển cảnh) → **Đại sảnh** (`#hall`) với bản đồ làng isometric.
+2. **Phi thăng** (hiệu ứng chuyển cảnh) → **Đại sảnh** (`#hall`) với thế giới 3D (bản 2D đã bỏ).
 3. Từ đại sảnh: **thế giới núi** (`#world`, chân núi → lên núi → chính điện / nhà thờ), làng tưởng niệm, làng riêng của gia đình, đài liệt sĩ.
 4. Các **trang mục** mở riêng, xếp theo 3 nơi: Chùa · Người thân · Gia đình.
 
@@ -31,10 +31,10 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | File | Tính năng |
 |---|---|
 | `00-vong-ve.js` | Hàm dùng chung: vòng vẽ chỉ chạy khi nhìn thấy (`ssVong`), theo dõi thanh công cụ (`ssKhiDoi`), AudioContext chung (`ssAm`) |
-| `01-man-cho.js` | Màn chờ có thanh phần trăm |
+| `01-man-cho.js` | Màn chờ có thanh phần trăm; máy có 3D thì chờ cảnh 3D sắp vào nạp xong (tối đa 60 giây), cảnh khác nạp ngầm |
 | `02-am-lich.js` | Lịch âm Việt Nam (thuật toán Hồ Ngọc Đức, UTC+7), biến toàn cục `LV` |
 | `03-nhac-nen.js` | Nhạc nền tự soạn bằng Web Audio theo lối (đàn tranh / organ) |
-| `04-00-du-lieu-canh.js` | Dữ liệu 7 cảnh isometric (`window.SS_CANH`): lưới đi được, tỉ lệ, điểm bấm. Sửa cảnh là sửa file này |
+| `04-00-du-lieu-canh.js` | Dữ liệu 7 cảnh (`window.SS_CANH`): lưới đi được, tỉ lệ, điểm bấm theo toạ độ ảnh camera iso (ảnh 2D đã bỏ, chỉ còn 3D). Sửa cảnh là sửa file này |
 | `04-01-the-gioi-nui.js` | Thế giới núi: chân núi → lên núi → chính điện, nhân vật, di chuyển |
 | `05-dai-sanh.js` | Mở đại sảnh sau cổng, khi vào lại trang, khi bấm logo |
 | `06-trang-muc.js` | Mỗi mục là một trang riêng, điều hướng |
@@ -54,7 +54,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `08-icon-bien-hinh.js` | Icon biến hình (morphicons, tải từ jsdelivr) |
 | `09-trang-nguoi-than.js` | Trang Người thân |
 | `10-thap-nhang.js` | Thắp nhang chỉ ở một nơi: chính điện / nhà thờ |
-| `11-lang-tuong-niem.js` | Làng tưởng niệm: chọn xóm → chọn người → vào gian thờ |
+| `11-lang-tuong-niem.js` | Làng tưởng niệm: chọn khu (Liệt sĩ, Thiên thần nhỏ) → chọn người → vào gian thờ |
 | `12-chon-loi.js` | Sảnh chọn lối, đi tới cổng để chọn |
 | `13-hud.js` | HUD bằng biểu tượng |
 | `14-phi-thang.js` | Hiệu ứng phi thăng chuyển cảnh |
@@ -65,10 +65,16 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `19-mot-cho-thap-nhang.js` | Mọi nút thắp đều dẫn về nghi thức trong chính điện |
 | `20-lang-rieng.js` | Làng riêng dựng từ gia phả |
 | `21-ban-do-lang.js` | Bản đồ các khu quanh Sảnh Song Song |
-| `22-nhan-ban-do.js` | Xếp nhãn trên bản đồ, tránh chồng chéo |
+| `26` · làng chung | Chủ dự án chốt 08/11/2026: các khu quanh Sảnh Song Song: **Liệt sĩ** (Đồi Tri Ân, đài tưởng niệm), **Bác Hồ** (quảng trường tượng đài đông bắc: tượng đồng vàng vẫy chào tạo bằng Meshy từ ảnh Bác, bệ đá đen khắc "CHỦ TỊCH HỒ CHÍ MINH (1890 - 1969)", xuất riêng trong `tuong.json`), **Các tướng** (tách khỏi khu Bác theo chủ dự án: quảng trường riêng tây bắc, 14 bia, ngôi sao đồng), **Gia phả các đời vua** (đình cũ thành đền, bia triều đại trên rùa đá), **Thiên thần nhỏ** (vườn hoa, nhà vòm trắng mái hồng). Bỏ Xóm Đồng Đội, Xóm Dòng Họ, Xóm Bình Yên, Đình làng (người thân, dòng họ ở Làng nhà tôi). Quanh làng: đồi, rừng, vách đá có thác lớn đổ xuống hồ sau tượng Bác, suối chảy về đông nam. Dựng bằng `tools/blender/sua-lang-v2.py` (ra lưới đi, cổng khu, vị trí nút, toạ độ nước) |
+| `28-khu-lich-su.js` | Ba bảng: gia phả các đời vua (từng triều, ai là con ai), Chủ tịch Hồ Chí Minh, các tướng và lãnh đạo tiêu biểu. Dữ liệu `data/lich-su.js` (`window.SS_LICHSU`) tra từ nguồn công khai, **chờ chủ dự án duyệt**; mục có `chuY` là chỗ các nguồn lệch nhau |
+| `22-nhan-ban-do.js` | Xếp nhãn trên bản đồ (cả nhãn 3D), tránh chồng chéo; nhãn nằm dưới thanh trên, nút, hoặc cắt mép màn hình thì ẩn. Nút có `p3` (toạ độ 3D) đặt cố định, như nhãn trên đầu tượng Bác |
 | `23-dai-tuong-niem-liet-si.js` | Đài tưởng niệm liệt sĩ: nhang tri ân, lời tri ân |
 | `24-bay-to.js` | Một nút "Bày tỏ", bấm mới mở 4 cách bày tỏ (chắp tay, thương nhớ, dâng hoa, cầu an) |
 | `25-npc.js` | NPC người viếng: 1–3 người mỗi cảnh đi lại, chắp tay, vái lạy, ngồi. Chỉ chạy trên máy người xem, không tên, không tính vào số người trực tuyến, đứng yên khi bật giảm chuyển động |
+| `26-the-gioi-3d.js` | Thế giới 3D thời gian thực, hiện có sảnh, chân núi, nhà thờ, làng tưởng niệm, làng dòng họ, ngôi nhà, chính điện; chuyển cảnh là đoạn phim "Bạn" đi bộ tới nơi (`ss3dPhim`, gọi từ `js/04-01`) (three.js, `css/29-the-gioi-3d.css`): vẽ lại cảnh, nhân vật đất nặn của mình, người khác và NPC từ vị trí của `04-01`; bấm để đi, kéo để xoay; thả tay 4 giây thì camera tự lướt về góc mặc định (thu nhỏ quá mặc định cũng trả về). Nạp ngay khi mở trang, màn tải (`01`) chờ 3D xong mới mở; vào cảnh 3D lúc chưa xong thì có màn chờ riêng. Máy không có GPU thật thì giữ ảnh 2D |
+| `26` · chùa đỉnh núi | Cảnh `dien` dựng bằng `tools/blender/sua-dien-v2.py` (chạy trên bản sao .blend, ra cả lưới đi và vị trí nút cho `04-00`). Năm khu: thắp nhang (lư hương giữa sân), lễ Phật (chiếu trước tượng), gõ mõ (gian trái), thỉnh chuông (lầu chuông), tĩnh tâm (đá thiền dưới cội bồ đề). Mái chính điện (`SS_Mai*` trong `tuong.json`) mờ khi "Bạn" vào điện. Cảnh động trong `trangTriDien` theo `CHUA`: cò bay, bướm, khói hương, nước hồ, suối, thác, mây, lá rơi. |
+| `img/am/suoi.mp3` | Tiếng suối ở chùa đỉnh núi: bản ghi "Tiếng suối chảy" của tiengdong.com do chủ dự án gửi (08/11/2026), cắt 42 giây lặp liền mạch. Thay âm thanh thì giữ ghi nguồn ở đây |
+| `27-cai-dat.js` | Nút bánh răng góc phải trên thế giới mở bảng **Cài đặt** (`css/30-cai-dat.css`): bật/tắt và âm lượng nhạc nền (`03`, `ss-music`, `ss-music-vol`), âm thanh không gian (`07-11`, `ss-sound`, `ss-vol`), hiệu ứng (`ss-sfx`, mọi tiếng chuông, mõ, nến, bay lên đi qua `ssRa()` của `03`); nút nghe thử tiếng bay lên |
 
 > Các file `07-NN-*.js` dùng chung tên cấp ngoài cùng (`people`, `current`, `select`, `buy`…) qua phạm vi toàn cục của trang.
 > Vì vậy phải giữ đúng thứ tự nạp, và file khác không được khai báo trùng các tên này ở cấp ngoài cùng.
