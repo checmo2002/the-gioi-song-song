@@ -88,7 +88,7 @@
  var FROM=null;
  function menu(k){if(!LAY||!LAY.houses[k])return;var hs=LAY.houses[k],pid=hs.ids[0];
   sh.innerHTML='<div class="hos-c">'+head(k)+'<div class="hos-act"><button type="button" data-a="vao">'+sv('vao')+'Vào nhà</button><button type="button" data-a="nhang">'+sv('nhang')+(window.ssFaith==='cg'?'Thắp nến':'Thắp hương')+'</button><button type="button" data-a="sua">'+sv('sua')+'Sửa nhà</button><button type="button" data-a="hs">'+sv('hs')+'Hồ sơ</button></div>'+(hs.ids.length>1?'<p class="hos-note">Vợ chồng ở chung một nhà.</p>':'')+'</div>';
-  sh.hidden=false;var d=stage.querySelector('.ho-h[data-h="'+k+'"]');if(d){d.classList.remove('pulse');void d.offsetWidth;d.classList.add('pulse')}
+  sh.hidden=false;var d=hall.querySelector('.ho-h[data-h="'+k+'"]');if(d){d.classList.remove('pulse');void d.offsetWidth;d.classList.add('pulse')}
   sh.querySelector('.hos-act').addEventListener('click',function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a;
    if(a==='vao'){sh.hidden=true;FROM=k;window.ssPerson&&ssPerson.select(pid);window.ssVaoNha&&ssVaoNha(pid)}
    if(a==='nhang'){sh.hidden=true;FROM=k;window.ssPerson&&ssPerson.select(pid);window.ssVaoNha&&ssVaoNha(pid);setTimeout(function(){window.ssRitual&&ssRitual.open(pid)},1500)}
