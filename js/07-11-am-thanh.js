@@ -78,7 +78,11 @@
 
   document.addEventListener('visibilitychange',()=>{if(!ctx||!on)return;document.hidden?ctx.suspend():ctx.resume()});
   // âm thanh khi thắp hương / mở kỷ vật
-  window.ssBell=()=>{if(on){bell(146.83,.9);mo(.05,.5)}};window.ssChime=()=>{if(on){zheng(74,.6,0,0);zheng(79,.5,.16,0)}};
+  // chuông khi thắp hương / mở kỷ vật: qua vang của không gian nếu đang bật, không thì tiếng chuông riêng (js/02); âm lượng theo mục Hiệu ứng
+  const bell02=window.ssBell,sv=()=>window.ssSfx?ssSfx():1;
+  window.ssBell=fa=>{if(!sv())return;if(on){bell(146.83,.9*sv());mo(.05,.5*sv())}else if(bell02)bell02(fa)};window.ssChime=()=>{if(on&&sv()){zheng(74,.6*sv(),0,0);zheng(79,.5*sv(),.16,0)}};
+  window.ssAmbient={on:()=>on,set:v=>{if(!!v!==on)setOn(!!v)},vol:v=>{if(v==null)return VOL/.3;VOL=Math.max(0,Math.min(.3,v*.3));try{localStorage.setItem('ss-vol',String(VOL))}catch(e){}
+    if(vol)vol.value=Math.round(VOL*100);if(ctx&&on){const t=ctx.currentTime;master.gain.cancelScheduledValues(t);master.gain.setTargetAtTime(VOL,t,.15)}}};
   let pref=null;try{pref=localStorage.getItem('ss-sound')}catch(e){}
   // mặc định luôn bật (âm lượng 20%); chỉ tắt nếu người xem đã chủ động tắt
   if(pref!=='0'){

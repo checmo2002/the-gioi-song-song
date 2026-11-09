@@ -1,7 +1,7 @@
 /* Làng tưởng niệm: chọn xóm → chọn người → vào gian thờ */
 (function(){
  var hall=document.getElementById('hall');if(!hall)return;
- var COL={ls:'#8B3A1E',tb:'#2F5D8A',dh:'#4E7A3A',nt:'#7A4A8C'},NAME={ls:['Đồi Tri Ân','Nơi các liệt sĩ yên nghỉ'],tb:['Xóm Đồng Đội','Các thương binh'],dh:['Xóm Dòng Họ','Ông bà, tổ tiên'],nt:['Xóm Bình Yên','Người thân trong gia đình']};
+ var COL={ls:'#8B3A1E',tb:'#2F5D8A',dh:'#4E7A3A',nt:'#7A4A8C',tt:'#C77C9A'},NAME={ls:['Liệt sĩ · Đồi Tri Ân','Nơi các liệt sĩ yên nghỉ'],tb:['Xóm Đồng Đội','Các thương binh'],dh:['Xóm Dòng Họ','Ông bà, tổ tiên'],nt:['Xóm Bình Yên','Người thân trong gia đình'],tt:['Thiên thần nhỏ','Vườn hoa tưởng nhớ các bé ra đi khi còn nhỏ']};
  function esc(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
  var box=document.createElement('div');box.className='xom';box.hidden=true;box.setAttribute('role','dialog');hall.appendChild(box);
  window.ssXom=function(c){var L=(window.ssPerson?ssPerson.all():[]).filter(function(p){return p.c===c}),n=NAME[c]||['Xóm',''];
