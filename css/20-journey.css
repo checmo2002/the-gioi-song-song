@@ -5,7 +5,7 @@
 .steps button{width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:16px 0 16px 52px;cursor:pointer;position:relative;display:block}
 .steps li:last-child button{border-bottom:1px solid var(--line)}
 .steps button::before{counter-increment:s;content:"0" counter(s);position:absolute;left:0;top:14px;width:34px;height:34px;border-radius:4px;font-family:var(--f-body)!important;font-size:13px!important;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--f-display);font-size:19px;color:var(--ink-soft)}
-.steps button[aria-selected="true"]::before{background:var(--blue);border-color:var(--blue);color:#fff}
+.steps button[aria-selected="true"]::before{background:var(--nut);border-color:var(--nut);color:#fff}
 .steps b{display:block;font-weight:500}
 .steps span{font-size:13px;color:var(--ink-soft)}
 .jpanel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:clamp(20px,3vw,32px);min-height:420px}
@@ -41,7 +41,7 @@
 .log p{font-size:13px;color:var(--ink-soft)}
 .ba{display:flex;gap:8px;margin-top:10px}
 .ba div{width:92px;aspect-ratio:4/3;border-radius:8px;position:relative;background:var(--g)}
-.ba div span{position:absolute;left:5px;bottom:4px;font-size:10px;background:rgba(255,255,255,.85);color:#222;padding:0 5px;border-radius:3px}
+.ba div span{position:absolute;left:5px;bottom:4px;font-size:12px;background:rgba(255,255,255,.85);color:#222;padding:0 5px;border-radius:3px}
 .quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:18px}
 .quick a{border:1px solid var(--line);border-radius:14px;padding:16px;text-decoration:none;color:var(--ink);background:var(--paper)}
 .quick a b{display:block;font-family:var(--f-display);font-size:22px}

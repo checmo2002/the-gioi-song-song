@@ -119,6 +119,10 @@
   var o=document.getElementById('hallOnline');if(o){o.hidden=n<2;o.querySelector('b').textContent=n;o.title=here+' người đang ở '+(scene==='dien'?'Chính điện':'chân núi')+' · '+n+' người trực tuyến'}}
  function send(){if(!room||!on())return;var p=av.me||me;room.presence({w:1,f:'phat',s:(window.ssHoKey?ssHoKey(scene):scene),h:hall.hidden?0:1,x:+p.x.toFixed(3),y:+p.y.toFixed(3),tx:+me.tx.toFixed(3),ty:+me.ty.toFixed(3),a:me.a,k:me.k,e:me.e,n:myName(),li:window.ssLit?ssLit.mine():0}).catch(function(){})}
  function goTo(x,y,act){var c=clampFloor(x,y);me.tx=c[0];me.ty=c[1];me.a=act||'dung';var p=av.me;if(p){p.tx=me.tx;p.ty=me.ty;p.path=null;if(st.map){var pa=pathTo(p.x,p.y,me.tx,me.ty);var f0=pa.shift()||[me.tx,me.ty];p.tx=f0[0];p.ty=f0[1];p.path=pa}p.want=me.a;p.faceUp=me.a==='chap'||me.a==='lay';if(Math.hypot(p.tx-p.x,p.ty-p.y)<.003){p.a=me.a;p.f=0;if(p.faceUp)p.d=4}}send()}
+ // bàn phím: mũi tên hoặc W A S D để đi (mỗi lần nhấn một bước, giữ phím thì đi liền)
+ addEventListener('keydown',function(e){if(hall.hidden||!on()||e.altKey||e.ctrlKey||e.metaKey||!av.me)return;var t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;if(document.querySelector('dialog[open]'))return;
+  var k={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]}[e.key.toLowerCase()];if(!k)return;e.preventDefault();
+  var p=av.me,b=.04;goTo(p.x+k[0]*b*(st.sh/st.sw||1),p.y+k[1]*b,'dung')});
  stage.addEventListener('click',function(ev){var ls=hall.querySelector('.hall-list.open');if(ls){ls.classList.remove('open');hall.classList.remove('list-open');return}if(ev.target.closest('.wh'))return;var r=stage.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width,y=(ev.clientY-r.top)/r.height,f=SC[scene].floor[O];
   if(!st.map&&y<f.t-.25)return;pend=null;goTo(x,y,'dung');var c=clampFloor(x,y),pg=document.createElement('i');pg.className='w-ping';pg.style.left=c[0]*100+'%';pg.style.top=c[1]*100+'%';fl.appendChild(pg);setTimeout(function(){pg.remove()},700)});
  // ---- chuyển cảnh

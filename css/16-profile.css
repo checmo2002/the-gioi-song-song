@@ -5,7 +5,7 @@
 @media (max-width:860px){.portrait{position:static}}
 .frame{aspect-ratio:3/4;max-width:100%;border-radius:999px 999px 14px 14px;padding:14px;background:linear-gradient(160deg,var(--ember-soft),var(--paper-2));border:1px solid var(--line)}
 .frame-in{width:100%;height:100%;border-radius:999px 999px 8px 8px;background:radial-gradient(ellipse at 50% 38%,color-mix(in srgb,var(--ink) 18%,var(--paper)) 0 22%,transparent 23%),radial-gradient(ellipse at 50% 100%,color-mix(in srgb,var(--ink) 22%,var(--paper)) 0 46%,transparent 47%),var(--paper);display:flex;align-items:flex-end;justify-content:center;padding:18px;text-align:center}
-.frame-in span{font-size:11px;color:var(--ink-soft);background:var(--paper);padding:3px 8px;border-radius:4px}
+.frame-in span{font-size:12px;color:var(--ink-soft);background:var(--paper);padding:3px 8px;border-radius:4px}
 .incense{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--card);display:grid;grid-template-columns:90px 1fr;gap:14px;align-items:center}
 .incense svg{width:90px;height:110px}
 .incense .smoke path{fill:none;stroke:var(--ink-soft);stroke-width:1.2;stroke-linecap:round;opacity:0;stroke-dasharray:4 6}
@@ -23,7 +23,7 @@
 .pdates{font-family:var(--f-display);font-size:28px;color:var(--ink-soft);margin-top:10px;font-variant-numeric:lining-nums}
 .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin-top:32px;border-top:1px solid var(--line)}
 .facts div{padding:12px 0;border-bottom:1px solid var(--line);padding-right:16px}
-.facts dt{font-family:var(--f-body);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.facts dt{font-family:var(--f-body);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
 .facts dd{margin:2px 0 0;font-weight:500}
 @media (max-width:520px){.facts{grid-template-columns:1fr}}
 .chapters{margin-top:48px;display:flex;flex-direction:column}

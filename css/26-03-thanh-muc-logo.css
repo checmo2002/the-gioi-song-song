@@ -6,7 +6,7 @@ nav.tabbar{position:relative;flex:0 1 auto;margin-inline:auto;display:flex;align
 .tabbar .tb-ic{display:grid;place-items:center;transition:transform .5s var(--ease),color .35s}
 .tabbar .tb-ic svg{width:17px;height:17px}
 .tabbar .tb.on{color:#2B241C}
-.tabbar .tb.on .tb-ic{color:#9A6E22}
+.tabbar .tb.on .tb-ic{color:#8C6324}
 .tabbar .tb:active .tb-ic{transform:scale(.88)}
 .tb-light{position:absolute;z-index:1;left:0;top:4px;height:38px;width:90px;border-radius:999px;background:linear-gradient(180deg,#FFF8E6 0%,#F6E3B4 100%);box-shadow:inset 0 1px 0 #fff,inset 0 0 0 1px rgba(184,134,47,.32),0 4px 14px rgba(184,134,47,.22);opacity:0;transition:opacity .3s,width .45s var(--ease),height .45s var(--ease);cursor:grab;touch-action:none;will-change:transform}
 .tb-light::after{content:"";position:absolute;left:50%;bottom:-7px;width:18px;height:3px;margin-left:-9px;border-radius:3px;background:#C9963A;box-shadow:0 0 10px 2px rgba(232,180,80,.7)}
@@ -18,7 +18,7 @@ nav.tabbar{position:relative;flex:0 1 auto;margin-inline:auto;display:flex;align
 .tb-pop[hidden]{display:none}
 @keyframes popIn{from{opacity:0;transform:translateY(-6px) scale(.97)}}
 .tb-pop a{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;color:#2B241C;text-decoration:none;font-size:14px}
-.tb-pop a svg{color:#9A6E22;flex-shrink:0}
+.tb-pop a svg{color:#8C6324;flex-shrink:0}
 .tb-pop a:hover,.tb-pop a.on{background:rgba(184,134,47,.12)}
 .nav-auth .btn{border-radius:999px;padding:9px 18px;height:40px}
 .nav-auth .btn.ghost{border-color:rgba(43,36,28,.14);background:rgba(255,253,248,.6)}
@@ -30,7 +30,7 @@ nav.tabbar{position:relative;flex:0 1 auto;margin-inline:auto;display:flex;align
 @media (max-width:1060px){.tabbar .tb-t{font-size:13px}.tabbar .tb{padding:0 9px}.nav-auth .btn.ghost{display:none}}
 @media (max-width:860px){
   nav.tabbar{position:fixed;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:45;margin:0;width:calc(100vw - 24px);max-width:420px;padding:4px 6px;justify-content:space-between;border-radius:30px;background:rgba(255,253,248,.86);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 16px 36px rgba(43,36,28,.2);transition:transform .45s var(--ease),opacity .3s}
-  .tabbar .tb{flex:1;flex-direction:column;gap:4px;height:58px;padding:0;font-size:11.5px;border-radius:20px;color:#7A6E5E}
+  .tabbar .tb{flex:1;flex-direction:column;gap:4px;height:58px;padding:0;font-size:12px;border-radius:20px;color:#7A6E5E}
   .tabbar .tb-ic{width:52px;height:30px;border-radius:999px}
   .tabbar .tb-ic svg{width:21px;height:21px}
   .tabbar .tb.on{color:#2B241C}.tabbar .tb.on .tb-ic{transform:none}
@@ -45,7 +45,7 @@ nav.tabbar{position:relative;flex:0 1 auto;margin-inline:auto;display:flex;align
   body{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
   .msheet{z-index:44;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
   .snd{bottom:calc(94px + env(safe-area-inset-bottom,0px))}
-  #tbMore[aria-expanded="true"]{color:#2B241C}#tbMore[aria-expanded="true"] .tb-ic{color:#9A6E22}
+  #tbMore[aria-expanded="true"]{color:#2B241C}#tbMore[aria-expanded="true"] .tb-ic{color:#8C6324}
   .toast{bottom:calc(98px + env(safe-area-inset-bottom,0px))}
   .nav .wrap{height:60px}
   .cal-btn{margin-left:auto;height:46px;padding:5px 12px 5px 6px}.cal-btn i{width:34px;height:34px;font-size:14px}

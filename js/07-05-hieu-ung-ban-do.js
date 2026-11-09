@@ -28,7 +28,7 @@ function renderMap(){
   // nhóm các điểm trùng nhau
   const seen={};
   $('#vmapMarks').innerHTML=list.map(({p,pt})=>{const [x,y]=vp(pt[0],pt[1]);const k=x.toFixed(0)+','+y.toFixed(0);const n=seen[k]=(seen[k]||0)+1;const ox=(n-1)*7,oy=-(n-1)*3;const c=ZBY[p.c].col;const on=p.id===current;
-    return `<g class="mk${on?' on':''}" data-id="${p.id}" transform="translate(${x+ox},${y+oy})"><circle class="pulse" r="8" stroke="${c}"/><circle class="o" r="7" stroke="${c}"/><circle class="i" r="3.2" fill="${c}"/>${on?`<text font-family="Be Vietnam Pro, sans-serif" x="12" y="4">${esc(p.name)}</text>`:''}</g>`}).join('');
+    return `<g class="mk${on?' on':''}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(p.name)}${on?', đang chọn':''}" transform="translate(${x+ox},${y+oy})"><circle class="pulse" r="8" stroke="${c}"/><circle class="o" r="7" stroke="${c}"/><circle class="i" r="3.2" fill="${c}"/>${on?`<text font-family="Be Vietnam Pro, sans-serif" x="12" y="4">${esc(p.name)}</text>`:''}</g>`}).join('');
   // đưa điểm đang chọn lên trên cùng
   const on=$('#vmapMarks .mk.on');if(on)on.parentNode.appendChild(on);
   const p=byId[current],g=GEO[current]||{};const pt=g[vLayer];
@@ -40,5 +40,6 @@ function renderMap(){
   const gt=$('#vcard [data-tab]');if(gt)gt.addEventListener('click',()=>showTab('msg'));
 }
 $('#vmapMarks').addEventListener('click',e=>{const g=e.target.closest('.mk');if(g)select(g.dataset.id,true)});
+$('#vmapMarks').addEventListener('keydown',e=>{const g=e.target.closest('.mk');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();select(g.dataset.id,true);const n=$(`#vmapMarks .mk[data-id="${CSS.escape(g.dataset.id)}"]`);n&&n.focus()}});   // vẽ lại xong vẫn giữ chỗ con trỏ phím
 $('#vlist').addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(b)select(b.dataset.id,true)});
 $('#vmapLayer').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;vLayer=b.dataset.l;$$('#vmapLayer button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderMap()});

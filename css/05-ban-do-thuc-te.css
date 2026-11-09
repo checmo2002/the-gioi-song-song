@@ -7,10 +7,11 @@
 .vmap .nb{fill:var(--paper-2);stroke:var(--line);stroke-width:.8}
 .vmap .vn{fill:color-mix(in srgb,var(--jade) 26%,var(--card));stroke:var(--jade);stroke-width:1.1;stroke-linejoin:round}
 .vmap .city circle{fill:var(--ink-soft)}
-.vmap .city text,.vmap .isl text,.vmap .sea-l{font-size:11px;fill:var(--ink-soft);font-family:var(--f-body)}
+.vmap .city text,.vmap .isl text,.vmap .sea-l{font-size:12px;fill:var(--ink-soft);font-family:var(--f-body)}
 .vmap .isl circle{fill:var(--jade)}
 .vmap .sea-l{font-style:italic;letter-spacing:.2em;font-size:13px}
 .vmap .mk{cursor:pointer}
+.vmap .mk:focus{outline:none}.vmap .mk:focus-visible circle.o{stroke-width:4;stroke-dasharray:3 2}
 .vmap .mk circle.o{fill:var(--card);stroke-width:3}
 .vmap .mk circle.i{stroke:none}
 .vmap .mk.on circle.o{stroke-width:4}
@@ -18,7 +19,7 @@
 .vmap .mk.on .pulse{animation:mkp 1.8s ease-out infinite}
 @keyframes mkp{from{r:8;opacity:.8}to{r:26;opacity:0}}
 @media (prefers-reduced-motion:reduce){.vmap .mk.on .pulse{animation:none}}
-.vmap .mk text{font-size:11px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:3px}
+.vmap .mk text{font-size:12px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:3px}
 .vmap-side{display:flex;flex-direction:column;gap:16px;min-width:0}
 .seg2{display:inline-flex;gap:2px;background:var(--paper-2);padding:4px;border-radius:999px;align-self:flex-start}
 .seg2 button{border:0;background:none;padding:7px 16px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;color:var(--ink-soft)}
@@ -61,7 +62,7 @@
   .zlabel{padding:5px 10px 6px;border-radius:10px}
   .zlabel b{font-size:15px}
   .zlabel small{display:none}
-  .plabel{font-size:11px;padding:2px 7px}
+  .plabel{font-size:12px;padding:2px 7px}
   .plabel i{display:none}
   .zone-banner{top:auto;bottom:14px;padding:8px 16px}
   .zone-banner b{font-size:20px}
@@ -70,7 +71,7 @@
   .park-prompt b{font-size:22px}
   .park-prompt .btn{padding:8px 12px;font-size:13px}
   .park-panel{padding:18px var(--gut);gap:12px}
-  .park-panel h1{font-size:28px}
+  .park-panel .pp-h{font-size:28px}
   .results{max-height:210px}
   .park-card{display:none}
   .home-stage{min-height:380px}

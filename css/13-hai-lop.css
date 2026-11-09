@@ -4,7 +4,7 @@ section[id]{scroll-margin-top:60px}
 .isteps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line)}
 .isteps{gap:0 36px}
 .isteps li{padding:26px 0 28px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.isteps span{font:600 11.0px var(--f-body);color:var(--blue-2);letter-spacing:.06em}
+.isteps span{font:600 12px var(--f-body);color:var(--blue-2);letter-spacing:.06em}
 .isteps h3{font-size:26px;font-weight:300;letter-spacing:-.03em}
 .isteps p{color:var(--ink-soft);max-width:34ch}
 @media (max-width:760px){.isteps{grid-template-columns:1fr}.isteps li{border-bottom:1px solid var(--line)}}
