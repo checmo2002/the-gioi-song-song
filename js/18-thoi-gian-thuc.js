@@ -3,6 +3,7 @@
  var hall=document.getElementById('hall');if(!hall)return;
  var CITY={hn:['Hà Nội',21.03,105.85,'b'],hp:['Hải Phòng',20.86,106.68,'b'],hue:['Huế',16.46,107.59,'t'],dn:['Đà Nẵng',16.05,108.2,'t'],nt:['Nha Trang',12.24,109.19,'t'],dl:['Đà Lạt',11.94,108.44,'c'],hcm:['TP. Hồ Chí Minh',10.78,106.7,'n'],ct:['Cần Thơ',10.03,105.78,'n']};
  var KEY='ss-wx',cfg={};try{cfg=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}cfg.city=cfg.city||'hn';
+if(!CITY[cfg.city])cfg.city='hn';   // tên nơi cũ đã bị bỏ khỏi danh sách: về Hà Nội thay vì làm sập
  function sv(){try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(e){}}
  var THU=['Chủ nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
  // ---------- biểu tượng ----------

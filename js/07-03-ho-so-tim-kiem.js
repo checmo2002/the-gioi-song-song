@@ -49,11 +49,16 @@ function select(id,fly){
 }
 
 /* ---------------- Ký ức ---------------- */
-const notes=SS_DATA.notes;
+const notes=SS_DATA.notes,NKEY='ss-loi-nhan';
+// lời nhắn người dùng gửi: lưu trên máy này (chưa có máy chủ), ghép vào dữ liệu mẫu khi mở trang
+let myNotes={};try{const d=JSON.parse(localStorage.getItem(NKEY)||'{}');if(d&&typeof d==='object')myNotes=d}catch(e){}
+for(const k in myNotes)if(Array.isArray(myNotes[k]))notes[k]=myNotes[k].filter(n=>Array.isArray(n)&&n.length===3).map(n=>n.map(String)).concat(notes[k]||[]);
 function renderWall(){const n=notes[current]||[];$('#wall').innerHTML=n.length?n.map(([t,a,d])=>`<div class="note"><p>${esc(t)}</p><footer>${esc(a)} · ${d}</footer></div>`).join(''):'<p style="color:var(--ink-soft)">Chưa có lời nhắn nào. Hãy là người đầu tiên.</p>'}
 // mọi chữ do người dùng nhập (tên, quê, năm…) phải qua esc trước khi vào innerHTML
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-$('#msgForm').addEventListener('submit',e=>{e.preventDefault();const t=new Date();(notes[current]||(notes[current]=[])).unshift([$('#mText').value,$('#mName').value,t.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'})]);$('#mText').value='';renderWall();toast('Đã gửi lời nhắn tới '+byId[current].name)});
+$('#msgForm').addEventListener('submit',e=>{e.preventDefault();const t=new Date();const n=[$('#mText').value,$('#mName').value,t.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'})];(notes[current]||(notes[current]=[])).unshift(n);(myNotes[current]||(myNotes[current]=[])).unshift(n);
+  let ok=true;try{localStorage.setItem(NKEY,JSON.stringify(myNotes))}catch(e){ok=false}
+  $('#mText').value='';renderWall();toast(ok?'Đã lưu lời nhắn tới '+byId[current].name+' trên máy này':'Lời nhắn chỉ hiện tạm, trình duyệt đang chặn bộ nhớ')});
 function showTab(p){$$('#memTabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p===p));$$('[data-pane]').forEach(d=>d.hidden=d.dataset.pane!==p)}
 $('#memTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showTab(b.dataset.p)});
 $$('[data-tab]').forEach(a=>a.addEventListener('click',()=>showTab(a.dataset.tab)));
