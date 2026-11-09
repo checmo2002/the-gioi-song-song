@@ -34,7 +34,7 @@
   if(e.target.closest('.rit-x'))close();if(e.target.closest('.rit-go'))light()});
  cta.addEventListener('click',function(){open()});
  // Phật giáo: muốn thắp thì lên chính điện trước
- function goDien(id){var W=window.ssWorld;if(cg()&&W){if(W.scene()!=='tho'){W.fade('tho');setTimeout(function(){open(id)},1300)}else open(id);return}if(W&&W.on&&W.on()&&W.scene()!=='dien'){W.climb();setTimeout(function(){open(id)},2900)}else open(id)}
+ function goDien(id){var W=window.ssWorld;if(cg()&&W){if(W.scene()!=='tho'){W.fade('tho',null,null,function(){open(id)})}else open(id);return}if(W&&W.on&&W.on()&&W.scene()!=='dien'){W.climb(function(){open(id)})}else open(id)}
  window.ssRitual={open:open,close:close,go:function(id){if(hall.hidden&&window.ssHall)ssHall.open();setTimeout(function(){goDien(id)},450)}};
  document.addEventListener('click',function(e){var b=e.target.closest('[data-pg-inc]');if(b){e.preventDefault();e.stopImmediatePropagation();var p=window.ssPerson&&ssPerson.get();ssRitual.go(p&&p.id)}
   var a=e.target.closest('a[href="#thap-nhang"]');if(a){e.preventDefault();e.stopImmediatePropagation();ssRitual.go()}},true);
