@@ -21,8 +21,8 @@
 @keyframes pageFlip{0%{transform:rotateX(-78deg);opacity:0;filter:brightness(.85)}60%{opacity:1}100%{transform:none;filter:none}}
 .lvn-glow{position:absolute;left:50%;top:40px;width:340px;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,246,214,.95) 0,rgba(255,232,180,.45) 30%,rgba(255,232,180,0) 68%);pointer-events:none;animation:glowBreath 9s ease-in-out infinite}
 .lvn-motes{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.lvn-motes i{position:absolute;bottom:-10px;width:4px;height:4px;border-radius:50%;background:#E3B65A;opacity:0;animation:mote 9s linear infinite;box-shadow:0 0 8px #F2C94C}
-@keyframes mote{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-520px) translateX(24px);opacity:0}}
+.lvn-motes i{position:absolute;bottom:-10px;width:4px;height:4px;border-radius:50%;background:#E3B65A;opacity:0;animation:moteLich 9s linear infinite;box-shadow:0 0 8px #F2C94C}
+@keyframes moteLich{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-520px) translateX(24px);opacity:0}}
 .lvn-top{position:relative;display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
 .lvn-top b{color:var(--ember);font-weight:600}
 .lvn-day{position:relative;font-family:var(--f-display);font-weight:200;font-size:clamp(110px,15vw,168px);line-height:.88;letter-spacing:-.06em;text-align:center;font-variant-numeric:tabular-nums;color:var(--ink)}

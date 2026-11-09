@@ -82,9 +82,9 @@ body:not(.signed) #ca-nhan>.wrap:not(.gd-wrap),body:not(.signed) .gd-out{display
 .me-hc h4{margin:0;font-size:17px;font-weight:500}.me-hc p{font-size:13px;color:var(--ink-soft)}.me-hc .me-hg{color:#8C6324}
 /* cửa hàng trong nhà 3D */
 .home-shopbtn{position:absolute;right:16px;top:58px;z-index:3;border:1px solid #B8862F;background:#B8862F;color:#fff;font-weight:500;font-size:13px;padding:8px 14px;border-radius:6px;cursor:pointer}
-.hshop{position:absolute;right:0;top:0;bottom:0;width:min(340px,100%);z-index:5;background:rgba(251,246,236,.97);backdrop-filter:blur(10px);border-left:1px solid var(--line);display:flex;flex-direction:column;gap:10px;padding:16px;overflow:hidden;animation:hsIn .35s var(--ease,ease)}
+.hshop{position:absolute;right:0;top:0;bottom:0;width:min(340px,100%);z-index:5;background:rgba(251,246,236,.97);backdrop-filter:blur(10px);border-left:1px solid var(--line);display:flex;flex-direction:column;gap:10px;padding:16px;overflow:hidden;animation:hsInCaNhan .35s var(--ease,ease)}
 .hshop[hidden]{display:none}
-@keyframes hsIn{from{transform:translateX(30px);opacity:0}}
+@keyframes hsInCaNhan{from{transform:translateX(30px);opacity:0}}
 .hs-head{display:flex;justify-content:space-between;align-items:center}.hs-head b{font-size:20px;font-weight:400}
 .hs-x{background:none;border:0;font-size:26px;line-height:1;cursor:pointer;color:var(--ink-soft)}
 .hs-to{font-size:13px;color:var(--ink-soft)}

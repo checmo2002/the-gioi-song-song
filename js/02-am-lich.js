@@ -64,9 +64,7 @@ return{jdFromDate:jdFromDate,jdToDate:jdToDate,toLunar:toLunar,canChiNgay:canChi
  gate.addEventListener('click',function(e){var b=e.target.closest('[data-faith]');if(b&&!gate.classList.contains('go'))choose(b.dataset.faith,b.classList.contains('g-door')?b:null)});
  addEventListener('keydown',function(e){if(e.key==='Escape'&&!gate.hidden&&!gate.classList.contains('go'))choose('tt')});
  document.addEventListener('click',function(e){if(e.target.closest('[data-open-gate]')){e.preventDefault();var l=$('#lvn');l&&l.open&&l.close();show()}});
- // chủ trang (người làm web) xem trên claude.ai thì bỏ qua bước đăng nhập; người khác vẫn phải đăng nhập
- var ownerP=null;function isOwner(){if(!ownerP)ownerP=(window.claude&&claude.use?claude.use('user').then(function(u){return u?u.isOwner():false}):Promise.resolve(false)).catch(function(){return false});return ownerP}
- function next(){if(true){next2();return}if(!authed()&&window.ssAuthOpen){isOwner().then(function(o){if(o){window.ssOwnerSkip=true;next2()}else{ssAuthOpen('signup',true);addEventListener('ss-auth-done',next2,{once:true})}});return}next2()}
+ function next(){next2()}   // trước đây chặn đăng ký ở cổng; đã tắt, giờ vào thẳng
  function next2(){var g=null;try{g=localStorage.getItem(K)}catch(e){}if(!g)setTimeout(show,400);else done()}
  if(window.ssGate.pending){var tries=0,iv=setInterval(function(){tries++;if(document.documentElement.classList.contains('loaded')||!document.getElementById('loader')||tries>60){clearInterval(iv);setTimeout(next,250)}},150)}
 })();
