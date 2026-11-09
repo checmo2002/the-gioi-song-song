@@ -75,7 +75,7 @@
   roll();if(st.day!==day()){st.streak=st.day===day(1)?st.streak+1:1;st.day=day()}
   var g=steady>=12?2:1,lv0=lvOf(st.tot);
   if(st.today>=CAP){g=0;say('Hôm nay đã viên mãn. Tiếng mõ vẫn ngân, mai lại tích tiếp')}else if(g===2)say('Nhất tâm · công đức ×2','nt');else if(now-tipT>2500)say('');
-  st.tot+=g;st.today+=g;st.bead++;fx(g?'+'+g:'');
+  st.tot+=g;st.today+=g;st.bead++;if(g&&window.ssCongDuc)ssCongDuc.ghi('mo',g);fx(g?'+'+g:'');
   if(st.bead>=108){st.bead=0;st.trang++;var bn=Math.min(st.streak,7)*6;if(st.today<CAP){st.tot+=bn;st.today+=bn}say('Tròn một tràng'+(bn?' · chuyên cần +'+bn:''),'nt');window.ssBell&&ssBell('phat');showHH()}
   save();draw();if(lvOf(st.tot)>lv0)levelUp(lvOf(st.tot))}
  var NOTE=['','Mầm xanh đã nhú khỏi bùn','Lá sen xoè rộng che mát','Nụ sen hồng vươn lên','Cánh sen bắt đầu hé mở','Hoa sen nở trọn','Hương sen ngát toả xa','Đài sen vững vàng','Liên hoa viên mãn, công đức tròn đầy'];
@@ -105,7 +105,7 @@
  function close(){box.hidden=true;q('.mo-path').hidden=true}
  q('.mo-x').addEventListener('click',close);box.addEventListener('click',function(e){if(e.target===box)close()});
  document.addEventListener('keydown',function(e){if(!box.hidden&&e.key==='Escape')close()});
- window.ssMo={open:function(){draw();say('Chạm vào mõ, giữ nhịp đều để tâm an');hh.hidden=true;box.hidden=false;setTimeout(function(){q('.mo-hit').focus()},50)},close:close,state:function(){return st},icon:lotus,levelUp:levelUp,
+ window.ssMo={LV:LV,lvOf:lvOf,open:function(){draw();say('Chạm vào mõ, giữ nhịp đều để tâm an');hh.hidden=true;box.hidden=false;setTimeout(function(){q('.mo-hit').focus()},50)},close:close,state:function(){return st},icon:lotus,levelUp:levelUp,
   add:function(n){var l0=lvOf(st.tot);st.tot+=n;save();if(!box.hidden)draw();if(lvOf(st.tot)>l0)levelUp(lvOf(st.tot))}};
  function addBtn(){var bar=document.querySelector('.hall .w-bar');if(!bar||bar.querySelector('.mo-btn'))return;var b=document.createElement('button');b.type='button';b.className='mo-btn';b.dataset.w='gomo';b.title='Gõ mõ';b.setAttribute('aria-label','Gõ mõ');
   b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 15c0-5 3.6-8 8-8s8 3 8 8c0 2.5-3.6 3.5-8 3.5S4 17.5 4 15z"/><path d="M7 15.5c3 1.3 7 1.3 10 0"/><path d="M10 7.2c0-2 4-2 4 0"/><path d="M17 3l3.5 3.5"/></svg><span>Gõ mõ</span>';
