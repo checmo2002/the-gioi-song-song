@@ -14,6 +14,9 @@
     background:transparent!important;border-bottom:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transform:none!important}
   html.hall-on header.nav .brand{visibility:hidden}
   html.hall-on header.nav .nav-prog{display:none}
+  /* thanh trong suốt phủ cả bề ngang: chỉ các nút trên thanh nhận bấm, chỗ trống để lọt xuống cảnh (nút cài đặt) */
+  html.hall-on header.nav,html.hall-on header.nav .wrap{pointer-events:none}
+  html.hall-on header.nav .wrap>*{pointer-events:auto}
 }
 
 /* một nút Bày tỏ: bấm mới mở 4 cách bày tỏ */

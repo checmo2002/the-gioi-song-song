@@ -34,8 +34,30 @@ html.sanh-on #mainNav,html.sanh-on .hall .hall-act,html.sanh-on .hall .w-bar,htm
 .hall[data-ws="sanh"] .hall-ttl::before{content:"Sảnh chọn lối";display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
 .hall[data-ws="sanh"] .hall-splash{display:none!important}
 .hall .wh.zn[data-w="g-logo"] .wh-lb b{font-family:var(--f-display);font-size:18px}
-.sanh-tip{position:absolute;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;padding:10px 18px;border-radius:999px;background:rgba(32,20,13,.8);color:#FBF1DC;border:1px solid rgba(212,162,76,.4);font-size:14px;white-space:nowrap;animation:ritIn .6s both;display:flex;align-items:center;gap:8px}
-.sanh-tip span{padding:0 4px;opacity:.85}.sanh-tip button{min-height:40px;padding:0 16px;border-radius:999px;border:0;font:inherit;font-weight:600;cursor:pointer;background:linear-gradient(180deg,#E2A548,#A8661A);color:#fff}.sanh-tip button[data-sp="g-cg"]{background:linear-gradient(180deg,#8FA6D6,#4E6698)}
+.sanh-tip{position:absolute;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;width:min(560px,calc(100% - 24px));padding:14px 14px 14px;border-radius:24px;
+ background:linear-gradient(180deg,rgba(46,30,18,.86),rgba(26,17,10,.92));color:#FBF1DC;border:1px solid rgba(226,176,74,.45);box-shadow:0 18px 50px rgba(20,10,4,.45),inset 0 1px rgba(255,230,180,.18);
+ backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:stVao .8s cubic-bezier(.2,.8,.2,1) both;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+/* vệt sáng lướt qua khung */
+.sanh-tip::before{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,226,160,.16) 50%,transparent 65%);transform:translateX(-100%);animation:stLuot 4.5s ease-in-out 1s infinite;pointer-events:none}
+@keyframes stVao{from{opacity:0;transform:translate(-50%,30px) scale(.96)}to{opacity:1;transform:translateX(-50%)}}
+@keyframes stLuot{0%{transform:translateX(-100%)}45%,100%{transform:translateX(100%)}}
+.st-dau{display:flex;align-items:center;justify-content:center;gap:9px;font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#E9D3A6}
+.st-lg{width:26px;height:26px;color:#FBF1DC;filter:drop-shadow(0 0 6px rgba(226,176,74,.8));animation:stLg 2.4s ease-in-out infinite}
+@keyframes stLg{50%{filter:drop-shadow(0 0 14px rgba(255,210,120,1))}}
+.st-hai{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.st-the{position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;text-align:left;padding:12px 14px;border-radius:16px;border:1px solid;cursor:pointer;font:inherit;color:#fff;
+ transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s;animation:stNhip 2.6s ease-in-out infinite}
+.st-the:hover,.st-the:focus-visible{transform:translateY(-3px)}
+.st-the:active{transform:scale(.97)}
+.st-phat{background:radial-gradient(120% 140% at 0% 0%,#F4C56A,#B6711E 60%,#7E4710);border-color:rgba(255,214,140,.7);--hq:255,196,90}
+.st-cg{background:radial-gradient(120% 140% at 0% 0%,#B9CBF2,#5F7BB8 60%,#34497E);border-color:rgba(214,226,255,.7);--hq:170,195,255;animation-delay:1.3s}
+@keyframes stNhip{0%,100%{box-shadow:0 0 0 1px rgba(var(--hq),.25),0 0 14px rgba(var(--hq),.35)}50%{box-shadow:0 0 0 1px rgba(var(--hq),.55),0 0 30px rgba(var(--hq),.75)}}
+.st-ic{grid-row:1/3;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(255,255,255,.35),rgba(255,255,255,.06) 70%);box-shadow:0 0 18px rgba(var(--hq),.9)}
+.st-ic svg{width:26px;height:26px;fill:#fff;color:#fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+.st-the b{font-family:var(--f-display);font-weight:500;font-size:19px;line-height:1.1;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.st-the small{font-size:11.5px;opacity:.9;line-height:1.3}
+@media (max-width:480px){.st-the{grid-template-columns:1fr;justify-items:center;text-align:center;padding:12px 8px;row-gap:4px}.st-ic{grid-row:auto;width:40px;height:40px}.st-the b{font-size:17px}.st-the small{font-size:10.5px}.st-dau{font-size:10.5px;letter-spacing:.1em}}
+@media (prefers-reduced-motion:reduce){.sanh-tip,.sanh-tip::before,.st-the,.st-lg{animation:none}}
 html:not(.sanh-on) .sanh-tip{display:none}
 
 /* ===== HUD: biểu tượng · chuyển động ===== */
