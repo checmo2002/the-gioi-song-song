@@ -13,7 +13,7 @@ ma = [f for f in files if f.endswith(('.js', '.html')) and not f.startswith('js/
 BI_MAT = re.compile(r'sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36}|AIza[0-9A-Za-z_-]{35}'
                     r'|-----BEGIN [A-Z ]*PRIVATE KEY|xox[baprs]-[A-Za-z0-9-]{10,}|eyJhbGciOi[A-Za-z0-9_-]{20,}')
 for f in files:
-    if f.endswith(('.webp', '.png', '.jpg', '.wav', '.mp3', '.glb')): continue
+    if f.startswith('img/') or f.endswith(('.webp', '.png', '.jpg', '.wav', '.mp3', '.glb')): continue  # img/: mô hình 3D dạng JSON chứa base64, dễ trùng mẫu khoá
     try: s = open(f, encoding='utf-8').read()
     except (UnicodeDecodeError, IsADirectoryError): continue
     for m in BI_MAT.finditer(s): loi.append(f'{f}: có vẻ là khoá bí mật "{m.group()[:12]}…"')
@@ -53,7 +53,7 @@ with sync_playwright() as p:
         pg.route('**/*', lambda r: r.continue_() if r.request.url.startswith(goc) else r.abort())
         pg.add_init_script('try{localStorage.clear();localStorage.setItem("ss-me",' + json.dumps(json.dumps(ME)) + ')}catch(e){}')
         pg.goto(url)
-        pg.wait_for_function("!document.getElementById('loader')", timeout=30000)
+        pg.wait_for_function("!document.getElementById('loader')", timeout=300000)  # chỉ còn 3D: máy kiểm tra vẽ bằng CPU, nạp lâu
         pg.wait_for_timeout(1500)
         for t in TRANG:
             pg.evaluate(f"location.hash='{t}'"); pg.wait_for_timeout(500)
