@@ -1,0 +1,48 @@
+/* Bó hoa thiêng: việc đạo đức ở nhà thờ (js/30). Khung .mo (css/27-07), nút và vòng tròn dùng chung với css/32 */
+.bht-h{display:flex;align-items:center;gap:10px;padding-right:44px}
+.bht-mi{width:46px;height:46px;flex:none;color:#FBF1DC}
+.bht-h b{display:block;font-family:var(--f-display);font-weight:500;font-size:19px}
+.bht-ai{display:flex;align-items:center;gap:6px;font-size:12.5px;opacity:.85}
+.bht-ai select{max-width:190px;min-height:32px;border-radius:999px;border:1px solid rgba(255,210,122,.45);background:rgba(255,255,255,.08);color:inherit;font:inherit;padding:0 10px}
+.bht-ai select option{color:#2B1606}
+.bht-s{position:relative;display:grid;justify-items:center;gap:10px;margin-top:10px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.bht-mn{margin:0;text-align:center;line-height:1.45}
+.bht-mn small{display:block;font-size:12px;opacity:.7;letter-spacing:.03em}
+.bht-mn b{display:block;font-weight:600;font-size:15px}
+.bht-mn span{display:block;font-size:13px;opacity:.85;font-style:italic}
+.bht-chuoi{height:210px}
+.bht-hat{fill:rgba(255,255,255,.12);stroke:rgba(255,210,122,.5);stroke-width:1.5;transition:fill .3s}
+.bht-hat.xong{fill:#E06A7E}
+.bht-hat.dang{fill:#FFD27A;stroke:#FFF}
+.bht-kinh{width:100%;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,210,122,.25)}
+.bht-kinh b{display:block;font-size:13.5px;color:#FFD27A}
+.bht-kinh p{margin:4px 0 0;font-size:14px;line-height:1.55}
+.bht-hien{display:flex;align-items:center;gap:6px;font-size:12.5px;opacity:.8;min-height:32px}
+.bht-cau{margin:0;min-height:2.6em;text-align:center;font-size:14px;font-style:italic;line-height:1.45}
+.cdg-nut.phu{background:none;color:#FFD27A}
+.bht-nhip{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.bht-nhip span{display:flex;gap:4px;padding:6px 8px;border-radius:999px}
+.bht-nhip span.dang{background:rgba(255,210,122,.15)}
+.bht-nhip i{width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(255,210,122,.6)}
+.bht-nhip i.on{background:#FFD27A}
+.bht-nguoi .bht-than{fill:rgba(255,255,255,.1);stroke:rgba(255,210,122,.4)}
+.bht-nho{fill:#FBF1DC;font-size:11px;text-anchor:middle;opacity:.6}
+.bht-dau{fill:rgba(255,210,122,.15);stroke:rgba(255,210,122,.6);stroke-width:2;cursor:pointer;outline:none}
+.bht-dau.dang{fill:rgba(255,210,122,.55);stroke:#fff;animation:bhtNhay 1.2s ease-in-out infinite}
+.bht-dau.xong{fill:#9FC9D9;stroke:#fff}
+.bht-dau:focus-visible{outline:none;stroke:#FFE9A8;stroke-width:4}
+@keyframes bhtNhay{50%{fill:rgba(255,210,122,.25)}}
+.bht-vet{stroke:#9FC9D9;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.bht-loi{margin:0;min-height:1.4em;font-size:15px;font-style:italic}
+.bht-thang{margin:0;padding:6px 12px;border-radius:999px;background:rgba(255,210,122,.15);font-size:12.5px}
+.bht-chon{display:grid;gap:8px;width:100%}
+.bht-chon button{display:grid;grid-template-columns:28px 1fr;align-items:center;column-gap:10px;text-align:left;min-height:56px;padding:8px 14px;border-radius:16px;border:1px solid rgba(255,210,122,.35);background:rgba(255,255,255,.05);color:inherit;font:inherit;cursor:pointer}
+.bht-chon button:hover,.bht-chon button:focus-visible{background:rgba(255,210,122,.14)}
+.bht-chon i{grid-row:1/span 2;width:22px;height:22px;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px rgba(255,255,255,.12)}
+.bht-chon b{font-weight:600;font-size:15px}
+.bht-chon small{font-size:12.5px;opacity:.7}
+/* bó hoa trên trang hồ sơ */
+.bht-trang{display:flex;align-items:center;gap:12px;margin-top:14px;padding:10px 14px;border-radius:16px;border:1px solid rgba(201,151,63,.35);background:rgba(201,151,63,.08)}
+.bht-trang .bht-bo{width:64px;height:64px;flex:none}
+.bht-trang b{display:block;font-weight:600}
+.bht-trang small{display:block;font-size:12.5px;opacity:.8;line-height:1.4}

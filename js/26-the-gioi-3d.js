@@ -23,7 +23,7 @@ const CANH={
  sanh:{ten:'sảnh',tgt:[2,18],ow:88,tam:[2,10],le:[],lh:null,toc:.42,tuong:1,day:.09,xa:60},
  chan:{ten:'chân núi',tgt:[3,13],ow:132,tam:[0,-9],lh:[0,-8],toc:.42,day:0,xa:30,
   le:[['BaCu','chap',-1.7,-11.45],['CoAoDai','chap',1.7,-11.45],['OngAoNau','ngoi',0,-12.05],['CuuChienBinh','dung',-3.8,-12.6]]},
- tho:{ten:'nhà thờ',tgt:[2,1.5],ow:42,tam:[2,1.5],le:[],lh:null,toc:.42,day:0,xa:30,cao:1,goc:40},
+ tho:{ten:'nhà thờ',tgt:[2,1.5],ow:42,tam:[2,1.5],le:[],lh:null,huong:[[0.5,12.5],[7.4,8.3],[-6.5,-10.5],[-1.6,-6.3]],toc:.42,day:0,xa:30,cao:1,goc:40},
  lang:{ten:'làng tưởng niệm',tgt:[0,2],ow:118,tam:[0,2],le:[],lh:null,toc:.42,day:0,xa:55,cao:1,tuong:1},
  ho:{ten:'làng dòng họ',tgt:[0,6],ow:100,tam:[0,6],le:[],lh:null,toc:.42,day:0,xa:50,cao:1,goc:30,nghieng:42,tranh:1},
  nha:{ten:'ngôi nhà',tgt:[0,-1],ow:38,tam:[0,-1],le:[],lh:null,toc:.42,day:0,xa:28,cao:1,goc:40,anh:1},
@@ -196,6 +196,22 @@ function khoi(){
     g.gain.setTargetAtTime(dich,ac.currentTime,.6);if(bat&&ac.state==='suspended')ac.resume();
     if(bat&&!GIAM&&performance.now()>hen){chim();hen=performance.now()+2500+Math.random()*6500}},300);
    return {song(gan,nuoc,ngoai){songT=performance.now();vi=ngoai;if(nuocG)nuocG.gain.setTargetAtTime(nuoc*(.1+.9*Math.max(0,1-gan/28)),ac.currentTime,.3)}}})();
+  // nhà thờ: giá chuông Truyền Tin trên sân, bình nước thánh trong ngưỡng cửa (chủ dự án duyệt 12/11/2026).
+  // Dựng bằng khối đơn giản theo lối low-poly, nhuộm theo màu trời như cây (d.cy); chuông lắc khi js/30 phát 'ss-chuong-tt'
+  function vatNhaTho(d){const M=c=>{const m=new THREE.MeshLambertMaterial({color:c,side:THREE.DoubleSide});m.userData.goc=new THREE.Color(c);d.cy.push(m);return m},
+    go=M(0x7a5236),dong=M(0xc9973f),da=M(0xeae4d8),nuoc=M(0x9fc9d9);
+   const ga=new THREE.Group(),tr=new THREE.Group();ga.position.copy(B(-6.5,-10.5,.06));
+   for(const s of [-1,1]){const cot=new THREE.Mesh(new THREE.BoxGeometry(.22,3.3,.22),go);cot.position.set(s*1.1,1.65,0);ga.add(cot)}
+   const xa=new THREE.Mesh(new THREE.BoxGeometry(2.7,.24,.3),go);xa.position.y=3.25;
+   const be=new THREE.Mesh(new THREE.BoxGeometry(3,.12,.9),da);be.position.y=.06;
+   const than=new THREE.Mesh(new THREE.LatheGeometry([[0,-1.08],[.56,-1.08],[.52,-1],[.4,-.7],[.32,-.25],[.18,-.02],[0,0]].map(([x,y])=>new THREE.Vector2(x,y)),18),dong);
+   const qua=new THREE.Mesh(new THREE.SphereGeometry(.09,8,6),go);qua.position.y=-1;tr.position.y=3.12;tr.add(than,qua);ga.add(xa,be,tr);d.canh.add(ga);
+   const bt=new THREE.Group();bt.position.copy(B(-1.6,-6.3,.54));
+   const chan=new THREE.Mesh(new THREE.CylinderGeometry(.14,.22,.9,12),da);chan.position.y=.45;
+   const bat=new THREE.Mesh(new THREE.SphereGeometry(.36,16,8,0,Math.PI*2,Math.PI/2,Math.PI/2),da);bat.position.y=1.12;
+   const mat=new THREE.Mesh(new THREE.CircleGeometry(.33,20),nuoc);mat.rotation.x=-Math.PI/2;mat.position.y=1.1;bt.add(chan,bat,mat);d.canh.add(bt);
+   let lac=0;addEventListener('ss-chuong-tt',()=>{lac=1});
+   const cu=d.capNhat;d.capNhat=(t,dt)=>{cu&&cu(t,dt);if(lac>.003){lac*=Math.pow(.4,dt);tr.rotation.z=Math.sin(t*.007)*.4*lac}}}
   function trangTriCanh(d,C){
    const P=C.P||0,cn=[],cu=d.capNhat,them=o=>{d.canh.add(o);return o},TB={transparent:true,depthWrite:false,toneMapped:false};
    // mặt hồ: gợn sóng trôi chậm
@@ -320,7 +336,7 @@ function khoi(){
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
-   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,huong:(c.huong||(c.lh?[c.lh]:[])).map(h=>B(h[0],h[1])),tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(TT[ten])trangTriCanh(DL[ten],TT[ten])}   // sảnh: cột sáng, logo trước; cảnh động chung nối sau
+   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,huong:(c.huong||(c.lh?[c.lh]:[])).map(h=>B(h[0],h[1])),tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(ten==='tho')vatNhaTho(DL[ten]);if(TT[ten])trangTriCanh(DL[ten],TT[ten])}   // sảnh: cột sáng, logo trước; cảnh động chung nối sau
   function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn
    const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
    return (z(i,j)*(1-fx)+z(i+1,j)*fx)*(1-fy)+(z(i,j+1)*(1-fx)+z(i+1,j+1)*fx)*fy}
@@ -503,7 +519,7 @@ function khoi(){
     if(dau){camM.copy(nhin);cam.position.copy(ph);dau=false}else{const k=1-Math.exp(-dt*4);cam.position.lerp(ph,k);camM.lerp(nhin,k)}
     cam.lookAt(camM);d.canh.fog.near=25;d.canh.fog.far=90;troiBuoc(d,dt,now,30);co2();r.render(d.canh,cam)}};
    return true};
-  window.ss3dCanh={cam,dk,B,get canh(){return dang&&DL[dang].canh},get raAnh(){return dang&&DL[dang].raAnh},get tuAnh(){return dang&&DL[dang].tuAnh},get cao(){return dang&&((u,v)=>caoTai(dang,u,v))},get nguoi(){return nguoi}};   // để thử nghiệm
+  window.ss3dCanh={cam,dk,B,get canh(){return dang&&DL[dang].canh},get raAnh(){return dang&&DL[dang].raAnh},get tuAnh(){return dang&&DL[dang].tuAnh},get cao(){return dang&&((u,v)=>caoTai(dang,u,v))},get nguoi(){return nguoi},get d(){return dang&&DL[dang]}};   // để thử nghiệm
 
   // ---- nạp mọi cảnh + đủ 9 nhân vật, rồi dựng sẵn shader một lần để lúc đi và lúc NPC xuất hiện không bị khựng
   const ds=await Promise.all(['ThanhNien','ChiBaBa',...NPC,...new Set(Object.values(CANH).flatMap(c=>c.le.map(x=>x[0])))].map(t=>mau(t).catch(()=>null)));

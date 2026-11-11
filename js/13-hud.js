@@ -7,6 +7,7 @@
   ra:'<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M9 16l-4-4 4-4M5 12h11"/>',
   lang:'<path d="M2 12l5-4 5 4M3 11v8h8v-8M12 13l5-4 5 4M13 12v7h8v-7"/>',
   lich:'<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  nuoc:'<path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z"/><path d="M9 15a3 3 0 0 0 3 3"/>',
   chuong:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
   nhang:'<path d="M9 21V10M12 21V8M15 21V10M5 21h14"/><path d="M12 8c-1.5-1.5 1.5-2.5 0-4"/>',
   nen:'<path d="M10 10h4v11h-4z"/><path d="M12 3c1.2 2 2 3 0 5-2-2-1.2-3 0-5z"/>',
@@ -31,7 +32,7 @@
  var SHORT={'Lên núi thắp nhang':'Lên núi','Phật giáo · Truyền thống':'Phật giáo','Vào thẳng làng tưởng niệm':'Vào làng','Đức Phật Thích Ca':'Lễ Phật','Đại hồng chung':'Thỉnh chuông','Xuống chân núi':'Xuống núi','Làng tưởng niệm':'Làng','Lịch phụng vụ':'Lịch','Bàn thờ chính':'Cầu nguyện'};
  window.ssHudIcon=function(el,h){var id=h.id||'',k='vong';
   if(id.indexOf('p:')===0){var p=window.ssPerson&&ssPerson.all().filter(function(q){return q.id===id.slice(2)})[0];el.classList.add('av');el.style.setProperty('--c',p&&COL[p.c]||'#8B5A2B');el.textContent=p?String(p.name).trim().split(/\s+/).pop()[0]:'?';return}
-  k={len:h.t==='Chính điện'?'phat':'nui',xuong:'xuong',venui:'ra',ralang:'ra',lang:'lang',cal:'lich',chuong:'chuong',gomo:'gomo','le-phat':'phat',thien:'sen',nhang:(document.getElementById('hall').dataset.ws==='tho'?(h.t==='Bàn thờ chính'?'thanh':'nen'):(h.t==='Đức Phật Thích Ca'?'phat':'nhang')),dinh:'dinh','xom-ls':'mo','khu-bac':'sao','khu-tuong':'khien','khu-vua':'dinh','khu-tt':'sen','g-phat':'sen','g-cg':'thanh','g-tt':'bien','g-logo':'vong'}[id]||k;
+  k={len:h.t==='Chính điện'?'phat':'nui',xuong:'xuong',venui:'ra',ralang:'ra',lang:'lang',cal:'lich',chuong:'chuong',gomo:'gomo','le-phat':'phat',thien:'sen',nhang:(document.getElementById('hall').dataset.ws==='tho'?(h.t==='Bàn thờ chính'?'thanh':'nen'):(h.t==='Đức Phật Thích Ca'?'phat':'nhang')),dinh:'dinh','xom-ls':'mo','khu-bac':'sao','khu-tuong':'khien','khu-vua':'dinh','khu-tt':'sen','g-phat':'sen','g-cg':'thanh','g-tt':'bien','g-logo':'vong','ban-tho':'thanh','chuong-tt':'chuong','nuoc-thanh':'nuoc'}[id]||k;
   el.innerHTML=sv(I[k]);if(SHORT[h.t])el.parentNode.querySelector('b').textContent=SHORT[h.t]};
  // thanh hành động: chỉ biểu tượng (chữ hiện khi rê chuột / nút chính)
  var BAR={len:['nui','Lên núi'],xuong:['xuong','Xuống núi'],venui:['ra','Cổng làng'],ralang:['ra','Ra làng'],chap:['chap','Chắp tay'],lay:['lay','Vái lạy'],ngoi:['ngoi','Ngồi'],doi:['doi','Đổi người']};
