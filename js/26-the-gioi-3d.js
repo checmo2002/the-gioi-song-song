@@ -17,15 +17,14 @@ window.ss3dXong=!coWebGL;   // màn tải (js/01) và kiểm tra hình ảnh ch�
 // tuong: có tuong.json (tượng giữ ảnh màu gốc, tự chiếu sáng như người); day: độ cao mặt sân lát (người đứng lên trên)
 // cao: có thong-tin.json với lưới độ cao mặt đi (bậc, nền cao trong gian thờ) thay cho day; goc: cảnh trong nhà cắt tường,
 //      chỉ cho xoay ±goc độ quanh hướng nhìn của ảnh để không vòng ra sau tường
-// anh: có di ảnh trên bàn thờ (.w-anh) cần đặt lại theo camera 3D; nghieng: góc nghiêng camera cố định; tranh: cảnh có tranh 2D vẽ thêm (nhà dựng từ gia phả, js/20) -> khoá camera đúng góc ảnh iso
-//      rồi chiếu tranh từ toạ độ ảnh xuống mặt đất 3D lên màn hình, nhà đứng đúng ô đất
+// anh: có di ảnh trên bàn thờ (.w-anh) cần đặt lại theo camera 3D; nghieng: góc nghiêng camera cố định
 const CANH={
  sanh:{ten:'sảnh',tgt:[2,18],ow:88,tam:[2,10],le:[],lh:null,toc:.42,tuong:1,day:.09,xa:60},
  chan:{ten:'chân núi',tgt:[3,13],ow:132,tam:[0,-9],lh:[0,-8],toc:.42,day:0,xa:30,
   le:[['BaCu','chap',-1.7,-11.45],['CoAoDai','chap',1.7,-11.45],['OngAoNau','ngoi',0,-12.05],['CuuChienBinh','dung',-3.8,-12.6]]},
  tho:{ten:'nhà thờ',tgt:[2,1.5],ow:42,tam:[2,1.5],le:[],lh:null,huong:[[0.5,12.5],[7.4,8.3],[-6.5,-10.5],[-1.6,-6.3]],toc:.42,day:0,xa:30,cao:1,goc:40},
  lang:{ten:'làng tưởng niệm',tgt:[0,2],ow:118,tam:[0,2],le:[],lh:null,toc:.42,day:0,xa:55,cao:1,tuong:1},
- ho:{ten:'làng dòng họ',tgt:[0,6],ow:100,tam:[0,6],le:[],lh:null,toc:.42,day:0,xa:50,cao:1,goc:30,nghieng:42,tranh:1},
+ ho:{ten:'làng dòng họ',tgt:[0,6],ow:100,tam:[0,6],le:[],lh:null,toc:.42,day:0,xa:50,cao:1,goc:30},
  nha:{ten:'ngôi nhà',tgt:[0,-1],ow:38,tam:[0,-1],le:[],lh:null,toc:.42,day:0,xa:28,cao:1,goc:40,anh:1},
  dien:{ten:'chính điện',tgt:[4.1026,2.7511]/* camera Blender nhắm (0,-2.5,6) mặt sân; đây là điểm cùng tia nhìn ở z=0 (thong-tin.json). Trước để [0,-2.5] làm người lệch 6,7m ra bãi cỏ */,ow:66,tam:[0,-2.5],le:[],lh:null,huong:[[0,12.2],[0,-12],[12.5,-12],[-9.6,7.6],[-19,5.5]],toc:.42,day:0,xa:32,cao:1,tuong:1}};   // chùa có mái, tường đủ bốn phía: xoay tự do 360°
 // chùa đỉnh núi (tools/blender/sua-dien-v2.py): độ cao đỉnh, hồ, suối, thác, lư hương, cội bồ đề, bồn hoa, vùng mái chính điện (toạ độ Blender)
@@ -336,11 +335,36 @@ function khoi(){
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
-   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,huong:(c.huong||(c.lh?[c.lh]:[])).map(h=>B(h[0],h[1])),tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(ten==='tho')vatNhaTho(DL[ten]);if(TT[ten])trangTriCanh(DL[ten],TT[ten])}   // sảnh: cột sáng, logo trước; cảnh động chung nối sau
+   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,huong:(c.huong||(c.lh?[c.lh]:[])).map(h=>B(h[0],h[1])),tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(ten==='tho')vatNhaTho(DL[ten]);if(ten==='ho')dungNha();if(TT[ten])trangTriCanh(DL[ten],TT[ten])}   // sảnh: cột sáng, logo trước; cảnh động chung nối sau
   function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn
    const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
    return (z(i,j)*(1-fx)+z(i+1,j)*fx)*(1-fy)+(z(i,j+1)*(1-fx)+z(i+1,j+1)*fx)*fy}
 
+  // ---- làng riêng: nhà 3D dựng từ gia phả (js/20 ssHo.nha()), chủ dự án duyệt 12/11/2026. Mẫu img/3d/ho/nha.json (tools/blender/nha-3d.py):
+  // nha_<kiểu> có vật liệu mai, tuong nhuộm theo lựa chọn người dùng; cua_<kiểu> lắp vào điểm o_cua_<kiểu>; do_<đồ> bày vào ô quanh nhà
+  let NHA=null;const nhaTop={};
+  function mauNha(){return NHA||(NHA=taiJSON('img/3d/ho/nha.json').then(parse))}
+  function vlNha(mau,d){const c=new THREE.Color(mau),v=new THREE.MeshStandardMaterial({color:c,roughness:.9,metalness:0,envMapIntensity:0});v.onBeforeCompile=sh=>AGX(sh,true);
+   v.userData.goc=c.clone();v.userData.nha=1;if(d)d.cy.push(v);return v}
+  function nhuom(o,mau,d){o.traverse(m=>{if(!m.isMesh)return;const t=m.material.name;m.material=vlNha(mau[t]||'#'+m.material.color.getHexString(),d)})}
+  function taoNha(gl,h,d){const ks=gl.scene.getObjectByName('nha_'+h.style)?h.style:'bagian',v=gl.scene.getObjectByName('nha_'+ks).clone(true);nhuom(v,{mai:h.roof,tuong:h.wall},d);
+   const oc=v.getObjectByName('o_cua_'+ks),cm=gl.scene.getObjectByName('cua_'+(h.cua||'go'))||gl.scene.getObjectByName('cua_go');
+   if(oc&&cm){const c=cm.clone(true);nhuom(c,{},d);c.position.copy(oc.position);v.add(c)}return v}
+  async function dungNha(){const d=DL.ho;if(!d||!window.ssHo||!ssHo.nha)return;const gl=await mauNha().catch(()=>null);if(!gl||!DL.ho)return;
+   if(d.nha){d.canh.remove(d.nha);d.cy=d.cy.filter(m=>!m.userData.nha)}
+   const nhom=new THREE.Group(),dat=(u,v)=>{const z=caoTai('ho',u,v),q=d.tuAnh(u,v,z);return B(q.x,q.y,z)};d.nha=nhom;
+   for(const n of ssHo.nha()){const g=taoNha(gl,n.h,d);g.position.copy(dat(n.a[0],n.a[1]));nhom.add(g);
+    const bb=new THREE.Box3().setFromObject(g);nhaTop[n.k]=[(bb.min.x+bb.max.x)/2,-(bb.min.z+bb.max.z)/2,bb.max.y+1.4];
+    for(const [ten,o,mau] of n.do){const m=gl.scene.getObjectByName('do_'+ten);if(!m||!o)continue;const c=m.clone(true);nhuom(c,mau?{tuong:mau}:{},d);c.position.copy(dat(o[0],o[1]));nhom.add(c)}}
+   d.canh.add(nhom);d.nutO=''}   // dựng lại nút tên trên nóc nhà
+  addEventListener('ss-ho-nha',()=>{if(DL.ho)dungNha()});
+  // ảnh nhỏ kiểu nhà cho bảng "Sửa nhà" (js/20): vẽ mẫu 3D ra khung riêng
+  const rtN=new THREE.WebGLRenderTarget(160,160),scN=new THREE.Scene(),camN=new THREE.OrthographicCamera(-6.5,6.5,6.5,-6.5,.1,200);rtN.texture.colorSpace=THREE.SRGBColorSpace;
+  scN.add(new THREE.HemisphereLight(0xfff6e8,0x8c7a62,2.4));{const n=new THREE.DirectionalLight(0xffffff,1.8);n.position.set(-6,14,9);scN.add(n)}
+  camN.position.copy(B(DIR.x*60,DIR.y*60,DIR.z*60+4));camN.lookAt(B(0,0,4));
+  window.ss3dAnhNha=(cv,h)=>mauNha().then(gl=>{const v=taoNha(gl,h,null);scN.add(v);const cc=new THREE.Color(),ca=r.getClearAlpha();r.getClearColor(cc);
+   r.setRenderTarget(rtN);r.setClearColor(0xf3ead8,1);r.clear();r.render(scN,camN);const px=new Uint8Array(160*160*4);r.readRenderTargetPixels(rtN,0,0,160,160,px);r.setRenderTarget(null);r.setClearColor(cc,ca);scN.remove(v);
+   const x=cv.getContext('2d'),im=x.createImageData(160,160);for(let y=0;y<160;y++)im.data.set(px.subarray((159-y)*640,(160-y)*640),y*640);x.putImageData(im,0,0)}).catch(()=>{});
   // ---- nút điểm đến: lấy đúng chỗ trên ảnh, bắn tia theo camera ảnh vào cảnh 3D để ra điểm thật
   const ray=new THREE.Raycaster();
   function dungNut(ten){const d=DL[ten],O=ori();d.nutO=O;hotL.innerHTML='';d.nut=[];
@@ -349,7 +373,8 @@ function khoi(){
     if(hit&&hit.object.userData.tuong){const bh=new THREE.Box3().setFromObject(hit.object),c=new THREE.Vector3();let top=bh.max.y;   // nút trúng tượng hoặc bệ: đặt trên đỉnh đầu tượng đứng trên đó, không che mặt
      for(const o of d.nen)if(o.userData.tuong){const b=new THREE.Box3().setFromObject(o);b.getCenter(c);if(c.x>=bh.min.x-.3&&c.x<=bh.max.x+.3&&c.z>=bh.min.z-.3&&c.z<=bh.max.z+.3)top=Math.max(top,b.max.y)}
      hit.point.set(bh.min.x/2+bh.max.x/2,top+1.2,bh.min.z/2+bh.max.z/2)}
-    const p=h.p3?B(...h.p3):hit?hit.point.clone():(()=>{const q=d.tuAnh(h.x,h.y);return B(q.x,q.y)})();   // p3: toạ độ 3D cố định (Blender) cho nút trên đỉnh tượng đài
+    const nt=h.id&&h.id.indexOf('hp:')===0&&nhaTop[h.id.slice(3)];   // nhà làng riêng: nút trên nóc nhà 3D
+    const p=h.p3?B(...h.p3):nt?B(...nt):hit?hit.point.clone():(()=>{const q=d.tuAnh(h.x,h.y);return B(q.x,q.y)})();   // p3: toạ độ 3D cố định (Blender) cho nút trên đỉnh tượng đài
     const a=document.createElement(h.id?'button':'a');a.className='wh'+(h.main?' main':'')+(h.z?' zn':'');if(h.id){a.type='button';a.dataset.w=h.id}else a.href=h.h;
     a.innerHTML='<i class="wh-dot"></i><span class="wh-lb"><i class="wh-ic"></i><b></b><small></small></span>';a.querySelector('b').textContent=h.short||h.t;a.querySelector('small').textContent=h.s||'';a.title=h.t+(h.s?' · '+h.s:'');
     window.ssHudIcon&&ssHudIcon(a.querySelector('.wh-ic'),h);a.style.setProperty('--d',(i*70)+'ms');hotL.appendChild(a);d.nut.push({el:a,p})})}
@@ -397,15 +422,6 @@ function khoi(){
    c1.copy(el._p).project(cam);c2.copy(el._p).addScaledVector(ri,el._wm).project(cam);c3.copy(el._p).add(new V3(0,el._hm,0)).project(cam);
    const x=(c1.x+1)/2*Wd,y=(1-c1.y)/2*Hd,pw=Math.abs(c2.x-c1.x)/2*Wd,ph=Math.abs(c3.y-c1.y)/2*Hd;
    el.style.left=(x-pw/2).toFixed(1)+'px';el.style.top=(y-ph/2).toFixed(1)+'px';el.style.width=pw.toFixed(1)+'px';el.style.height=ph.toFixed(1)+'px';el._k=el.style.left+el.style.top+el.style.width+el.style.height}
-  function datTranh(ten){const d=DL[ten],Wd=hall.clientWidth,Hd=hall.clientHeight;
-   for(const el of stg.querySelectorAll('.ho-h,.ho-d')){el._g={L:parseFloat(el.style.left)/100,T:parseFloat(el.style.top)/100,w:parseFloat(el.style.width)/100};tranhL.appendChild(el)}
-   // tranh đứng như tấm bảng quay về camera, chân ở giữa mép dưới ô tranh trên ảnh: xoay camera thì nhà vẫn đứng đúng chỗ, không méo.
-   // Ở góc mặc định (nghiêng 42° như ảnh) khớp đúng ảnh iso: cao thật = cao trên ảnh / cos(42°)
-   const ri=new V3(1,0,0).applyQuaternion(cam.quaternion);
-   for(const el of tranhL.children){const g=el._g;if(!g)continue;
-    const a=d.tuAnh(g.L+g.w/2,g.T+g.w*1.5),p0=B(a.x,a.y),m=g.w*CANH[ten].ow;c1.copy(p0).project(cam);c2.copy(p0).addScaledVector(ri,m).project(cam);c3.copy(p0).add(new V3(0,m/Math.cos(EL),0)).project(cam);
-    const x=(c1.x+1)/2*Wd,y=(1-c1.y)/2*Hd,pw=Math.abs(c2.x-c1.x)/2*Wd,ph=Math.abs(c3.y-c1.y)/2*Hd;
-    el.style.left=(x-pw/2).toFixed(1)+'px';el.style.top=(y-ph).toFixed(1)+'px';el.style.width=pw.toFixed(1)+'px';el.style.height=ph.toFixed(1)+'px';el.style.zIndex=Math.round((1-c1.z)*1e5)}}   // nhà gần che nhà xa ở mọi góc xoay
   let truoc=performance.now();
   // máy yếu (trình duyệt vẽ bằng CPU, điện thoại cũ): khung hình chậm kéo dài thì hạ dần độ phân giải vẽ, thấp nhất 0.5. Vừa vào cảnh chờ 2.5 s cho nạp xong
   let khTB=16,haT=0;function hieuNang(ms,t){if(ms>500)return;khTB+=(ms-khTB)*.05;const pr=r.getPixelRatio();if(khTB>40&&pr>.5&&t-haT>2500){haT=t;r.setPixelRatio(Math.max(.5,pr*.8));khTB=30}}
@@ -448,7 +464,6 @@ function khoi(){
    if(pingT<1){pingT+=dt/.7;ping.material.opacity=.95*(1-pingT);ping.scale.setScalar(1+pingT*1.2)}else ping.material.opacity=0;
    for(const n of d.nut)nhan(n.el,n.p,0);
    if(d.capNhat)d.capNhat(t,dt);
-   if(CANH[ten].tranh)datTranh(ten);
    if(CANH[ten].anh)datAnh(ten);
    r.render(d.canh,cam)};
   // ---- đoạn phim chuyển cảnh thay màn tải: "Bạn" đi bộ trên đường thật của cảnh (lên chùa: leo bậc đá chân núi), máy quay bám theo.

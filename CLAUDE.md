@@ -21,7 +21,7 @@ index.html      Khung trang: toàn bộ HTML, nạp CSS và JS theo đúng thứ
 css/NN-*.css    Giao diện, mỗi file một khu. Thứ tự số = thứ tự nạp (quan trọng vì CSS đè nhau)
 js/NN-*.js      Mỗi file một tính năng, đa số là IIFE độc lập. Thứ tự số = thứ tự chạy
 data/           Dữ liệu mẫu (JSON thuần trong window.SS_DATA), nạp ngay trước js/07-*
-img/            Cảnh và nhân vật 3D (3d/), tranh nhà gia phả (ho/), âm thanh (am/). Không còn bản 2D
+img/            Cảnh, nhân vật, nhà làng riêng 3D (3d/), âm thanh (am/). Không còn bản 2D
 tests/smoke.py  Kiểm tra nhanh, bắt buộc ĐẠT trước khi gộp
 tests/hinh-anh.py  So ảnh chụp 6 màn × 2 cỡ với tests/anh-chuan/, bắt buộc ĐẠT
 docs/           Tầm nhìn, bản đồ tính năng, chuẩn đồ hoạ, danh sách việc
