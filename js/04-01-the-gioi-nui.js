@@ -156,6 +156,8 @@
   else if(w==='chuong'){var cd=SC[scene].chuongDoor,ring=function(){if(window.ssCongDuc)ssCongDuc.open('chuong');else{window.ssBell&&ssBell();window.toast&&toast('Một hồi chuông ngân vang')}};if(cd){var gc=gridNear(cd[0],cd[1]);goTo(gc[0],gc[1],'chap');pend=ring}else ring()}
   else if(w==='le-phat'){var lp=SC.dien.lePhat,gl=gridNear(lp[0],lp[1]);goTo(gl[0],gl[1],'lay');pend=function(){if(av.me){av.me.d=4;av.me.faceUp=true}window.ssCongDuc?ssCongDuc.open('lay'):window.toast&&toast('Thành tâm đảnh lễ Đức Phật')}}
   else if(w==='thien'){var td=SC.dien.thienDoor,gt=gridNear(td[0],td[1]);goTo(gt[0],gt[1],'ngoi');pend=function(){if(av.me){av.me.d=4;av.me.faceUp=true}window.toast&&toast('Ngồi tĩnh tâm dưới cội bồ đề · nghe suối chảy, chim kêu');window.ssCongDuc&&ssCongDuc.open('thien')}}
+  else if(w==='ban-tho'||w==='chuong-tt'||w==='nuoc-thanh'){var C2=SC[scene],k2={'ban-tho':['banTho','ngoi','ban-tho'],'chuong-tt':['chuongTT','chap','chuong'],'nuoc-thanh':['ntDoor','dung','dau']}[w],q2=C2[k2[0]],mo2=function(){window.ssHoaThieng&&ssHoaThieng.open(k2[2])};   // nhà thờ: bó hoa thiêng (js/30)
+   if(q2){var g4=gridNear(q2[0],q2[1]);goTo(g4[0],g4[1],k2[1]);pend=mo2}else mo2()}
   else if(w==='nhang'){var pq=SC[scene].pray[O];goTo(pq[0]+(Math.random()-.5)*.1,pq[1],'chap');window.ssRitual&&ssRitual.open()}
   else if(w==='cal'){var c=hall.querySelector('.hall-act [data-open-cal]');c&&c.click()}
   else if(w==='ngoi')goTo((av.me||me).x,(av.me||me).y,'ngoi');
