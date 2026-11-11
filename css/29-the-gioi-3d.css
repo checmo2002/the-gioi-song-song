@@ -22,7 +22,6 @@
 /* tranh 2D (nhà dựng từ gia phả, js/20) đặt lại theo camera 3D */
 .w3d-tranh{position:absolute;inset:0;display:none;pointer-events:none;overflow:hidden}
 .hall.w3d-on .w3d-tranh{display:block}
-.w3d-tranh .ho-h,.w3d-tranh .ho-d{position:absolute}
 /* đoạn phim chuyển cảnh (js/26 ss3dPhim): màn ngà có logo Song Song vẽ dần, tên nơi đến hiện từng chữ, tia sáng quay, đốm vàng bay;
    rồi mở tròn (viền vàng) ra đoạn phim, hai dải nâu trầm viền vàng, dải dưới có logo nhỏ quay, tên và vệt sáng chạy; hết phim khép tròn về logo */
 .w-trans.phim{background:#1a120b!important;padding-bottom:0;align-items:flex-end;animation:wIn .3s ease both!important;--nga:#F4EAD6;--vang:#C9973F}
