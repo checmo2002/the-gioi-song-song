@@ -24,7 +24,7 @@ Hai vòng tròn lồng nhau, phần giao nhau tô vàng `#B8862F`. Bản SVG có
 ## Quy trình làm asset
 
 - Dựng bằng **Blender** (có Blender MCP), có thể dùng **Meshy AI** làm mẫu thô.
-- Xuất **WebP**, đặt đúng thư mục: `img/3d/<cảnh>/` (cảnh 3D), `img/3d/nv/` (nhân vật 3D). Nhà và đồ trang trí làng riêng: `img/3d/ho/nha.json` dựng bằng `tools/blender/nha-3d.py` (vật liệu `mai`, `tuong` để web nhuộm theo lựa chọn người dùng).
+- Xuất **WebP**, đặt đúng thư mục: `img/3d/<cảnh>/` (cảnh 3D), `img/3d/nv/` (nhân vật 3D). Nhà và đồ trang trí làng riêng: `img/3d/ho/nha.json` dựng bằng `tools/blender/nha-3d.py` (vật liệu `mai`, `tuong` để web nhuộm theo lựa chọn người dùng, `mai2` nhuộm màu mái sẫm hơn cho hàng ngói). Thêm quà mới có hình: thêm hàm `do_<mã quà>` trong script, khai báo chỗ bày trong `js/26` (`DO_TRONG`) hoặc ô sân trong `js/20`.
 - Mỗi cảnh cần thêm dữ liệu lưới đi được trong `js/04-00-du-lieu-canh.js` (cùng tên cảnh với ảnh).
 - Ảnh cảnh nên dưới 400 KB để điện thoại tải nhanh.
 - Cảnh 3D: nướng sáng từ Blender vào texture (`img/3d/vat-*.webp`), hình khối ở `img/3d/canh.json` (glb mã hoá base64 vì bản thử trên claude.ai không phục vụ file .glb). Cây và nhân vật được chiếu sáng thời gian thực (không đổ bóng thật; bóng cây nằm sẵn trong ảnh nướng, người có bóng mềm dưới chân), màu đất nặn theo đỉnh (`img/3d/cay.json`, `img/3d/nv/*.json`).

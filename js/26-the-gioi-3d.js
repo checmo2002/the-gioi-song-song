@@ -335,7 +335,7 @@ function khoi(){
    const lh=c.lh?B(c.lh[0],c.lh[1]):null,tinh=[];
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
-   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,huong:(c.huong||(c.lh?[c.lh]:[])).map(h=>B(h[0],h[1])),tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(ten==='tho')vatNhaTho(DL[ten]);if(ten==='ho')dungNha();if(TT[ten])trangTriCanh(DL[ten],TT[ten])}   // sảnh: cột sáng, logo trước; cảnh động chung nối sau
+   DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,huong:(c.huong||(c.lh?[c.lh]:[])).map(h=>B(h[0],h[1])),tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(ten==='tho')vatNhaTho(DL[ten]);if(ten==='ho')dungNha();if(ten==='nha')dungDo();if(TT[ten])trangTriCanh(DL[ten],TT[ten])}   // sảnh: cột sáng, logo trước; cảnh động chung nối sau
   function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn
    const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
    return (z(i,j)*(1-fx)+z(i+1,j)*fx)*(1-fy)+(z(i,j+1)*(1-fx)+z(i+1,j+1)*fx)*fy}
@@ -347,7 +347,7 @@ function khoi(){
   function vlNha(mau,d){const c=new THREE.Color(mau),v=new THREE.MeshStandardMaterial({color:c,roughness:.9,metalness:0,envMapIntensity:0});v.onBeforeCompile=sh=>AGX(sh,true);
    v.userData.goc=c.clone();v.userData.nha=1;if(d)d.cy.push(v);return v}
   function nhuom(o,mau,d){o.traverse(m=>{if(!m.isMesh)return;const t=m.material.name;m.material=vlNha(mau[t]||'#'+m.material.color.getHexString(),d)})}
-  function taoNha(gl,h,d){const ks=gl.scene.getObjectByName('nha_'+h.style)?h.style:'bagian',v=gl.scene.getObjectByName('nha_'+ks).clone(true);nhuom(v,{mai:h.roof,tuong:h.wall},d);
+  function taoNha(gl,h,d){const ks=gl.scene.getObjectByName('nha_'+h.style)?h.style:'bagian',v=gl.scene.getObjectByName('nha_'+ks).clone(true);nhuom(v,{mai:h.roof,mai2:new THREE.Color(h.roof).multiplyScalar(.72),tuong:h.wall},d);
    const oc=v.getObjectByName('o_cua_'+ks),cm=gl.scene.getObjectByName('cua_'+(h.cua||'go'))||gl.scene.getObjectByName('cua_go');
    if(oc&&cm){const c=cm.clone(true);nhuom(c,{},d);c.position.copy(oc.position);v.add(c)}return v}
   async function dungNha(){const d=DL.ho;if(!d||!window.ssHo||!ssHo.nha)return;const gl=await mauNha().catch(()=>null);if(!gl||!DL.ho)return;
@@ -357,12 +357,28 @@ function khoi(){
     const bb=new THREE.Box3().setFromObject(g);nhaTop[n.k]=[(bb.min.x+bb.max.x)/2,-(bb.min.z+bb.max.z)/2,bb.max.y+1.4];
     for(const [ten,o,mau] of n.do){const m=gl.scene.getObjectByName('do_'+ten);if(!m||!o)continue;const c=m.clone(true);nhuom(c,mau?{tuong:mau}:{},d);c.position.copy(dat(o[0],o[1]));nhom.add(c)}}
    d.canh.add(nhom);d.nutO=''}   // dựng lại nút tên trên nóc nhà
-  addEventListener('ss-ho-nha',()=>{if(DL.ho)dungNha()});
+  addEventListener('ss-ho-nha',()=>{if(DL.ho)dungNha();if(DL.nha)dungDo()});
+  // đồ người thân tặng bày trong gian nhà (cảnh 'nha'): [x,y Blender của cảnh, xoay độ, rộng, sâu]; áo treo trong tủ áo
+  const DO_TRONG={truongky:[8.2,1.8,-90,2.4,1.9],sap:[-8.5,4.5,0,2.0,1.4],tuche:[6.3,8.9,0,1.6,.6],tuao:[8.5,6.0,-90,2.0,1.8]},AO={aodai:-.45,quanphuc:0,aolen:.45};let luoiGoc=null;
+  async function dungDo(){const d=DL.nha;if(!d||!window.ssHo||!ssHo.qua)return;const p=window.ssPerson&&ssPerson.get(),co={};(p?ssHo.qua(p.id):[]).forEach(id=>co[id]=1);
+   const vat=Object.keys(DO_TRONG).filter(k=>k==='tuao'?Object.keys(AO).some(a=>co[a]):co[k]),gl=vat.length?await mauNha().catch(()=>null):null;if(!DL.nha)return;
+   if(d.doTrong){d.canh.remove(d.doTrong);d.cy=d.cy.filter(m=>!m.userData.nha);d.doTrong=null}
+   const g=new THREE.Group(),mau=ten=>{const m=gl&&gl.scene.getObjectByName('do_'+ten);if(!m)return null;const c=m.clone(true);nhuom(c,{},d);c.traverse(o=>{if(o.isMesh){o.material.color.multiplyScalar(.3);o.material.userData.goc.multiplyScalar(.3)}});return c};   // gian nhà sáng hơn làng: hạ màu cho khỏi bạc
+   for(const k of vat){const [x,y,r]=DO_TRONG[k],c=mau(k);if(!c)continue;let uv=d.raAnh(new V3(x,y,0));uv=d.raAnh(new V3(x,y,caoTai('nha',uv[0],uv[1])));
+    c.position.copy(B(x,y,caoTai('nha',uv[0],uv[1])));c.rotation.y=r*Math.PI/180;g.add(c);if(k==='tuao')for(const a in AO)if(co[a]){const o=mau(a);if(o){o.position.x=AO[a];c.add(o)}}}
+   d.doTrong=g;d.canh.add(g);chanLuoi(gl?vat:[])}
+  function chanLuoi(vat){const s=window.SS_CANH&&SS_CANH.nha,d=DL.nha;if(!s||!s.grid)return;const gr=s.grid;if(!luoiGoc)luoiGoc=gr.rows.slice();const R=luoiGoc.map(r=>r.split(''));
+   for(let j=0;j<gr.h;j++)for(let i=0;i<gr.w;i++){if(R[j][i]!=='1')continue;const u=(i+.5)/gr.w,v=(j+.5)/gr.h,q=d.tuAnh(u,v,caoTai('nha',u,v));
+    for(const k of vat){const [x,y,r,w,h]=DO_TRONG[k],a=r*Math.PI/180,dx=q.x-x,dy=q.y-y;if(Math.abs(dx*Math.cos(a)+dy*Math.sin(a))<w/2+.3&&Math.abs(-dx*Math.sin(a)+dy*Math.cos(a))<h/2+.3)R[j][i]='0'}}
+   gr.rows=R.map(r=>r.join(''))}   // không đi xuyên đồ vừa bày
+  addEventListener('ss-person',()=>{if(DL.nha)dungDo()});
   // ảnh nhỏ kiểu nhà cho bảng "Sửa nhà" (js/20): vẽ mẫu 3D ra khung riêng
   const rtN=new THREE.WebGLRenderTarget(160,160),scN=new THREE.Scene(),camN=new THREE.OrthographicCamera(-6.5,6.5,6.5,-6.5,.1,200);rtN.texture.colorSpace=THREE.SRGBColorSpace;
   scN.add(new THREE.HemisphereLight(0xfff6e8,0x8c7a62,2.4));{const n=new THREE.DirectionalLight(0xffffff,1.8);n.position.set(-6,14,9);scN.add(n)}
   camN.position.copy(B(DIR.x*60,DIR.y*60,DIR.z*60+4));camN.lookAt(B(0,0,4));
-  window.ss3dAnhNha=(cv,h)=>mauNha().then(gl=>{const v=taoNha(gl,h,null);scN.add(v);const cc=new THREE.Color(),ca=r.getClearAlpha();r.getClearColor(cc);
+  window.ss3dAnhNha=(cv,h)=>mauNha().then(gl=>{let v;if(h.do){const m=gl.scene.getObjectByName('do_'+h.do);if(!m)return;v=m.clone(true);nhuom(v,{},null)}else v=taoNha(gl,h,null);scN.add(v);
+   const bb=new THREE.Box3().setFromObject(v),c=bb.getCenter(new V3()),k=h.do?Math.max(.6,bb.getSize(new V3()).length()*.42):6.5;camN.left=camN.bottom=-k;camN.right=camN.top=k;camN.updateProjectionMatrix();
+   camN.position.copy(h.do?c:B(0,0,4)).addScaledVector(B(DIR.x,DIR.y,DIR.z),60);camN.lookAt(h.do?c:B(0,0,4));const cc=new THREE.Color(),ca=r.getClearAlpha();r.getClearColor(cc);
    r.setRenderTarget(rtN);r.setClearColor(0xf3ead8,1);r.clear();r.render(scN,camN);const px=new Uint8Array(160*160*4);r.readRenderTargetPixels(rtN,0,0,160,160,px);r.setRenderTarget(null);r.setClearColor(cc,ca);scN.remove(v);
    const x=cv.getContext('2d'),im=x.createImageData(160,160);for(let y=0;y<160;y++)im.data.set(px.subarray((159-y)*640,(160-y)*640),y*640);x.putImageData(im,0,0)}).catch(()=>{});
   // ---- nút điểm đến: lấy đúng chỗ trên ảnh, bắn tia theo camera ảnh vào cảnh 3D để ra điểm thật

@@ -4,7 +4,9 @@ Mỗi nhà là một vật thể 'nha_<kiểu>' (gốc ở giữa nền, cửa q
   mai   mái (web nhuộm theo màu mái người dùng chọn)   tuong  tường (nhuộm theo màu tường)
   còn lại giữ màu: go, da, cot, kinh, toi, vang, do
 Mỗi nhà có điểm rỗng 'o_cua_<kiểu>' là chỗ lắp cửa; ba kiểu cửa dùng chung: cua_go, cua_kinh, cua_vom.
-Đồ trang trí: do_dao, do_sen, do_cau, do_rao, do_den, do_xemay, do_xedap, do_oto (gốc ở chân, mặt quay về -Y).
+  mai2  hàng ngói, nóc mái (web nhuộm màu mái sẫm hơn)
+Đồ trang trí: do_dao, do_sen, do_cau, do_rao, do_den, do_xemay, do_xedap, do_oto, do_binhsen (gốc ở chân, mặt quay về -Y).
+Đồ trong nhà (bày trong cảnh 'nha'): do_truongky, do_sap, do_tuche, do_tuao (tủ áo mở cửa) và áo treo trong tủ do_aodai, do_quanphuc, do_aolen.
 Ô đất trên web rộng 7.8 x 5.8 (trục X x trục Y), nhà nằm trong khoảng đó."""
 import bpy, bmesh, sys, math
 from mathutils import Vector
@@ -18,7 +20,9 @@ sc = bpy.context.scene
 
 MAU = {'mai': (1, 1, 1), 'tuong': (1, 1, 1), 'go': (.42, .27, .16), 'da': (.72, .69, .64), 'cot': (.93, .9, .83),
        'kinh': (.22, .32, .4), 'toi': (.18, .15, .13), 'vang': (.85, .66, .28), 'do': (.72, .16, .12),
-       'la': (.36, .55, .27), 'hong': (.96, .67, .76), 'nuoc': (.5, .72, .78), 'tre': (.62, .58, .34), 'kim': (.7, .72, .75), 'den': (.98, .85, .55)}
+       'la': (.36, .55, .27), 'hong': (.96, .67, .76), 'nuoc': (.5, .72, .78), 'tre': (.62, .58, .34), 'kim': (.7, .72, .75), 'den': (.98, .85, .55),
+       'mai2': (.78, .78, .78), 'gom': (.62, .33, .22), 'go2': (.3, .16, .1), 'su': (.93, .93, .95), 'xanhsu': (.2, .3, .58),
+       'lua': (.86, .2, .22), 'xanh': (.36, .42, .26), 'len': (.55, .27, .22)}
 MAT = {}
 def mat(t):
     if t not in MAT:
@@ -50,12 +54,27 @@ def mai_hoi(w, d, z, h, ridge, t='mai', cong=0.0, y0=0.0):
     a, b, r = w / 2, d / 2, ridge / 2
     V = [(-a, y0 - b, z + cong), (a, y0 - b, z + cong), (a, y0 + b, z + cong), (-a, y0 + b, z + cong), (-r, y0, z + h), (r, y0, z + h), (0, y0 - b, z), (0, y0 + b, z)]
     F = [(0, 6, 5, 4), (6, 1, 5), (1, 2, 5), (2, 7, 4, 5), (7, 3, 4), (3, 0, 4)] if ridge < w else [(0, 6, 5, 4), (6, 1, 5), (2, 7, 4, 5), (7, 3, 4)]
-    return luoi('mai', V, F, t, day=.14)
+    o = luoi('mai', V, F, t, day=.14)
+    if t == 'mai':   # hàng ngói chạy ngang mặt mái trước, sau và nóc mái
+        for s in (-1, 1):
+            for i in range(1, 7):
+                k = i / 7; hop(2 * (a - (a - r) * k) - .25, .07, .05, 0, y0 + s * b * (1 - k), z + h * k + .04, 'mai2')
+        if ridge > .5: hop(ridge + .3, .2, .2, 0, y0, z + h - .06, 'mai2')
+    return o
 def hoi(w, d, z, h, t='tuong'):   # hai tam giác đầu hồi cho mái hai mái
     a, b = w / 2, d / 2
     return luoi('hoi', [(-a, -b, z), (-a, b, z), (-a, 0, z + h), (a, -b, z), (a, b, z), (a, 0, z + h)], [(0, 1, 2), (3, 5, 4)], t, day=.1)
 def cua_so(x, y, z, w, h, mat_kinh='kinh', khung='go', ngang=False):
     hop(w + .14, .08, h + .14, x, y - .02, z - .07, khung); hop(w, .1, h, x, y - .05, z, mat_kinh)
+    for i in range(1, 4): hop(.04, .13, h, x - w / 2 + i * w / 4, y - .06, z, khung)   # song cửa
+    hop(w + .3, .2, .07, x, y - .1, z - .12, khung)   # bậu cửa
+def chau(x, y, z, k=1.0):   # chậu cây cảnh
+    tru(.2 * k, .32 * k, x, y, z, 'gom', r2=.26 * k); cau_(.3 * k, x, y, z + .55 * k, 'la', sz=(1, 1, .9))
+def bac(x, y, w, z):        # bậc thềm trước cửa, y = mép nền, z = cao nền
+    n = max(1, round(z / .16))
+    for i in range(n): hop(w, .32, z * (n - i) / (n + 1), x, y - .16 - .32 * i, 0, 'da')
+def hoanh_phi(x, y, z, w=1.6):   # bức hoành phi đỏ viền vàng trên cửa
+    hop(w + .14, .06, .5, x, y - .03, z, 'vang'); hop(w, .08, .38, x, y - .05, z + .06, 'do')
 def nut_rong(ten, x, y, z):
     e = bpy.data.objects.new(ten, None); e.location = (x, y, z); sc.collection.objects.link(e); return e
 
@@ -77,6 +96,9 @@ def bagian():   # nhà ba gian Bắc Bộ: nền đá, hiên cột gỗ, mái ng
     for x in (-2.15, 2.15): cua_so(x, -1.31, 1.25, 1.1, .9)
     mai_hoi(8.6, 6.4, 2.9, 2.0, 8.6, cong=.18); hoi(7.0, 3.6, 2.95, 1.25)
     hop(8.0, .2, .22, 0, 0, 4.85, 'mai'); [tru(.1, .5, x, 0, 4.95, 'mai', r2=.02) for x in (-4.0, 4.0)]
+    for x in (-3.2, -1.05, 1.05, 3.2): tru(.22, .14, x, -1.85, .45, 'da', n=8)
+    hop(7.0, .06, .3, 0, -1.33, .45, 'da'); hoanh_phi(0, -1.33, 2.48)
+    for x in (-1.5, 1.5): chau(x, -2.35, .45)
     return (0, -1.3, .45)
 def ruong():    # nhà rường Huế: thân gỗ thấp, mái bốn mặt dốc, hiên rộng, nhiều cột
     hop(7.6, 5.6, .5, 0, 0, 0, 'da')
@@ -85,6 +107,10 @@ def ruong():    # nhà rường Huế: thân gỗ thấp, mái bốn mặt dốc
         for y in (-2.2, 2.3): tru(.12, 2.4, x, y, .5, 'go')
     for x in (-2.4, 2.4): cua_so(x, -1.21, 1.2, 1.0, .9, 'toi')
     mai_hoi(8.4, 6.6, 2.85, 2.4, 3.6, cong=.22); hop(3.8, .22, .26, 0, 0, 5.2, 'mai')
+    for x in (-1.9, 1.9): cau_(.16, x, 0, 5.4, 'mai2', sz=(1, .6, 1.4))
+    for x in (-3.4, -1.7, 0, 1.7, 3.4): tru(.2, .14, x, -2.2, .5, 'da', n=8)
+    hop(7.0, .2, .2, 0, -2.2, 2.75, 'go'); hoanh_phi(0, -1.23, 2.3, 1.4); bac(0, -2.8, 1.8, .5)
+    for x in (-.85, .85): chau(x, -2.45, .5, .8)
     return (0, -1.2, .5)
 def maithai():  # mái Thái: tường xây, mái bốn mặt rất dốc, sảnh nhỏ có hai cột
     hop(7.4, 5.4, .35, 0, 0, 0, 'da')
@@ -92,6 +118,8 @@ def maithai():  # mái Thái: tường xây, mái bốn mặt rất dốc, sản
     for x in (-.95, .95): tru(.13, 2.6, x, -2.55, .35, 'cot')
     for x in (-2.3, 2.3): cua_so(x, -1.81, 1.35, 1.2, 1.3, 'kinh', 'cot')
     mai_hoi(7.4, 5.0, 3.35, 3.0, 1.2); mai_hoi(3.0, 1.9, 2.95, .9, 3.0, y0=-2.1)
+    hop(6.6, .06, .3, 0, -1.83, .35, 'da'); bac(0, -2.7, 1.6, .35)
+    for x in (-1.7, 1.7): chau(x, -3.1, 0)
     return (0, -2.71, .35)
 def maibang():  # nhà mái bằng hai tầng: khối hộp, ban công tầng hai, mái bằng có lan can
     hop(7.2, 5.2, .3, 0, 0, 0, 'da')
@@ -103,6 +131,9 @@ def maibang():  # nhà mái bằng hai tầng: khối hộp, ban công tầng ha
     hop(6.4, .08, .08, 0, -3.0, 4.06, 'kim')
     for x in (-2.0, 2.0): cua_so(x, -1.81, 1.3, 1.2, 1.2, 'kinh', 'cot')
     for x in (-1.9, 0, 1.9): cua_so(x, -1.81, 3.6, 1.0, 1.5, 'kinh', 'cot')
+    hop(2.0, .9, .1, 0, -2.25, 2.7, 'cot'); hop(6.5, .1, .15, 0, -1.86, 2.85, 'cot'); bac(0, -2.6, 1.6, .3)
+    for x in (-2.7, 2.7): chau(x, -2.7, 3.18, .7)
+    for x in (-1.3, 1.3): chau(x, -2.4, .3, .8)
     return (0, -1.81, .3)
 def nhasan():   # nhà sàn: cột chống, sàn gỗ, mái hai mái lớn dốc, cầu thang trước
     for x in (-3.0, -1.0, 1.0, 3.0):
@@ -112,6 +143,11 @@ def nhasan():   # nhà sàn: cột chống, sàn gỗ, mái hai mái lớn dốc
     for i in range(6): hop(1.1, .3, .08, 0, -2.75 - i * .3, 1.55 - i * .3, 'go')
     for x in (-2.2, 2.2): cua_so(x, -1.51, 2.6, .9, .8, 'toi')
     mai_hoi(8.0, 6.0, 3.7, 2.6, 6.2); hoi(6.4, 3.6, 4.0, 1.9)
+    for i in range(17):   # lan can hiên
+        x = -3.2 + i * .4
+        if abs(x) > .6: tru(.03, .6, x, -2.4, 1.95, 'go', n=4)
+    for s in (-1, 1): hop(2.6, .06, .06, s * 1.9, -2.4, 2.5, 'go')
+    for x in (-3.1, 3.1): hop(.08, .08, 1.1, x, 0, 6.2, 'go')   # khau cút đầu nóc
     return (0, -1.51, 1.9)
 def nhaong():   # nhà ống phố: mặt tiền hẹp ba tầng, ban công, mái tôn dốc trước
     hop(4.6, 5.6, .25, 0, 0, 0, 'da')
@@ -121,6 +157,10 @@ def nhaong():   # nhà ống phố: mặt tiền hẹp ba tầng, ban công, má
         for x in (-2.0, -1.0, 0, 1.0, 2.0): hop(.07, .07, .85, x, -3.15, z + .16, 'kim')
         hop(4.2, .07, .07, 0, -3.15, z + 1.0, 'kim'); cua_so(0, -2.31, z + .3, 2.2, 2.0, 'kinh', 'cot')
     cua_so(1.3, -2.31, 1.2, .8, 1.0, 'kinh', 'cot')
+    hop(3.6, .1, .5, 0, -2.36, 2.35, 'do'); hop(3.3, .11, .3, 0, -2.37, 2.45, 'vang'); hop(4.4, .8, .08, 0, -2.7, 2.15, 'mai2')
+    for z in (3.16, 5.96):
+        for x in (-1.6, 1.6): chau(x, -2.85, z, .6)
+    bac(0, -2.8, 2.0, .25)
     mai_hoi(4.8, 5.8, 8.65, 1.5, 4.8); hoi(4.2, 5.0, 8.65, 1.3)
     return (-.6, -2.31, .25)
 def hoian():    # nhà cổ Hội An: một tầng rưỡi, mái ngói hai tầng, mặt gỗ, đèn lồng đỏ
@@ -132,6 +172,10 @@ def hoian():    # nhà cổ Hội An: một tầng rưỡi, mái ngói hai tần
     for x in (-2.0, 2.0): cua_so(x, -1.88, 3.3, 1.1, .7, 'go', 'go')
     mai_hoi(7.4, 5.2, 4.45, 1.9, 7.4, cong=.1); hoi(6.6, 4.2, 4.5, 1.5)
     for x in (-2.2, 2.2): cau_(.24, x, -2.4, 2.35, 'do', sz=(1, 1, 1.3)); tru(.1, .08, x, -2.4, 2.66, 'vang')
+    for x in (-.32, .32): cau_(.1, x, -1.95, 2.6, 'vang', sz=(1, .4, 1))   # mắt cửa
+    for x in (-3.3, 3.3): tru(.2, .14, x, -2.5, .3, 'da', n=8)
+    bac(0, -2.6, 1.6, .3)
+    for x in (-1.3, 1.3): chau(x, -2.35, .3, .8)
     return (0, -1.92, .3)
 def bietthu():  # biệt thự nhỏ: hai tầng, sảnh cột tròn, ban công, mái bốn mặt
     hop(7.6, 5.6, .4, 0, 0, 0, 'da'); hop(3.0, 1.0, .2, 0, -3.0, 0, 'da')
@@ -144,6 +188,9 @@ def bietthu():  # biệt thự nhỏ: hai tầng, sảnh cột tròn, ban công,
         cua_so(x, -1.81, 1.3, 1.0, 1.4, 'kinh', 'cot'); cua_so(x, -1.81, 3.8, 1.0, 1.2, 'kinh', 'cot')
     cua_so(0, -2.81, 3.8, 1.2, 1.3, 'kinh', 'cot')
     mai_hoi(7.6, 5.4, 5.8, 2.2, 2.4); mai_hoi(3.6, 2.0, 5.65, .9, 3.6, y0=-2.2)
+    for x in (-2.35, 2.35): hop(2.1, .15, .18, x, -1.87, 3.3, 'cot')
+    for x in (-1.3, 1.3): hop(.5, .5, .2, x, -2.65, .4, 'cot')
+    for x in (-2.1, 2.1): chau(x, -3.0, 0)
     return (0, -2.81, .4)
 
 NHA = [('bagian', bagian), ('ruong', ruong), ('maithai', maithai), ('maibang', maibang), ('nhasan', nhasan), ('nhaong', nhaong), ('hoian', hoian), ('bietthu', bietthu)]
@@ -202,7 +249,59 @@ def oto():      # ô tô con
     for x in (-.75, .75):
         for y in (-1.1, 1.1): tru(.3, .22, x, y, .3, 'toi', n=12); bpy.context.object.rotation_euler = (0, math.pi / 2, 0)
     for x in (-.55, .55): hop(.25, .05, .12, x, -1.71, .6, 'den')
-DO = [('dao', dao), ('sen', sen), ('cau', cau), ('rao', rao), ('den', den), ('xemay', xemay), ('xedap', xedap), ('oto', oto)]
+def binhsen():  # bình hoa sen: bình sứ men lam, hoa và lá sen
+    tru(.3, .62, 0, 0, 0, 'su', n=14, r2=.2); tru(.2, .1, 0, 0, 0, 'xanhsu', n=14, r2=.3); tru(.31, .07, 0, 0, .32, 'xanhsu', n=14)
+    tru(.16, .22, 0, 0, .62, 'su', n=14, r2=.22); tru(.23, .05, 0, 0, .82, 'xanhsu', n=14)
+    for (x, y, h) in ((0, 0, .9), (.14, .06, .7), (-.13, -.05, .62), (.05, -.12, .78)):
+        tru(.015, h, x * .6, y * .6, .8, 'la', n=4, r2=.012); cau_(.09, x, y, .8 + h + .05, 'hong', sz=(1, 1, 1.35))
+    for (x, y) in ((.3, .1), (-.28, .12)): cau_(.22, x, y, 1.2, 'la', sz=(1, 1, .18))
+def chan(sx, sy, h, x0, y0, t='go2', w=.07):   # bốn chân bàn ghế
+    for x in (x0 - sx / 2 + w / 2, x0 + sx / 2 - w / 2):
+        for y in (y0 - sy / 2 + w / 2, y0 + sy / 2 - w / 2): hop(w, w, h, x, y, 0, t)
+def am_chen(x, y, z):       # ấm trà và bốn chén
+    tru(.1, .13, x, y, z, 'su', n=10, r2=.07); cau_(.03, x, y, z + .15, 'su'); hop(.09, .03, .03, x - .12, y, z + .08, 'su')
+    for (dx, dy) in ((.2, .08), (.2, -.08), (-.2, .1), (-.2, -.1)): tru(.04, .05, x + dx, y + dy, z, 'xanhsu', n=8, r2=.05)
+def truongky():   # bộ trường kỷ gỗ gụ: ghế dài tựa lưng, bàn nước, hai đôn
+    chan(2.2, .6, .42, 0, .5); hop(2.2, .6, .1, 0, .5, .42, 'go2'); hop(2.2, .08, .6, 0, .78, .52, 'go2'); hop(2.3, .12, .08, 0, .78, 1.12, 'go2')
+    for x in (-1.08, 1.08): hop(.08, .6, .3, x, .5, .52, 'go2')
+    hop(1.6, .02, .3, 0, .73, .65, 'do')   # nệm tựa
+    chan(1.1, .6, .44, 0, -.35); hop(1.2, .7, .06, 0, -.35, .44, 'go2'); am_chen(0, -.35, .5)
+    for x in (-1.0, 1.0): tru(.2, .42, x, -.35, 0, 'go2', n=10, r2=.17)
+def sap():        # sập gụ: mặt phản dày, diềm chạm, chân quỳ, chiếu và khay trà
+    hop(2.0, 1.4, .14, 0, 0, .38, 'go2'); hop(1.94, 1.34, .2, 0, 0, .18, 'go2')
+    chan(1.96, 1.36, .2, 0, 0, 'go2', .14); hop(1.8, 1.2, .02, 0, 0, .52, 'tre')
+    hop(.6, .4, .1, .4, 0, .54, 'go2'); am_chen(.4, 0, .64)
+def tuche():      # tủ chè: thân gỗ gụ, ô kính, bày bình và ấm chén
+    chan(1.5, .5, .12, 0, 0); hop(1.5, .5, .78, 0, 0, .12, 'go2'); hop(1.56, .54, .05, 0, 0, .9, 'go2')
+    for x in (-.37, .37): hop(.6, .04, .5, x, -.25, .25, 'go'); cau_(.025, x * .2, -.29, .5, 'vang')
+    hop(1.4, .44, .55, 0, .02, .95, 'kinh'); hop(1.5, .5, .05, 0, 0, 1.5, 'go2')
+    for x in (-.73, 0, .73): hop(.05, .5, .55, x, 0, .95, 'go2')
+    am_chen(-.35, 0, 1.55); tru(.1, .3, .45, 0, 1.55, 'su', n=10, r2=.06); tru(.07, .05, .45, 0, 1.6, 'xanhsu', n=10)
+def tuao():       # tủ áo gỗ mở hai cánh, thanh treo bên trong (áo gắn vào tủ trên web)
+    hop(1.6, .05, 2.0, 0, .28, .1, 'go2'); hop(.05, .6, 2.0, -.78, 0, .1, 'go2'); hop(.05, .6, 2.0, .78, 0, .1, 'go2')
+    hop(1.66, .64, .08, 0, 0, 2.1, 'go2'); hop(1.6, .6, .1, 0, 0, 0, 'go2'); hop(1.5, .55, .02, 0, 0, .1, 'go')
+    hop(1.5, .03, .03, 0, 0, 1.78, 'kim')
+    for s in (-1, 1): hop(.04, .78, 1.92, s * .82, -.68, .14, 'go2'); hop(.05, .5, 1.5, s * .84, -.68, .36, 'go')
+def moc(x=0):     # móc áo
+    hop(.42, .03, .03, x, 0, 1.68, 'kim'); hop(.02, .02, .1, x, 0, 1.71, 'kim')
+def aodai():      # áo dài đỏ: thân ôm, tà dài, tay dài, quần trắng
+    moc(); hop(.36, .12, .5, 0, 0, 1.18, 'lua'); hop(.12, .12, .08, 0, 0, 1.66, 'lua')
+    hop(.32, .06, .9, 0, -.04, .3, 'lua'); hop(.32, .06, .8, 0, .04, .38, 'lua')
+    for s in (-1, 1): hop(.07, .08, .62, s * .22, 0, .9, 'lua')
+    for s in (-1, 1): hop(.12, .08, .5, s * .08, 0, .28, 'cot')
+def quanphuc():   # quân phục: áo xanh lá, cúc vàng, cầu vai, quần, mũ trên giá
+    moc(); hop(.48, .16, .62, 0, 0, 1.02, 'xanh'); hop(.5, .16, .05, 0, 0, 1.6, 'xanh')
+    for s in (-1, 1): hop(.1, .14, .58, s * .29, 0, 1.0, 'xanh'); hop(.08, .17, .04, s * .16, 0, 1.6, 'do')
+    for z in (1.1, 1.25, 1.4): cau_(.022, 0, -.09, z, 'vang')
+    hop(.44, .12, .7, 0, .03, .3, 'xanh'); hop(.46, .13, .05, 0, .03, 1.0, 'toi')
+    cau_(.17, 0, .12, 1.86, 'xanh', sz=(1, 1, .55)); cau_(.04, 0, -.04, 1.88, 'vang')
+def aolen():      # áo len mẹ đan: thân rộng, sọc kem, cổ tròn
+    moc(); hop(.52, .18, .6, 0, 0, 1.06, 'len'); cau_(.08, 0, 0, 1.66, 'len', sz=(1, .6, .5))
+    for s in (-1, 1): hop(.13, .17, .6, s * .32, 0, 1.0, 'len')
+    for z in (1.18, 1.32): hop(.53, .19, .04, 0, 0, z, 'cot')
+    hop(.53, .19, .08, 0, 0, 1.0, 'toi')
+DO = [('dao', dao), ('sen', sen), ('cau', cau), ('rao', rao), ('den', den), ('xemay', xemay), ('xedap', xedap), ('oto', oto), ('binhsen', binhsen),
+      ('truongky', truongky), ('sap', sap), ('tuche', tuche), ('tuao', tuao), ('aodai', aodai), ('quanphuc', quanphuc), ('aolen', aolen)]
 for i, (k, f) in enumerate(DO):
     f(); o = gom('do_' + k, X=i * 4); o.location.y = 12
 

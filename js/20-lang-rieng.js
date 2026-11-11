@@ -8,6 +8,7 @@
  var WALL=[['#E6C374','Vàng'],['#EDE2C8','Trắng ngà'],['#B9B2A6','Ghi'],['#D9A38A','Hồng đất'],['#A87A52','Màu gỗ']];
  var GARD=[['dao','Cây đào trước ngõ'],['sen','Ao sen'],['cau','Hàng cau'],['rao','Rào tre'],['den','Đèn lồng lối đi']];
  var YARD={xemay:1,xedap:1,oto:1};
+ var MO={dao:'dao',denlong:'den',binhsen:'binhsen',truongky:'truongky',sap:'sap',tuche:'tuche',aodai:'aodai',quanphuc:'quanphuc',aolen:'aolen',xemay:'xemay',xedap:'xedap',oto:'oto'};   // quà → mẫu 3D do_<tên> trong img/3d/ho/nha.json
  var COL={ls:'#8B3A1E',tb:'#2F5D8A',dh:'#4E7A3A',nt:'#7A4A8C'};
  var DEMO=[{id:'le',spouse:'to'},{id:'to',spouse:'le'},{id:'can',parent:'le',spouse:'gai'},{id:'gai',spouse:'can'},{id:'khoi',parent:'can'},{id:'khiem',parent:'can'}];
  var DEMOH={le:{style:'ruong',roof:'#4a4f63',wall:'#A87A52',garden:{cau:true,rao:true}},to:{style:'ruong',roof:'#4a4f63',wall:'#A87A52',garden:{dao:true,rao:true}},
@@ -64,6 +65,7 @@
  // danh sách nhà cho cảnh 3D (js/26): ô đất, kiểu, màu, cửa và đồ bày theo ô quanh nhà
  function nha(){layout();return Object.keys(LAY.place).map(function(k){var pl=META.plots[LAY.place[k]];if(!pl)return null;var h=H(k),gf={},ds=[];h.gifts.forEach(function(id){gf[id]=1});
   GARD.forEach(function(x){if(h.garden[x[0]]||(x[0]==='dao'&&gf.dao)||(x[0]==='den'&&gf.denlong))ds.push([x[0],pl.s[x[0]]])});
+  if(gf.binhsen)ds.push(['binhsen',[pl.a[0]+.0101,pl.a[1]+.0342]]);   // ô cạnh cửa, lệch (-1.3,-3.3) m so với tâm nhà
   ['xemay','xedap','oto'].forEach(function(n){if(gf[n]&&h.hide.indexOf(n)<0)ds.push([n,n==='oto'?pl.s.oto:pl.s.xe,n==='oto'?'#9c3b28':null])});
   return {k:k,a:pl.a,h:{style:h.style,roof:h.roof,wall:h.wall,cua:h.cua},do:ds}}).filter(Boolean)}
  function SCo(){return window.__SC_HO_REF}function SCg(){return SCo().grid}
@@ -90,8 +92,8 @@
  function thumb(cv,st,h){window.ss3dAnhNha&&ss3dAnhNha(cv,{style:st,roof:h.roof,wall:h.wall,cua:h.cua})}
  function edit(k){var h=H(k),hs=LAY.houses[k];var G=window.ssMe&&ssMe.goods?ssMe.goods():[];var cnt={};h.gifts.forEach(function(id){cnt[id]=(cnt[id]||0)+1});
   var gl=Object.keys(cnt).map(function(id){var g=G.filter(function(x){return x.id===id})[0]||{n:id,k:''};
-   if(YARD[id])return '<label><input type="checkbox" data-y="'+id+'"'+(h.hide.indexOf(id)<0?' checked':'')+'> '+esc(g.n)+(cnt[id]>1?' ×'+cnt[id]:'')+' · bày ngoài sân</label>';
-   return '<div class="in">'+esc(g.n)+(cnt[id]>1?' ×'+cnt[id]:'')+' · '+(g.k==='ao'?'trong tủ áo':g.k==='trang'?'ngoài sân':'bày trong nhà')+'</div>'}).join('')||'<div class="in">Chưa có quà. Người thân có thể gửi từ cửa hàng.</div>';
+   if(YARD[id])return '<label><input type="checkbox" data-y="'+id+'"'+(h.hide.indexOf(id)<0?' checked':'')+'> <canvas width="160" height="160" data-do="'+id+'"></canvas>'+esc(g.n)+(cnt[id]>1?' ×'+cnt[id]:'')+' · bày ngoài sân</label>';
+   return '<div class="in">'+(MO[id]?'<canvas width="160" height="160" data-do="'+MO[id]+'"></canvas>':'')+esc(g.n)+(cnt[id]>1?' ×'+cnt[id]:'')+' · '+(g.k==='ao'?'trong tủ áo':g.k==='trang'?'ngoài sân':'bày trong nhà')+'</div>'}).join('')||'<div class="in">Chưa có quà. Người thân có thể gửi từ cửa hàng.</div>';
   sh.innerHTML='<div class="hos-c">'+head(k)+'<h4>Kiểu nhà</h4><div class="hos-sty">'+STY.map(function(x){return '<button type="button" data-s="'+x[0]+'" aria-pressed="'+(h.style===x[0])+'"><canvas width="160" height="160"></canvas>'+x[1]+'</button>'}).join('')+'</div>'+
    '<h4>Màu mái</h4><div class="hos-sw" data-k="roof">'+ROOF.map(function(x){return '<button type="button" data-c="'+x[0]+'" aria-label="'+x[1]+'" title="'+x[1]+'" style="background:'+x[0]+'" aria-pressed="'+(h.roof===x[0])+'"></button>'}).join('')+'</div>'+
    '<h4>Màu tường</h4><div class="hos-sw" data-k="wall">'+WALL.map(function(x){return '<button type="button" data-c="'+x[0]+'" aria-label="'+x[1]+'" title="'+x[1]+'" style="background:'+x[0]+'" aria-pressed="'+(h.wall===x[0])+'"></button>'}).join('')+'</div>'+
@@ -101,6 +103,7 @@
    '<div class="hos-foot"><button type="button" data-f="qua">'+'Gửi thêm quà</button><button type="button" class="pri" data-f="xong">Xong</button></div>'+(real()?'':'<p class="hos-note">Làng mẫu: thay đổi chỉ lưu trên máy này. Đăng ký để lập làng của gia đình bạn.</p>')+'</div>';
   sh.hidden=false;
   [].forEach.call(sh.querySelectorAll('.hos-sty button'),function(b){thumb(b.querySelector('canvas'),b.dataset.s,h)});
+  [].forEach.call(sh.querySelectorAll('.hos-gf canvas'),function(c){window.ss3dAnhNha&&ss3dAnhNha(c,{do:c.dataset.do})});
   sh.querySelector('.hos-c').addEventListener('click',function(e){var b;
    if((b=e.target.closest('.hos-sty [data-s]'))){h.style=b.dataset.s;upd()}
    else if((b=e.target.closest('[data-cua]'))){h.cua=b.dataset.cua;upd()}
@@ -131,7 +134,8 @@
  setInterval(addBtn,1500);addBtn();
  // ---------- mở làng ----------
  function go(){layout();build();var W=window.ssWorld;if(!W)return;if(hall.hidden){W.set('ho');window.ssHall&&ssHall.open();setTimeout(function(){W.refresh()},60)}else W.fade('ho','Về làng nhà…')}
- window.ssHo={nha:nha,go:go,menu:menu,tree:tree,door:door,build:build,from:function(v){if(arguments.length)FROM=v;return FROM},key:key};
+ function qua(pid){layout();for(var k in LAY.houses)if(LAY.houses[k].ids.indexOf(pid)>=0)return H(k).gifts.slice();return []}
+ window.ssHo={nha:nha,qua:qua,go:go,menu:menu,tree:tree,door:door,build:build,from:function(v){if(arguments.length)FROM=v;return FROM},key:key};
  var lastWs='';new MutationObserver(function(){var w=hall.dataset.ws;if(w==='ho'&&lastWs!=='ho'){build();setTimeout(function(){window.ssWorld&&ssWorld.refresh()},30)}lastWs=w}).observe(hall,{attributes:true,attributeFilter:['data-ws']});
  addEventListener('ss-person',function(){if(hall.dataset.ws==='ho')build()});
  // lối vào từ trang Người thân / Gia đình
