@@ -37,7 +37,8 @@
 .hos-cua button{min-height:44px;padding:8px;border-radius:12px;background:#fff;border:2px solid #E6DAC3;font:inherit;font-size:13px;cursor:pointer}
 .hos-cua button[aria-pressed="true"]{border-color:#C9892E;background:#FFF4DE}
 .hos-tg input,.hos-gf input{accent-color:#A8661A;width:18px;height:18px}
-.hos-gf{display:grid;gap:6px}.hos-gf .in{padding:9px 10px;border-radius:12px;background:#F4EDE0;font-size:13px}
+.hos-gf{display:grid;gap:6px}.hos-gf .in{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:12px;background:#F4EDE0;font-size:13px}
+.hos-gf canvas{width:44px;height:44px;border-radius:10px;flex:none;background:#f3ead8}
 .hos-foot{display:flex;gap:8px;margin-top:16px}
 .hos-foot button{flex:1;min-height:44px;border-radius:999px;border:1px solid #D9CDB5;background:#fff;font:inherit;font-weight:600;cursor:pointer}
 .hos-foot .pri{border:0;color:#fff;background:linear-gradient(180deg,#E2A548,#A8661A)}
