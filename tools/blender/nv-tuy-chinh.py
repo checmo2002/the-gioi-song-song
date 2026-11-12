@@ -90,6 +90,29 @@ def mat_dau(x, z, noi=0.0):   # điểm trên mặt trước của đầu
     nx, nz = x / RD.x, (z - DAU.z) / RD.z; ny = -math.sqrt(max(0, 1 - nx * nx - nz * nz))
     return Vector((x, DAU.y + ny * (RD.y + noi), z))
 
+# ---- dáng nữ: nắn lại từ dáng nam (eo thon, hông nở, vai hẹp, ngực, tay thon). Áo quần có thêm khoá hình 'nu' nắn y như thân để vừa người
+def g(z, c, w): return math.exp(-((z - c) / w) ** 2)
+def nan_nu(p):
+    x, y, z = p; ax = abs(x); s = 1 if x >= 0 else -1
+    if ax >= .15 and z > .75:   # tay: theo vai hẹp, thon lại quanh trục tay
+        return Vector((x - s * .026, y * .8, .89 + (z - .89) * .8))
+    kx = 1 - .26 * g(z, .76, .05) + .22 * g(z, .63, .055) - .18 * g(z, .92, .04); ky = 1 - .14 * g(z, .76, .05) + .08 * g(z, .63, .05)
+    x, y = x * kx, y * ky
+    if y < 0: y -= .05 * g(z, .845, .035) * math.exp(-((ax - .055) / .04) ** 2)
+    return Vector((x, y, z))
+def than_nu(nam):
+    o = nam.copy(); o.data = nam.data.copy(); o.name = o.data.name = 'than_nu'; sc.collection.objects.link(o)
+    for v in o.data.vertices: v.co = nan_nu(v.co)   # thân chưa gắn xương, toạ độ = thế giới
+    return o
+def khoa_nu(o):
+    o.shape_key_add(name='Basis'); k = o.shape_key_add(name='nu', from_mix=False)
+    for i, v in enumerate(o.data.vertices): k.data[i].co = nan_nu(o.matrix_world @ v.co)
+def mi_nu():   # lông mi cong ở đuôi mắt và má hồng, chỉ hiện với dáng nữ
+    k = Khoi(); h = Khoi()
+    for s in (-1, 1):
+        chuoi(k, [mat_dau(s * x, 1.148 + .014 * ((x - .04) / .045) ** 2, .006) for x in (.04, .055, .07, .082, .092)], .004)
+        h.cau(mat_dau(s * .098, 1.078, -.002), (.026, .006, .017))
+    return gop('mi_nu', [tao('mi', k, 'mat', voxel=.0022, mat_=260, mem=1, xuong='Head'), tao('ma', h, 'hong', voxel=.0025, mat_=200, mem=2, xuong='Head')])
 def than(nu):
     k = Khoi()
     if nu: k.cau((0, 0, .84), (.11, .08, .1)).cau((0, 0, .7), (.13, .088, .1)).cau((0, -.02, .85), (.1, .07, .06))
@@ -176,7 +199,7 @@ def quan(ten, chan_toi, r=(.075, .06, .052), them=None):
     return tao(ten, k, 'quan', mem=6)
 
 def dung_tat_ca():
-    out = [than(False), than(True)] + [mat_kieu(n) for n in (1, 2, 3, 4)]
+    nam = than(False); out = [nam, than_nu(nam), mi_nu()] + [mat_kieu(n) for n in (1, 2, 3, 4)]
     out += [toc('ngan'), toc('cua', tran=.55, day=.012, phong=1.02),
             toc('mai', lambda k: k.cau(DAU + Vector((.045, -.135, .115)), (.11, .045, .05))),
             toc('dai', lambda k: k.cau((0, .11, .98), (.15, .06, .21)), ben=-.25),
@@ -210,6 +233,8 @@ def dung_tat_ca():
 
 PHAN = dung_tat_ca()
 for o in PHAN:
+    if o.name.startswith(('ao_', 'quan_', 'vay')): khoa_nu(o)
+for o in PHAN:
     o.parent = ARM; o.matrix_parent_inverse = ARM.matrix_world.inverted()
     m = o.modifiers.new('xuong', 'ARMATURE'); m.object = ARM
     print('PHAN', o.name, len(o.data.vertices))
@@ -221,8 +246,10 @@ if XEM:   # ảnh xem: 6 bộ phối khác nhau đứng thành hàng (tư thế 
           ('than_nu', 'mat_3', 'toc_duoi', 'ao_somi', 'vay'), ('than_nam', 'mat_4', 'toc_duoi', 'ao_baba', 'quan_rong')]
     XN = []
     for i, bo in enumerate(BO):
-        for ten in bo + ('giay',):
-            c = bpy.data.objects[ten].copy(); c.parent = None; c.modifiers.clear(); c.matrix_world = Matrix.Translation((i * 1.2 - 4.2, 0, 0)); sc.collection.objects.link(c); XN.append(c)
+        for ten in bo + ('giay',) + (('mi_nu',) if bo[0] == 'than_nu' else ()):
+            c = bpy.data.objects[ten].copy(); c.data = c.data.copy(); c.parent = None
+            if bo[0] == 'than_nu' and c.data.shape_keys: c.data.shape_keys.key_blocks['nu'].value = 1
+            c.modifiers.clear(); c.matrix_world = Matrix.Translation((i * 1.2 - 4.2, 0, 0)); sc.collection.objects.link(c); XN.append(c)
     for o in PHAN + [ARM]: o.hide_render = True
     eng = [e.identifier for e in bpy.types.RenderSettings.bl_rna.properties['engine'].enum_items]
     sc.render.engine = 'BLENDER_EEVEE' if 'BLENDER_EEVEE' in eng else 'BLENDER_EEVEE_NEXT'
@@ -235,6 +262,6 @@ if XEM:   # ảnh xem: 6 bộ phối khác nhau đứng thành hàng (tư thế 
     for o in PHAN + [ARM]: o.hide_render = False
 
 for o in sc.objects: o.select_set(o in PHAN or o == ARM)
-bpy.ops.export_scene.gltf(filepath=RA, export_format='GLB', use_selection=True, export_yup=True, export_skins=True, export_animations=True,
+bpy.ops.export_scene.gltf(filepath=RA, export_format='GLB', use_selection=True, export_yup=True, export_skins=True, export_morph=True, export_morph_normal=False, export_animations=True,
                           export_animation_mode='ACTIONS', export_materials='EXPORT', export_extras=False, export_cameras=False, export_lights=False)
 print('XONG', RA)
