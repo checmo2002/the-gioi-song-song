@@ -362,8 +362,10 @@ function khoi(){
    for(const [m,dt,x,y] of c.le)mau(m).then(gl=>{const q=dung(m,gl,canh),p=B(x,y);q.rig.position.set(p.x,c.day+.03,p.z);q.bo.position.set(p.x,c.day+.05,p.z);
     if(lh){const d=new V3().subVectors(lh,p);q.rig.rotation.y=Math.atan2(d.x,d.z)}choi(q,DONG[dt]);if(!GIAM)q.mx.update(Math.random()*3);tinh.push(q)}).catch(()=>{});
    DL[ten]={...a,canh,nen,dat,bk,cy,den,hemi,lh,huong:(c.huong||(c.lh?[c.lh]:[])).map(h=>B(h[0],h[1])),tinh,nut:[],nutO:'',cao:tt&&tt.cao};if(ten==='sanh')trangTriSanh(DL[ten]);if(ten==='tho')vatNhaTho(DL[ten]);if(ten==='ho')dungNha();if(ten==='nha')dungDo();if(TT[ten])trangTriCanh(DL[ten],TT[ten])}   // sảnh: cột sáng, logo trước; cảnh động chung nối sau
-  function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn
-   const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
+  function trongDa(x,y,ps){let c=false;for(let i=0,j=ps.length-1;i<ps.length;j=i++){const a=ps[i],b=ps[j];if(((a[1]>y)!==(b[1]>y))&&(x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]))c=!c}return c}
+  function caoTai(ten,u,v){   // độ cao mặt đi tại điểm ảnh (u,v), nội suy từ lưới nướng sẵn; nền dinh thự ở làng riêng nâng thêm (js/20 ssHo.nen)
+   if(ten==='ho'&&window.ssHo&&ssHo.nen)for(const n of ssHo.nen())if(trongDa(u,v,n.p))return caoGoc(ten,u,v)+n.h;return caoGoc(ten,u,v)}
+  function caoGoc(ten,u,v){const g=DL[ten].cao;if(!g)return CANH[ten].day;const x=Math.max(0,Math.min(g.w-1.001,u*g.w-.5)),y=Math.max(0,Math.min(g.h-1.001,v*g.h-.5)),i=x|0,j=y|0,fx=x-i,fy=y-j,z=(a,b)=>g.cm[b*g.w+a]/100;
    return (z(i,j)*(1-fx)+z(i+1,j)*fx)*(1-fy)+(z(i,j+1)*(1-fx)+z(i+1,j+1)*fx)*fy}
 
   // ---- làng riêng: nhà 3D dựng từ gia phả (js/20 ssHo.nha()), chủ dự án duyệt 12/11/2026. Mẫu img/3d/ho/nha.json (tools/blender/nha-3d.py):
@@ -373,13 +375,14 @@ function khoi(){
   function vlNha(mau,d){const c=new THREE.Color(mau),v=new THREE.MeshStandardMaterial({color:c,roughness:.9,metalness:0,envMapIntensity:0});v.onBeforeCompile=sh=>AGX(sh,true);
    v.userData.goc=c.clone();v.userData.nha=1;if(d)d.cy.push(v);return v}
   function nhuom(o,mau,d){o.traverse(m=>{if(!m.isMesh)return;const t=m.material.name;m.material=vlNha(mau[t]||'#'+m.material.color.getHexString(),d)})}
-  function taoNha(gl,h,d){const ks=gl.scene.getObjectByName('nha_'+h.style)?h.style:'bagian',v=gl.scene.getObjectByName('nha_'+ks).clone(true);nhuom(v,{mai:h.roof,mai2:new THREE.Color(h.roof).multiplyScalar(.72),tuong:h.wall},d);
-   const oc=v.getObjectByName('o_cua_'+ks),cm=gl.scene.getObjectByName('cua_'+(h.cua||'go'))||gl.scene.getObjectByName('cua_go');
+  function taoNha(gl,h,d){const ks=gl.scene.getObjectByName('nha_'+h.style)?h.style:'bagian',cs=h.cap===1||h.cap===3?'_'+h.cap:'',v=(gl.scene.getObjectByName('nha_'+ks+cs)||gl.scene.getObjectByName('nha_'+ks)).clone(true);nhuom(v,{mai:h.roof,mai2:new THREE.Color(h.roof).multiplyScalar(.72),tuong:h.wall},d);
+   const oc=v.getObjectByName('o_cua_'+ks+cs)||v.getObjectByName('o_cua_'+ks),cm=gl.scene.getObjectByName('cua_'+(h.cua||'go'))||gl.scene.getObjectByName('cua_go');
    if(oc&&cm){const c=cm.clone(true);nhuom(c,{},d);c.position.copy(oc.position);v.add(c)}return v}
   async function dungNha(){const d=DL.ho;if(!d||!window.ssHo||!ssHo.nha)return;const gl=await mauNha().catch(()=>null);if(!gl||!DL.ho)return;
    if(d.nha){d.canh.remove(d.nha);d.cy=d.cy.filter(m=>!m.userData.nha)}
    const nhom=new THREE.Group(),dat=(u,v)=>{const z=caoTai('ho',u,v),q=d.tuAnh(u,v,z);return B(q.x,q.y,z)};d.nha=nhom;
-   for(const n of ssHo.nha()){const g=taoNha(gl,n.h,d);g.position.copy(dat(n.a[0],n.a[1]));nhom.add(g);
+   for(const n of ssHo.nha()){const g=taoNha(gl,n.h,d),z0=caoGoc('ho',n.a[0],n.a[1]),q0=d.tuAnh(n.a[0],n.a[1],z0);g.position.copy(B(q0.x,q0.y,z0));nhom.add(g);   /* nhà đặt trên đất gốc, đồ vườn theo mặt nền dinh thự */
+
     const bb=new THREE.Box3().setFromObject(g);nhaTop[n.k]=[(bb.min.x+bb.max.x)/2,-(bb.min.z+bb.max.z)/2,bb.max.y+1.4];
     for(const [ten,o,mau] of n.do){const m=gl.scene.getObjectByName('do_'+ten);if(!m||!o)continue;const c=m.clone(true);nhuom(c,mau?{tuong:mau}:{},d);c.position.copy(dat(o[0],o[1]));nhom.add(c)}}
    d.canh.add(nhom);d.nutO=''}   // dựng lại nút tên trên nóc nhà
@@ -403,7 +406,7 @@ function khoi(){
   scN.add(new THREE.HemisphereLight(0xfff6e8,0x8c7a62,2.4));{const n=new THREE.DirectionalLight(0xffffff,1.8);n.position.set(-6,14,9);scN.add(n)}
   camN.position.copy(B(DIR.x*60,DIR.y*60,DIR.z*60+4));camN.lookAt(B(0,0,4));
   window.ss3dAnhNha=(cv,h)=>mauNha().then(gl=>{let v;if(h.do){const m=gl.scene.getObjectByName('do_'+h.do);if(!m)return;v=m.clone(true);nhuom(v,{},null)}else v=taoNha(gl,h,null);scN.add(v);
-   const bb=new THREE.Box3().setFromObject(v),c=bb.getCenter(new V3()),k=h.do?Math.max(.6,bb.getSize(new V3()).length()*.42):6.5;camN.left=camN.bottom=-k;camN.right=camN.top=k;camN.updateProjectionMatrix();
+   const bb=new THREE.Box3().setFromObject(v),c=bb.getCenter(new V3()),k=h.do?Math.max(.6,bb.getSize(new V3()).length()*.42):h.cap===3?13:h.cap===1?5.2:6.5;camN.left=camN.bottom=-k;camN.right=camN.top=k;camN.updateProjectionMatrix();
    camN.position.copy(h.do?c:B(0,0,4)).addScaledVector(B(DIR.x,DIR.y,DIR.z),60);camN.lookAt(h.do?c:B(0,0,4));const cc=new THREE.Color(),ca=r.getClearAlpha();r.getClearColor(cc);
    r.setRenderTarget(rtN);r.setClearColor(0xf3ead8,1);r.clear();r.render(scN,camN);const px=new Uint8Array(160*160*4);r.readRenderTargetPixels(rtN,0,0,160,160,px);r.setRenderTarget(null);r.setClearColor(cc,ca);scN.remove(v);
    const x=cv.getContext('2d'),im=x.createImageData(160,160);for(let y=0;y<160;y++)im.data.set(px.subarray((159-y)*640,(160-y)*640),y*640);x.putImageData(im,0,0)}).catch(()=>{});
