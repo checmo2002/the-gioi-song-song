@@ -301,13 +301,13 @@ function khoi(){
   const DONG={di:'Walk',dung:'Idle',chap:'Pray',lay:'Bow',ngoi:'Kneel'},TO=1.6;   // người to hơn thật 1,6 lần như hình nhân vật trong game
   // nhân vật tự tạo (js/31): một mẫu TuyChinh có đủ bộ phận, bật bộ phận đã chọn và nhuộm màu riêng cho từng người
   const TC=window.ssNVTC;   // js/31: danh sách lựa chọn hợp lệ, đọc chuỗi kiểu dáng
-  function khoac(rig,tc,nvm){const c=TC.doc(tc);if(!c)return[];const hien={['than_'+c.d]:1,['mat_'+c.mat]:1,['toc_'+c.toc]:1,['ao_'+c.ao]:1,[c.quan==='vay'?'vay':'quan_'+c.quan]:1,giay:1},ms=[];
-   const mau={da:c.da,toc:c.mt,ao:c.ma,ao2:new THREE.Color(c.ma).lerp(new THREE.Color(new THREE.Color(c.ma).getHSL({}).l>.5?0x403830:0xfff8ec),.45),quan:c.mq};
-   rig.traverse(o=>{if(/^(than|mat|toc|ao|quan|vay|giay)/.test(o.name)&&!o.isBone&&o.parent&&!/^(than|mat|toc|ao|quan|vay|giay)/.test(o.parent.name))o.visible=!!hien[o.name];
-    if(!o.isMesh)return;const m=o.material.clone(),k=mau[m.name];m.userData={goc:k?new THREE.Color(k):m.color.clone()};m.color.copy(m.userData.goc);m.onBeforeCompile=sh=>AGX(sh);o.material=m;ms.push(m);if(nvm)NVM.push(m)});return ms}
-  function dung(ten,gl,canh){const rig=SU.clone(gl.scene);rig.scale.multiplyScalar(TO);rig.traverse(o=>{if(o.isMesh)o.frustumCulled=false});const tc=ten.split('|')[1],ms=tc&&TC?khoac(rig,tc,true):[];
+  function khoac(rig,tc,nvm){const c=TC.doc(tc);if(!c)return[];const hien={['than_'+c.d]:1,['mat_'+c.mat]:1,['toc_'+c.toc]:1,['ao_'+c.ao]:1,[c.quan==='vay'?'vay':'quan_'+c.quan]:1,giay:1,mi_nu:c.d==='nu'},ms=[],nu=c.d==='nu'?1:0;
+   const mau={da:c.da,toc:c.mt,moi:nu?'#cf4f5c':'#a3625a',ao:c.ma,ao2:new THREE.Color(c.ma).lerp(new THREE.Color(new THREE.Color(c.ma).getHSL({}).l>.5?0x403830:0xfff8ec),.45),quan:c.mq};
+   rig.traverse(o=>{if(/^(than|mat|toc|ao|quan|vay|giay|mi_)/.test(o.name)&&!o.isBone&&o.parent&&!/^(than|mat|toc|ao|quan|vay|giay|mi_)/.test(o.parent.name))o.visible=!!hien[o.name];
+    if(!o.isMesh)return;if(o.morphTargetDictionary&&'nu' in o.morphTargetDictionary){o.morphTargetInfluences=o.morphTargetInfluences.slice();o.morphTargetInfluences[o.morphTargetDictionary.nu]=nu}   /* áo quần nắn theo dáng nữ */const m=o.material.clone(),k=mau[m.name];m.userData={goc:k?new THREE.Color(k):m.color.clone()};m.color.copy(m.userData.goc);m.onBeforeCompile=sh=>AGX(sh);o.material=m;ms.push(m);if(nvm)NVM.push(m)});return ms}
+  function dung(ten,gl,canh){const rig=SU.clone(gl.scene);rig.scale.multiplyScalar(TO);rig.traverse(o=>{if(o.isMesh)o.frustumCulled=false});const tc=ten.split('|')[1],ms=tc&&TC?khoac(rig,tc,true):[],s0=TO*(tc&&tc.startsWith('nu.')?.94:1);rig.scale.setScalar(s0);   /* nữ thấp hơn nam một chút */
    const bo=new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.25),new THREE.MeshBasicMaterial({map:BONG,transparent:true,depthWrite:false,toneMapped:false,opacity:.55}));bo.rotation.x=-Math.PI/2;bo.renderOrder=1;
-   const q={ten,rig,bo,canh,ms,mx:new THREE.AnimationMixer(rig),act:{},dang:null,yaw:0};for(const c of gl.animations)q.act[c.name]=q.mx.clipAction(c);canh.add(rig,bo);return q}
+   const q={ten,rig,bo,canh,ms,s0,mx:new THREE.AnimationMixer(rig),act:{},dang:null,yaw:0};for(const c of gl.animations)q.act[c.name]=q.mx.clipAction(c);canh.add(rig,bo);return q}
   function choi(q,k){const a=q.act[k]||(k==='Bow'?q.act.Pray:null)||q.act.Idle;if(!a||q.dang===a)return;a.reset().fadeIn(.3).play();if(q.dang)q.dang.fadeOut(.3);q.dang=a;
    const mot=a===q.act.Bow||a===q.act.Kneel;a.setLoop(mot?THREE.LoopOnce:THREE.LoopRepeat);a.clampWhenFinished=a===q.act.Kneel;
    if(GIAM){q.mx.update(.6);}}   // giảm chuyển động: đứng yên ở một tư thế
@@ -321,7 +321,7 @@ function khoi(){
    const ve=()=>{if(!song)return;requestAnimationFrame(ve);const w=cv.clientWidth,h=cv.clientHeight;if(w&&(cv.width!==Math.round(w*rr.getPixelRatio())||cv.height!==Math.round(h*rr.getPixelRatio()))){rr.setSize(w,h,false);cm.aspect=w/h;cm.updateProjectionMatrix()}
     const now=performance.now(),dt=Math.min(.05,(now-t0)/1000);t0=now;if(q){if(!keo&&!GIAM)quay+=dt*.25;q.rig.rotation.y=quay;GIAM||q.mx.update(dt)}rr.render(sc,cm)};
    cv.addEventListener('pointerdown',e=>{keo=e.clientX;cv.setPointerCapture(e.pointerId)});cv.addEventListener('pointermove',e=>{if(keo!==null){quay+=(e.clientX-keo)*.012;keo=e.clientX}});cv.addEventListener('pointerup',()=>keo=null);cv.addEventListener('pointercancel',()=>keo=null);
-   const doi=tc=>{tcNay=tc;mau('TuyChinh').then(gl=>{if(tc!==tcNay||!song)return;if(q){sc.remove(q.rig);q.mx.stopAllAction()}const rig=SU.clone(gl.scene);khoac(rig,tc,false);rig.traverse(o=>{if(o.isMesh)o.frustumCulled=false});
+   const doi=tc=>{tcNay=tc;mau('TuyChinh').then(gl=>{if(tc!==tcNay||!song)return;if(q){sc.remove(q.rig);q.mx.stopAllAction()}const rig=SU.clone(gl.scene);khoac(rig,tc,false);rig.scale.setScalar(tc.startsWith('nu.')?.94:1);rig.traverse(o=>{if(o.isMesh)o.frustumCulled=false});
     q={rig,mx:new THREE.AnimationMixer(rig)};const a=gl.animations.find(c=>c.name==='Idle');a&&q.mx.clipAction(a).play();q.mx.update(.01);q.rig.rotation.y=quay;sc.add(rig)}).catch(()=>{})};
    ve();return{doi,anh:anhNV,dung(){song=false;rr.dispose()}}};
   // ảnh nhỏ cho từng lựa chọn (tóc, mặt, áo, quần, dáng): một bộ vẽ ẩn dùng chung, vẽ xong chép sang canvas của nút
@@ -331,7 +331,7 @@ function khoi(){
     if(!rrA){rrA=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});rrA.setSize(160,160);rrA.outputColorSpace=THREE.SRGBColorSpace;
      scA=new THREE.Scene();const l=new THREE.DirectionalLight(0xfff1e0,2.6);l.position.set(2,4,5);scA.add(l,new THREE.HemisphereLight(0xfff6ea,0xd9c6a8,2.4))}
     const [vt,nh,k]=KHUNG[khung]||KHUNG.d,cm=new THREE.OrthographicCamera(-k,k,k,-k,.1,20);cm.position.set(...vt);cm.lookAt(...nh);
-    const rig=SU.clone(gl.scene),ms=khoac(rig,tc,false),mx=new THREE.AnimationMixer(rig),a=gl.animations.find(c=>c.name==='Idle');if(a){mx.clipAction(a).play();mx.update(.5)}
+    const rig=SU.clone(gl.scene),ms=khoac(rig,tc,false);rig.scale.setScalar(tc.startsWith('nu.')?.94:1);const mx=new THREE.AnimationMixer(rig),a=gl.animations.find(c=>c.name==='Idle');if(a){mx.clipAction(a).play();mx.update(.5)}
     scA.add(rig);rrA.render(scA,cm);scA.remove(rig);mx.stopAllAction();ms.forEach(m=>m.dispose());
     const x=dich.getContext('2d');x.clearRect(0,0,dich.width,dich.height);x.drawImage(rrA.domElement,0,0,dich.width,dich.height)}).catch(()=>{})}
 
@@ -485,7 +485,7 @@ function khoi(){
     const k=DONG[p.a]||'Idle';if(m.dangA!==k){m.dangA=k;choi(m,k)}
     if(k==='Walk'&&m.act.Walk)m.act.Walk.timeScale=THREE.MathUtils.clamp((m.toc||2.2)/2.2,.6,1.6);
     if(!GIAM)m.mx.update(dt);
-    if(p.me&&nangMe){m.rig.position.y+=nangMe.y;m.rig.scale.setScalar(TO*nangMe.s)}else if(p.me&&m.rig.scale.x!==TO)m.rig.scale.setScalar(TO);
+    if(p.me&&nangMe){m.rig.position.y+=nangMe.y;m.rig.scale.setScalar(m.s0*nangMe.s)}else if(p.me&&m.rig.scale.x!==m.s0)m.rig.scale.setScalar(m.s0);
     if(p.me){vongVang.visible=true;vongVang.position.set(wp.x,hz+.06,wp.z);if(!GIAM)vongVang.material.opacity=.55+.3*Math.sin(t/320);theo=wp}}
    for(const id in nguoi)if(!thay[id]){const q=nguoi[id];q.q&&boNguoi(q.q);q.tag&&q.tag.remove();delete nguoi[id]}
    if(!GIAM)for(const q of d.tinh)q.mx.update(dt);
