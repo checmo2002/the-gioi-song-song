@@ -28,6 +28,10 @@
 .tnv.khong-3d .tnv-chon span{position:static;width:auto;height:auto;clip:auto;font-size:14px}
 .tnv-chon button[aria-pressed="true"]{border-color:#B8862F;box-shadow:0 0 0 2px #F3DDAA}
 .tnv-chon.k-d{grid-template-columns:repeat(2,minmax(0,150px))}
+.tnv-chon.k-d button{display:grid;place-items:center;color:#8A5F17}
+.tnv-chon.k-d svg{width:46%;height:46%}
+.tnv-chon.k-d button[data-v="nu"]{color:#B0476A}
+.tnv.khong-3d .tnv-chon.k-d button{aspect-ratio:1}
 .tnv-mau{display:flex;flex-wrap:wrap;gap:10px}
 .tnv-mau button{width:38px;height:38px;border-radius:50%;border:2px solid #fff;background:var(--m);box-shadow:0 0 0 1.5px #E7D9C0;cursor:pointer}
 .tnv-mau button[aria-pressed="true"]{box-shadow:0 0 0 3px #B8862F}
