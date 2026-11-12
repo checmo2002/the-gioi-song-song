@@ -385,6 +385,7 @@ function khoi(){
 
     const bb=new THREE.Box3().setFromObject(g);nhaTop[n.k]=[(bb.min.x+bb.max.x)/2,-(bb.min.z+bb.max.z)/2,bb.max.y+1.4];
     for(const [ten,o,mau] of n.do){const m=gl.scene.getObjectByName('do_'+ten);if(!m||!o)continue;const c=m.clone(true);nhuom(c,mau?{tuong:mau}:{},d);c.position.copy(dat(o[0],o[1]));nhom.add(c)}}
+   for(const r of ssHo.ranh?ssHo.ranh():[]){const m=gl.scene.children.find(o=>o.name==='ranh_'+r.k);if(!m)continue;const c=m.clone(true),z=caoGoc('ho',r.c[0],r.c[1]),q=d.tuAnh(r.c[0],r.c[1],z);nhuom(c,{},d);c.position.copy(B(q.x,q.y,z));nhom.add(c)}   /* ranh giới ô đất */
    d.canh.add(nhom);d.nutO=''}   // dựng lại nút tên trên nóc nhà
   addEventListener('ss-ho-nha',()=>{if(DL.ho)dungNha();if(DL.nha)dungDo()});
   // đồ người thân tặng bày trong gian nhà (cảnh 'nha'): [x,y Blender của cảnh, xoay độ, rộng, sâu]; áo treo trong tủ áo

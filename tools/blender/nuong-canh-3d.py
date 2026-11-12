@@ -2,6 +2,7 @@
 blender -b <bản sao .blend> --python nuong-canh-3d.py -- <thư mục ra> [số mẫu=256] [ảnh nền=2048] [ảnh vật=4096] [xuat]
   xuat: không nướng lại, dùng ảnh .png đã có trong thư mục ra, chỉ xuất lại các tệp .glb (UV tự chia ra giống hệt lần nướng)
   bocot (thêm cuối): bỏ cột và xà trong nhà, chùa, nhà thờ (tên trong BO_COT) cho người xem đỡ vướng; lưới đi mở bằng mo-luoi-cot.py
+  bo=a,b (thêm cuối): bỏ các vật tên a, b (vd làng riêng: bo=vien,vienT, hàng rào ô đất web tự dựng lại)
 Ra: canh.glb (nền + 3 khối vật, UV nướng), nen.png, vat-0.png (khu chính), vat-1.png (cảnh xa), vat-3.png (đồ nhỏ),
     tuong.glb (tượng nếu có: ảnh màu gốc, trình duyệt tự chiếu sáng), cay.glb (cây: pháp tuyến + màu đỉnh), thong-tin.json (camera ảnh iso).
 Không lưu file .blend. Bài học chân núi/sảnh: tấm nền bỏ ô nằm dưới sân/đồi, lá sen nâng so le, tượng xuất riêng."""
@@ -16,8 +17,8 @@ sc = max(bpy.data.scenes, key=lambda s: len(s.objects))   # cảnh chính trong 
 for s in [x for x in bpy.data.scenes if x != sc]: bpy.data.scenes.remove(s)
 CAM = next(o for o in sc.objects if o.type == 'CAMERA')
 BO_COT = {'cot', 'chanCot', 'cotHien', 'chanCotH', 'xa', 'xaD'}   # cột, chân cột, xà gian nhà / chính điện / nhà thờ (lầu chuông, cổng, trụ lan can giữ lại)
-if 'bocot' in A[4:]:
-    for o in [o for o in sc.objects if o.type == 'MESH' and o.name.split('.')[0] in BO_COT]: bpy.data.objects.remove(o)
+BO = (BO_COT if 'bocot' in A[4:] else set()) | {t for a in A[4:] if a.startswith('bo=') for t in a[3:].split(',')}
+for o in [o for o in sc.objects if o.type == 'MESH' and o.name.split('.')[0] in BO]: bpy.data.objects.remove(o)
 _fw = (CAM.rotation_euler.to_matrix() @ Vector((0, 0, -1))).normalized(); _t = -CAM.location.z / _fw.z; _tg = CAM.location + _fw * _t
 OW = CAM.data.ortho_scale; TX, TY = round(_tg.x, 3), round(_tg.y, 3); R = max(40.0, OW * .8)   # vùng giữ lại quanh tâm ảnh; ngoài vùng là sương trên web
 
