@@ -28,7 +28,7 @@
 .tnv.khong-3d .tnv-chon span{position:static;width:auto;height:auto;clip:auto;font-size:14px}
 .tnv-chon button[aria-pressed="true"]{border-color:#B8862F;box-shadow:0 0 0 2px #F3DDAA}
 .tnv-chon.k-d{grid-template-columns:repeat(2,minmax(0,150px))}
-.tnv-chon.k-d button{display:grid;place-items:center;color:#8A5F17}
+.tnv-chon.k-d button{display:grid;place-items:center;color:#2F6DB5}
 .tnv-chon.k-d svg{width:46%;height:46%}
 .tnv-chon.k-d button[data-v="nu"]{color:#B0476A}
 .tnv.khong-3d .tnv-chon.k-d button{aspect-ratio:1}
