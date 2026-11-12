@@ -48,7 +48,9 @@ with sync_playwright() as p:
         goc = url.split('/')[2]
         pg.route('**/*', lambda r: r.continue_() if goc in r.request.url or any(c in r.request.url for c in CHO_PHEP) else r.abort())
         pg.add_init_script("Math.random=(()=>{let s=7;return()=>(s=(s*9301+49297)%233280)/233280})();"
-                           "try{localStorage.clear()}catch(e){}")
+                           "try{localStorage.clear();localStorage.setItem('ss-nv-tc','nam.ngan.1.somi.dai.e7b896.1b1411.f4f1ea.2f3b52')}catch(e){}"
+                           # như chủ trang xem trên claude.ai: bỏ qua bước đăng ký bắt buộc, nhân vật đã tạo sẵn (js/02, js/31)
+                           "window.claude={use:k=>Promise.resolve(k==='user'?{isOwner:()=>Promise.resolve(true)}:null)};")
         pg.clock.set_fixed_time(GIO)   # chỉ đóng băng giờ hiển thị, hẹn giờ và hoạt ảnh vẫn chạy
         pg.goto(url)
         pg.wait_for_function("!document.getElementById('loader')", timeout=300000)  # qua màn chờ (chỉ còn 3D: máy kiểm tra vẽ bằng CPU, nạp lâu)

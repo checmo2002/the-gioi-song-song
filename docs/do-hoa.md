@@ -42,6 +42,9 @@ Hai vòng tròn lồng nhau, phần giao nhau tô vàng `#B8862F`. Bản SVG có
 - Asset miễn phí là chính. Mua asset trả phí phải hỏi chủ dự án.
 - File gốc Blender ở máy chủ dự án: `E:\5.2\TheGioiSongSong`, chưa đưa vào repo.
 
+### Nhân vật tự tạo
+`tools/blender/nv-tuy-chinh.py` dựng thân, mặt, tóc, áo, quần, giày rời, cùng bộ xương và động tác của ThanhNien (trọng số chép từ thân ThanhNien), ra `img/3d/nv/TuyChinh.json`. Vật liệu `da`, `toc`, `ao`, `ao2`, `quan` để web nhuộm màu. Thêm kiểu: thêm hàm dựng bộ phận trong script (tên vật thể = mã kiểu) và thêm lựa chọn vào `CHON` trong `js/31`.
+
 ## Lịch sử phong cách (đừng quay lại)
 
 Đã thử rồi bỏ: hoạt hình toon, Party Animals, phim AI, Naraka, Gaussian splat (quá giật trên điện thoại). Three.js 3D thời gian thực từng bị bỏ, nay chủ dự án chọn lại với nhân vật đất nặn (tháng 11/2026).

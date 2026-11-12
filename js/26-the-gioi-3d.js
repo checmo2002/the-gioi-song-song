@@ -124,7 +124,7 @@ function khoi(){
    const k=TR.set?1-Math.exp(-dt*1.2):1;TR.set=true;   // đổi dần trong vài giây (đổi cảnh thì nhảy luôn)
    TR.tint.lerp(DICH.tint,k);TR.tren.lerp(DICH.tren,k);TR.duoi.lerp(DICH.duoi,k);for(const x of ['nang','toa','dom','gan','mua'])TR[x]+=(DICH[x]-TR[x])*k;
    let chop=0;if(DICH.dong&&!GIAM){if(now>samSau){samSau=now+5000+Math.random()*9000;sam=now}chop=Math.max(0,1-(now-sam)/180)}
-   for(const m of d.bk)m.color.copy(TR.tint).addScalar(chop*.6);cyM.copy(TR.tint).lerp(TRANG,.55).addScalar(chop*.6);for(const m of d.cy){m.color.copy(cyM);if(m.userData.goc)m.color.multiply(m.userData.goc)}for(const m of NVM)m.color.copy(cyM);   // cây, tượng, người còn được đèn chiếu: nhân nhẹ hơn kẻo đêm đen kịt
+   for(const m of d.bk)m.color.copy(TR.tint).addScalar(chop*.6);cyM.copy(TR.tint).lerp(TRANG,.55).addScalar(chop*.6);for(const m of d.cy){m.color.copy(cyM);if(m.userData.goc)m.color.multiply(m.userData.goc)}for(const m of NVM){m.color.copy(cyM);if(m.userData.goc)m.color.multiply(m.userData.goc)}   // cây, tượng, người còn được đèn chiếu: nhân nhẹ hơn kẻo đêm đen kịt
    if(d.den){d.den.intensity=TR.nang+chop*3;d.hemi.intensity=TR.toa+chop*4}
    d.canh.fog.color.copy(TR.duoi);d.canh.fog.near=Math.max(4,d.canh.fog.near-TR.gan);d.canh.fog.far=Math.max(d.canh.fog.near+25,d.canh.fog.far-TR.gan*1.6);
    const kh=TR.tren.getHexString()+TR.duoi.getHexString();if(kh!==cvT._k){cvT._k=kh;const gr=xT.createLinearGradient(0,0,0,256);gr.addColorStop(0,'#'+TR.tren.getHexString());gr.addColorStop(1,'#'+TR.duoi.getHexString());xT.fillStyle=gr;xT.fillRect(0,0,4,256);TROI.needsUpdate=true}
@@ -295,19 +295,35 @@ function khoi(){
   function hong(g){let h=null;g.scene.traverse(o=>{if(!h&&o.isBone&&o.name==='Hips')h=o});return h}
   function muon(c,tu,toi){const a=hong(tu),b=hong(toi),k=c.clone(),s=a&&b&&a.position.length()?b.position.length()/a.position.length():1;
    k.tracks=k.tracks.filter(t=>t.name.endsWith('.quaternion')||t.name==='Hips.position');for(const t of k.tracks)if(t.name==='Hips.position')t.values=t.values.map(v=>v*s);return k}
-  function mau(ten){return MAU[ten]||(MAU[ten]=mau0(ten).then(async gl=>{for(const k in MUON)if(!gl.animations.some(a=>a.name===k)){const tu=await mau0(MUON[k]).catch(()=>null),c=tu&&tu.animations.find(a=>a.name===k);if(c)gl.animations.push(muon(c,tu,gl))}return gl}))}
+  function mau(ten){ten=ten.split('|')[0];return MAU[ten]||(MAU[ten]=mau0(ten).then(async gl=>{for(const k in MUON)if(!gl.animations.some(a=>a.name===k)){const tu=await mau0(MUON[k]).catch(()=>null),c=tu&&tu.animations.find(a=>a.name===k);if(c)gl.animations.push(muon(c,tu,gl))}return gl}))}
   const BONG=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),gr=x.createRadialGradient(64,64,0,64,64,64);
    gr.addColorStop(0,'rgba(70,45,25,.75)');gr.addColorStop(.45,'rgba(70,45,25,.35)');gr.addColorStop(1,'rgba(70,45,25,0)');x.fillStyle=gr;x.fillRect(0,0,128,128);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t})();
   const DONG={di:'Walk',dung:'Idle',chap:'Pray',lay:'Bow',ngoi:'Kneel'},TO=1.6;   // người to hơn thật 1,6 lần như hình nhân vật trong game
-  function dung(ten,gl,canh){const rig=SU.clone(gl.scene);rig.scale.multiplyScalar(TO);rig.traverse(o=>{if(o.isMesh)o.frustumCulled=false});
+  // nhân vật tự tạo (js/31): một mẫu TuyChinh có đủ bộ phận, bật bộ phận đã chọn và nhuộm màu riêng cho từng người
+  const TC=window.ssNVTC;   // js/31: danh sách lựa chọn hợp lệ, đọc chuỗi kiểu dáng
+  function khoac(rig,tc,nvm){const c=TC.doc(tc);if(!c)return[];const hien={['than_'+c.d]:1,['mat_'+c.mat]:1,['toc_'+c.toc]:1,['ao_'+c.ao]:1,[c.quan==='vay'?'vay':'quan_'+c.quan]:1,giay:1},ms=[];
+   const mau={da:c.da,toc:c.mt,ao:c.ma,ao2:new THREE.Color(c.ma).lerp(new THREE.Color(new THREE.Color(c.ma).getHSL({}).l>.5?0x403830:0xfff8ec),.45),quan:c.mq};
+   rig.traverse(o=>{if(/^(than|mat|toc|ao|quan|vay|giay)/.test(o.name)&&!o.isBone&&o.parent&&!/^(than|mat|toc|ao|quan|vay|giay)/.test(o.parent.name))o.visible=!!hien[o.name];
+    if(!o.isMesh)return;const m=o.material.clone(),k=mau[m.name];m.userData={goc:k?new THREE.Color(k):m.color.clone()};m.color.copy(m.userData.goc);m.onBeforeCompile=sh=>AGX(sh);o.material=m;ms.push(m);if(nvm)NVM.push(m)});return ms}
+  function dung(ten,gl,canh){const rig=SU.clone(gl.scene);rig.scale.multiplyScalar(TO);rig.traverse(o=>{if(o.isMesh)o.frustumCulled=false});const tc=ten.split('|')[1],ms=tc&&TC?khoac(rig,tc,true):[];
    const bo=new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.25),new THREE.MeshBasicMaterial({map:BONG,transparent:true,depthWrite:false,toneMapped:false,opacity:.55}));bo.rotation.x=-Math.PI/2;bo.renderOrder=1;
-   const q={ten,rig,bo,canh,mx:new THREE.AnimationMixer(rig),act:{},dang:null,yaw:0};for(const c of gl.animations)q.act[c.name]=q.mx.clipAction(c);canh.add(rig,bo);return q}
+   const q={ten,rig,bo,canh,ms,mx:new THREE.AnimationMixer(rig),act:{},dang:null,yaw:0};for(const c of gl.animations)q.act[c.name]=q.mx.clipAction(c);canh.add(rig,bo);return q}
   function choi(q,k){const a=q.act[k]||(k==='Bow'?q.act.Pray:null)||q.act.Idle;if(!a||q.dang===a)return;a.reset().fadeIn(.3).play();if(q.dang)q.dang.fadeOut(.3);q.dang=a;
    const mot=a===q.act.Bow||a===q.act.Kneel;a.setLoop(mot?THREE.LoopOnce:THREE.LoopRepeat);a.clampWhenFinished=a===q.act.Kneel;
    if(GIAM){q.mx.update(.6);}}   // giảm chuyển động: đứng yên ở một tư thế
-  function boNguoi(q){q.canh.remove(q.rig,q.bo);q.mx.stopAllAction()}
+  function boNguoi(q){q.canh.remove(q.rig,q.bo);q.mx.stopAllAction();if(q.ms&&q.ms.length){for(let i=NVM.length;i--;)if(q.ms.includes(NVM[i]))NVM.splice(i,1)}}
   const NPC=['SuThay','PhuNuTim','HocSinh'];
-  function mauCua(id,p){if(id.indexOf('npc-')===0)return NPC[(+id.split('-').pop()||0)%NPC.length];return p.k===1?'ThanhNien':'ChiBaBa'}
+  function mauCua(id,p){if(id.indexOf('npc-')===0)return NPC[(+id.split('-').pop()||0)%NPC.length];if(p.tc&&TC&&TC.doc(p.tc))return 'TuyChinh|'+p.tc;return p.k===1?'ThanhNien':'ChiBaBa'}
+  // xem trước trong màn tạo nhân vật (js/31): bộ vẽ riêng trên canvas của màn đó, người đứng nghỉ, kéo để xoay
+  window.ss3dNV=function(cv){const rr=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});rr.setPixelRatio(Math.min(2,devicePixelRatio));rr.outputColorSpace=THREE.SRGBColorSpace;
+   const sc=new THREE.Scene(),cm=new THREE.PerspectiveCamera(30,1,.1,50),den=new THREE.DirectionalLight(0xfff1e0,2.6);den.position.set(2,4,5);sc.add(den,new THREE.HemisphereLight(0xfff6ea,0xd9c6a8,2.4));
+   cm.position.set(0,.85,3.3);cm.lookAt(0,.7,0);let q=null,quay=0,keo=null,tcNay='',song=true,t0=performance.now();
+   const ve=()=>{if(!song)return;requestAnimationFrame(ve);const w=cv.clientWidth,h=cv.clientHeight;if(w&&(cv.width!==Math.round(w*rr.getPixelRatio())||cv.height!==Math.round(h*rr.getPixelRatio()))){rr.setSize(w,h,false);cm.aspect=w/h;cm.updateProjectionMatrix()}
+    const now=performance.now(),dt=Math.min(.05,(now-t0)/1000);t0=now;if(q){if(!keo&&!GIAM)quay+=dt*.25;q.rig.rotation.y=quay;GIAM||q.mx.update(dt)}rr.render(sc,cm)};
+   cv.addEventListener('pointerdown',e=>{keo=e.clientX;cv.setPointerCapture(e.pointerId)});cv.addEventListener('pointermove',e=>{if(keo!==null){quay+=(e.clientX-keo)*.012;keo=e.clientX}});cv.addEventListener('pointerup',()=>keo=null);cv.addEventListener('pointercancel',()=>keo=null);
+   const doi=tc=>{tcNay=tc;mau('TuyChinh').then(gl=>{if(tc!==tcNay||!song)return;if(q){sc.remove(q.rig);q.mx.stopAllAction()}const rig=SU.clone(gl.scene);khoac(rig,tc,false);rig.traverse(o=>{if(o.isMesh)o.frustumCulled=false});
+    q={rig,mx:new THREE.AnimationMixer(rig)};const a=gl.animations.find(c=>c.name==='Idle');a&&q.mx.clipAction(a).play();q.mx.update(.01);q.rig.rotation.y=quay;sc.add(rig)}).catch(()=>{})};
+   ve();return{doi,dung(){song=false;rr.dispose()}}};
 
   // ---- vòng ring vàng dưới chân "Bạn" và vòng chạm đất khi bấm: dời sang cảnh đang xem
   const vongVang=new THREE.Mesh(new THREE.RingGeometry(.42,.6,48),new THREE.MeshBasicMaterial({color:0xFFD98A,transparent:true,opacity:.85,toneMapped:false,depthWrite:false,depthTest:false}));vongVang.rotation.x=-Math.PI/2;vongVang.renderOrder=9;   // không thử chiều sâu: đứng sát bậc, mép bệ thì vòng không bị mặt đá che nửa chừng
@@ -492,7 +508,7 @@ function khoi(){
    const cs=kieu==='di'?s:'chan',d=DL[cs],w=window.ssWorld;
    if(hong||GIAM||phim||!tr||!san[cs]||!d||d.loi||!w||!w.duong)return false;
    const av=w.avs?w.avs():{};let mi=null;for(const id in av)if(av[id].me)mi=av[id];
-   const mm=mauCua('me',mi||{k:1});if(!CO[mm])return false;
+   const mm=mauCua('me',mi||{k:1});if(!CO[mm.split('|')[0]])return false;
    // đường theo toạ độ ảnh -> dãy điểm 3D: đường đi đặt như người chơi (lưới độ cao); bậc đá bắn tia camera ảnh vào mặt nướng (bỏ qua cây)
    d.canh.updateMatrixWorld();   // cảnh chưa vẽ lần nào thì ma trận còn trống (chân núi nén toạ độ theo tỉ lệ nút): tia bắn trượt
    const uv=kieu==='di'?w.duong(s,VAO[s]||sp,sp):kieu==='len'?THANG:THANG.slice().reverse(),P=[];
@@ -504,7 +520,7 @@ function khoi(){
    const Ls=[0];for(let i=1;i<P.length;i++)Ls.push(Ls[i-1]+Math.hypot(P[i].x-P[i-1].x,P[i].z-P[i-1].z));
    // đi đường: đoạn cuối, dừng đúng chỗ sẽ đứng ở cảnh mới; lên chùa: nửa trên, mái chùa hiện dần phía trước; xuống núi: từ gần đỉnh xuống
    const T=kieu==='di'?3.2:4.2,L=Ls[Ls.length-1],dai=kieu==='di'?Math.min(L,VDI*(T+.5)):L*.28,d0=kieu==='len'?L*.55:kieu==='xuong'?L*.1:L-dai,tc=dai/(T+.5);
-   const q=dung(mm,CO[mm],d.canh);choi(q,'Walk');q.mx.update(.31);   // hết pha hoà dần, khung đầu không lộ tư thế dang tay
+   const q=dung(mm,CO[mm.split('|')[0]],d.canh);choi(q,'Walk');q.mx.update(.31);   // hết pha hoà dần, khung đầu không lộ tư thế dang tay
    if(q.act.Walk)q.act.Walk.timeScale=THREE.MathUtils.clamp(tc/VDI,.7,1.3);
    for(const id in nguoi){const x=nguoi[id].q;if(x)x.rig.visible=x.bo.visible=false}vongVang.visible=false;ping.material.opacity=0;
    tr.prepend(r.domElement);r.domElement.style.opacity='1';cw=-1;
@@ -553,7 +569,7 @@ function khoi(){
   window.ss3dCanh={cam,dk,B,get canh(){return dang&&DL[dang].canh},get raAnh(){return dang&&DL[dang].raAnh},get tuAnh(){return dang&&DL[dang].tuAnh},get cao(){return dang&&((u,v)=>caoTai(dang,u,v))},get nguoi(){return nguoi},get d(){return dang&&DL[dang]}};   // để thử nghiệm
 
   // ---- nạp mọi cảnh + đủ 9 nhân vật, rồi dựng sẵn shader một lần để lúc đi và lúc NPC xuất hiện không bị khựng
-  const ds=await Promise.all(['ThanhNien','ChiBaBa',...NPC,...new Set(Object.values(CANH).flatMap(c=>c.le.map(x=>x[0])))].map(t=>mau(t).catch(()=>null)));
+  const ds=await Promise.all(['ThanhNien','ChiBaBa','TuyChinh',...NPC,...new Set(Object.values(CANH).flatMap(c=>c.le.map(x=>x[0])))].map(t=>mau(t).catch(()=>null)));
   // cảnh đầu trước; sau đó lần lượt: ưu tiên cảnh người dùng đang đứng chờ, rồi theo thứ tự trong CANH
   let dau=true;
   for(;;){const s=canhNay(),ten=s&&!san[s]&&!DL[s]?s:dau?DAU:Object.keys(CANH).find(k=>!DL[k]);if(!ten)break;
