@@ -28,6 +28,8 @@
 .hos-sty button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px 8px;border-radius:14px;border:2px solid transparent;background:#fff;font:inherit;font-size:11px;cursor:pointer;color:#3A2E20}
 .hos-sty button[aria-pressed="true"]{border-color:#C9892E;background:#FFF4DE}
 .hos-sty canvas{width:100%;aspect-ratio:1;display:block}
+.hos-cap{grid-template-columns:repeat(3,1fr)}
+.hos-sty button:disabled{opacity:.45;cursor:not-allowed}
 .hos-sw{display:flex;gap:8px;flex-wrap:wrap}
 .hos-sw button{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px #D9CDB5;cursor:pointer}
 .hos-sw button[aria-pressed="true"]{box-shadow:0 0 0 2px #C9892E}

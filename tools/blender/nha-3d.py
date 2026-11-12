@@ -22,7 +22,7 @@ MAU = {'mai': (1, 1, 1), 'tuong': (1, 1, 1), 'go': (.42, .27, .16), 'da': (.72, 
        'kinh': (.22, .32, .4), 'toi': (.18, .15, .13), 'vang': (.85, .66, .28), 'do': (.72, .16, .12),
        'la': (.36, .55, .27), 'hong': (.96, .67, .76), 'nuoc': (.5, .72, .78), 'tre': (.62, .58, .34), 'kim': (.7, .72, .75), 'den': (.98, .85, .55),
        'mai2': (.78, .78, .78), 'gom': (.62, .33, .22), 'go2': (.3, .16, .1), 'su': (.93, .93, .95), 'xanhsu': (.2, .3, .58),
-       'lua': (.86, .2, .22), 'xanh': (.36, .42, .26), 'len': (.55, .27, .22)}
+       'lua': (.86, .2, .22), 'xanh': (.36, .42, .26), 'len': (.55, .27, .22), 'chop': (.24, .45, .36), 'co': (.48, .62, .34)}
 MAT = {}
 def mat(t):
     if t not in MAT:
@@ -193,10 +193,75 @@ def bietthu():  # biệt thự nhỏ: hai tầng, sảnh cột tròn, ban công,
     for x in (-2.1, 2.1): chau(x, -3.0, 0)
     return (0, -2.81, .4)
 
-NHA = [('bagian', bagian), ('ruong', ruong), ('maithai', maithai), ('maibang', maibang), ('nhasan', nhasan), ('nhaong', nhaong), ('hoian', hoian), ('bietthu', bietthu)]
+def ede():       # nhà dài Ê Đê (Tây Nguyên): sàn thấp, thân dài vách tre, mái tranh hai mái trùm thấp, cầu thang ngực trước
+    for x in (-3.4, -1.7, 0, 1.7, 3.4):
+        for y in (-1.5, 1.5): tru(.13, 1.15, x, y, 0, 'go', n=6)
+    hop(7.6, 3.6, .18, 0, 0, 1.1, 'go'); hop(7.2, 3.0, 1.6, 0, .1, 1.28, 'tuong')
+    for i in range(14): hop(.04, .06, 1.6, -3.4 + i * .52, -1.42, 1.28, 'tre')   # nẹp vách tre
+    hop(2.4, 1.0, .12, 0, -2.0, 1.1, 'go')   # sàn khách trước cửa
+    for i in range(4): hop(.5, .26, .07, 0, -2.6 - i * .26, .9 - i * .28, 'go')
+    for z in (.55, 1.25): cau_(.09, 0, -2.75 - (1.25 - z) * .5, z, 'go', sz=(1, .7, 1))   # bầu ngực trên cầu thang
+    mai_hoi(8.6, 5.4, 2.4, 2.6, 8.6); hoi(7.2, 3.0, 2.88, 2.1)
+    return (0, -1.42, 1.28)
+def trinhtuong():   # nhà trình tường Hà Nhì (Tây Bắc): tường đất nện dày, cửa nhỏ, mái bốn mặt thấp
+    hop(7.4, 5.2, .25, 0, 0, 0, 'da'); hop(6.8, 4.4, 2.6, 0, .2, .25, 'tuong'); hop(6.9, 4.5, .12, 0, .2, 1.4, 'tuong')
+    for x in (-2.3, 2.3): cua_so(x, -2.01, 1.4, .55, .5, 'toi')
+    hop(1.6, .3, .2, 0, -2.15, 2.4, 'go'); mai_hoi(7.8, 5.6, 2.85, 1.9, 3.2)
+    for x in (-3.0, 3.0): tru(.28, .5, x, -2.6, 0, 'gom', r2=.22)   # chum nước
+    bac(0, -2.6, 1.4, .25); return (0, -2.01, .25)
+def maila():    # nhà mái lá Nam Bộ: ba gian thấp, vách ván, mái lá dừa nước dày hai mái, hiên trước, lu nước
+    hop(7.6, 5.4, .3, 0, 0, 0, 'da'); hop(7.0, 3.4, 2.2, 0, .5, .3, 'tuong')
+    for i in range(13): hop(.05, .06, 2.2, -3.3 + i * .55, -1.23, .3, 'go')   # nẹp ván
+    for x in (-3.3, -1.1, 1.1, 3.3): tru(.12, 2.1, x, -2.2, .3, 'go', n=6)
+    for x in (-2.3, 2.3): cua_so(x, -1.21, 1.1, 1.0, .8, 'toi')
+    mai_hoi(8.8, 6.6, 2.4, 2.3, 8.8); hoi(7.0, 3.4, 2.55, 1.85)
+    hop(9.0, .35, .3, 0, -3.25, 2.2, 'mai2'); hop(9.0, .35, .3, 0, 3.25, 2.2, 'mai2')   # mép lá dày
+    tru(.32, .7, 2.9, -2.9, 0, 'gom', r2=.24); tru(.3, .05, 2.9, -2.9, .7, 'go')   # lu nước có nắp
+    bac(0, -2.7, 1.8, .3); return (0, -1.21, .3)
+def phap():     # biệt thự Pháp cổ (Đông Dương): hai tầng tường vàng, cửa chớp xanh, hiên vòm, ban công, mái ngói đỏ bốn mặt, ống khói
+    hop(7.6, 5.6, .5, 0, 0, 0, 'da'); hop(6.8, 4.4, 5.4, 0, .4, .5, 'tuong')
+    for x in (-2.2, 0, 2.2):   # hiên ba vòm tầng một
+        tru(.17, 2.4, x - 1.1, -2.4, .5, 'cot', n=12); tru(.17, 2.4, x + 1.1, -2.4, .5, 'cot', n=12)
+    hop(6.8, 1.2, .3, 0, -2.4, 2.9, 'tuong'); hop(6.9, 1.4, .12, 0, -2.4, 3.2, 'cot')
+    for i in range(23): tru(.04, .62, -3.3 + i * .3, -3.0, 3.32, 'cot', n=6)   # lan can con tiện
+    hop(6.9, .1, .1, 0, -3.0, 3.94, 'cot')
+    for x in (-2.2, 0, 2.2):
+        for z in (1.0, 3.7):
+            cua_so(x, -1.81, z, .8, 1.5, 'kinh', 'cot')
+            for s in (-1, 1): hop(.42, .06, 1.5, x + s * .64, -1.86, z, 'chop')   # hai cánh chớp mở
+    mai_hoi(7.8, 5.8, 5.9, 2.0, 3.0); tru(.25, 1.6, 2.2, 1.0, 6.4, 'tuong', n=4)
+    bac(0, -3.1, 2.4, .5); return (0, -1.81, .5)
+NHA = [('bagian', bagian), ('ruong', ruong), ('maithai', maithai), ('maibang', maibang), ('nhasan', nhasan), ('nhaong', nhaong), ('hoian', hoian), ('bietthu', bietthu),
+       ('ede', ede), ('trinhtuong', trinhtuong), ('maila', maila), ('phap', phap)]
+# ---------------- cấp nhà: 1 nhỏ (bản thu nhỏ), 2 khang trang (bản gốc), 3 dinh thự 2 ô ----------------
+# cấp 1 và 3 dùng chung lưới với cấp 2 (glTF chỉ lưu một lần), chỉ khác vị trí, tỉ lệ; dinh thự thêm nền chung 'dinh_nen'.
+# Nền dinh thự phủ cả hai ô và hàng rào giữa: rộng 22.8 x 10.8, cao .7, tâm ở giữa hai ô (ô cách nhau 12 m); web nâng mặt đi lên .7 ở đây (js/20 oDat, js/26 caoTai).
+K1, K3, CANH3, NEN_Z = (.74, .86, .86), (1.15, 1.05, 1.1), (.62, .85, .85), .7
+def dinh_nen():
+    hop(22.8, 10.8, NEN_Z - .06, 0, -1.0, 0, 'da'); hop(22.0, 10.0, .06, 0, -1.0, NEN_Z - .06, 'co')
+    for x in (-11.2, 11.2): hop(.4, 10.8, .1, x, -1.0, NEN_Z - .06, 'da')
+    hop(22.8, .4, .1, 0, 4.2, NEN_Z - .06, 'da')
+    for s in (-1, 1): hop(10.0, .4, .1, s * 6.4, -6.2, NEN_Z - .06, 'da')
+    for i in range(4): hop(3.0, .3, NEN_Z * (4 - i) / 5, 0, -6.55 - i * .3, 0, 'da')   # bậc lên giữa
+    for s in (-1, 1):   # lan can đá hai bên lối lên, cột đèn ở góc
+        for i in range(12): tru(.06, .5, s * (1.9 + i * .8), -6.25, NEN_Z, 'cot', n=6)
+        hop(9.3, .14, .1, s * 6.3, -6.25, NEN_Z + .5, 'cot')
+        tru(.16, 1.3, s * 1.75, -6.3, NEN_Z, 'da', n=8); cau_(.22, s * 1.75, -6.3, NEN_Z + 1.5, 'den', sz=(1, 1, 1.2))
+        tru(.16, 1.3, s * 11.0, -6.0, NEN_Z, 'da', n=8); cau_(.22, s * 11.0, -6.0, NEN_Z + 1.5, 'den', sz=(1, 1, 1.2))
+    return gom('dinh_nen')
+NEN = dinh_nen()
+def ban_sao(ten, o, loc, k, cha=None):   # vật thể dùng chung lưới, chỉ khác vị trí và tỉ lệ
+    c = bpy.data.objects.new(ten, o.data); sc.collection.objects.link(c); c.parent = cha; c.location = loc; c.scale = k; return c
 for i, (k, f) in enumerate(NHA):
     cx, cy, cz = f(); o = gom('nha_' + k, X=i * 10)
     e = nut_rong('o_cua_' + k, cx, cy, cz); e.parent = o; e.location = (cx, cy, cz)
+    o1 = ban_sao('nha_%s_1' % k, o, (i * 10, -16, 0), K1)
+    e = nut_rong('o_cua_%s_1' % k, 0, 0, 0); e.parent = o1; e.location = (cx, cy, cz)   # trong toạ độ của nhà nên tự co theo
+    g3 = bpy.data.objects.new('nha_%s_3' % k, None); sc.collection.objects.link(g3); g3.location = (i * 26, -40, 0)
+    ban_sao('nha_%s_3_nen' % k, NEN, (0, 0, 0), (1, 1, 1), g3); ban_sao('nha_%s_3_chinh' % k, o, (0, .2, NEN_Z), K3, g3)
+    for s in (-1, 1): ban_sao('nha_%s_3_chai%d' % (k, s + 1), o, (s * 6.9, .5, NEN_Z), CANH3, g3)
+    e = nut_rong('o_cua_%s_3' % k, 0, 0, 0); e.parent = g3; e.location = (cx * K3[0], cy * K3[1] + .2, cz * K3[2] + NEN_Z)
+NEN.location = (0, -80, 0)
 
 # ---------------- cửa (rộng 1.3, cao 2.2, gốc ở chân giữa) ----------------
 def cua_go():
@@ -314,8 +379,8 @@ if XEM:   # ảnh xem trước: đặt tất cả thành hàng, chụp từ góc
     sc.render.engine = 'BLENDER_EEVEE' if 'BLENDER_EEVEE' in [e.identifier for e in bpy.types.RenderSettings.bl_rna.properties['engine'].enum_items] else 'BLENDER_EEVEE_NEXT'
     w = bpy.data.worlds.new('w'); w.color = (.9, .92, .95); sc.world = w
     s = bpy.data.objects.new('nang', bpy.data.lights.new('nang', 'SUN')); s.data.energy = 3.5; s.rotation_euler = (math.radians(50), 0, math.radians(30)); sc.collection.objects.link(s)
-    c = bpy.data.objects.new('cam', bpy.data.cameras.new('cam')); c.data.type = 'ORTHO'; c.data.ortho_scale = 90; sc.collection.objects.link(c); sc.camera = c
-    el, az = math.radians(42), math.radians(-38); tg = Vector((35, 0, 2)); d = Vector((math.sin(az) * math.cos(el), -math.cos(az) * math.cos(el), math.sin(el)))
+    c = bpy.data.objects.new('cam', bpy.data.cameras.new('cam')); c.data.type = 'ORTHO'; c.data.ortho_scale = 190; sc.collection.objects.link(c); sc.camera = c
+    el, az = math.radians(42), math.radians(-38); tg = Vector((100, -25, 2)); d = Vector((math.sin(az) * math.cos(el), -math.cos(az) * math.cos(el), math.sin(el)))
     c.location = tg + d * 120; c.rotation_euler = (-d).to_track_quat('-Z', 'Y').to_euler()
     sc.render.resolution_x, sc.render.resolution_y = 1800, 1200; sc.render.filepath = XEM; bpy.ops.render.render(write_still=True)
     for o in (s, c): bpy.data.objects.remove(o)
