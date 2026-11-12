@@ -59,6 +59,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `14-phi-thang.js` | Hiệu ứng phi thăng chuyển cảnh |
 | `15-go-mo.js` | Gõ mõ tích công đức, 108 tiếng, 9 phẩm sen |
 | `29-cong-duc.js` | Trò nhỏ trên chùa: Thắp nhang, Thỉnh chuông, Vái lạy, Tĩnh tâm; cộng chung công đức Gõ mõ, Bảng công đức (`css/32`) |
+| `31-tao-nhan-vat.js` | Tạo nhân vật (`css/34`): dáng nam/nữ, 7 kiểu tóc + màu, 4 khuôn mặt + màu da, 5 kiểu áo + màu, quần/váy + màu; xem trước 3D xoay được (`ss3dNV` trong `js/26`). Mở bắt buộc sau khi đăng ký (lần đầu vào Song Song, `js/02`), mở lại bằng nút **Nhân vật** trên thanh hành động. Lưu `ss-nv-tc`, gửi kèm vị trí để người khác thấy (`js/04-01`) |
 | `30-bo-hoa-thieng.js` | Nhà thờ: Bó hoa thiêng (không điểm, không xếp hạng): Thắp nến, Lần chuỗi Mân Côi, Ở lại với Chúa, Chuông Truyền Tin, Nước thánh, Cầu cho các linh hồn; bó hoa trên trang hồ sơ (`css/33`). Giá chuông, bình nước thánh dựng trong `js/26` (`vatNhaTho`) |
 | `16-goc-nhin.js` | Phóng to / thu nhỏ góc nhìn, nhớ theo máy |
 | `17-nghi-thuc.js` | Nghi thức Phật giáo 5 bước, Công giáo 5 bước |
@@ -84,7 +85,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 
 - Toàn bộ dữ liệu là **mẫu hư cấu**. Người đã khuất, vị trí mộ/quê, lời nhắn mẫu, vật phẩm cửa hàng nằm ở `data/du-lieu-mau.js` (`window.SS_DATA`, nội dung là JSON thuần). Làng mẫu họ Phạm vẫn nằm trong `20-lang-rieng.js`.
 - Khi có máy chủ: API trả về đúng dạng `SS_DATA` là thay được, giao diện không phải sửa.
-- Trạng thái người dùng lưu trong `localStorage`: `ss-auth`, `ss-me`, `ss-faith`, `ss-nv`, `ss-music`, `ss-sound`, `ss-vol`, `ss-zoom`, `ss-dai`, `ss-dai-ta`…
+- Trạng thái người dùng lưu trong `localStorage`: `ss-auth`, `ss-me`, `ss-faith`, `ss-nv`, `ss-nv-tc`, `ss-music`, `ss-sound`, `ss-vol`, `ss-zoom`, `ss-dai`, `ss-dai-ta`…
 - **Chưa có:** máy chủ, cơ sở dữ liệu, đăng nhập thật, thanh toán thật.
 
 ## Phụ thuộc bên ngoài
