@@ -406,7 +406,7 @@ function khoi(){
   scN.add(new THREE.HemisphereLight(0xfff6e8,0x8c7a62,2.4));{const n=new THREE.DirectionalLight(0xffffff,1.8);n.position.set(-6,14,9);scN.add(n)}
   camN.position.copy(B(DIR.x*60,DIR.y*60,DIR.z*60+4));camN.lookAt(B(0,0,4));
   window.ss3dAnhNha=(cv,h)=>mauNha().then(gl=>{let v;if(h.do){const m=gl.scene.getObjectByName('do_'+h.do);if(!m)return;v=m.clone(true);nhuom(v,{},null)}else v=taoNha(gl,h,null);scN.add(v);
-   const bb=new THREE.Box3().setFromObject(v),c=bb.getCenter(new V3()),k=h.do?Math.max(.6,bb.getSize(new V3()).length()*.42):h.cap===3?13:h.cap===1?5.2:6.5;camN.left=camN.bottom=-k;camN.right=camN.top=k;camN.updateProjectionMatrix();
+   const bb=new THREE.Box3().setFromObject(v),c=bb.getCenter(new V3()),k=h.do?Math.max(.6,bb.getSize(new V3()).length()*.42):h.cap===3?13:6.5;camN.left=camN.bottom=-k;camN.right=camN.top=k;camN.updateProjectionMatrix();
    camN.position.copy(h.do?c:B(0,0,4)).addScaledVector(B(DIR.x,DIR.y,DIR.z),60);camN.lookAt(h.do?c:B(0,0,4));const cc=new THREE.Color(),ca=r.getClearAlpha();r.getClearColor(cc);
    r.setRenderTarget(rtN);r.setClearColor(0xf3ead8,1);r.clear();r.render(scN,camN);const px=new Uint8Array(160*160*4);r.readRenderTargetPixels(rtN,0,0,160,160,px);r.setRenderTarget(null);r.setClearColor(cc,ca);scN.remove(v);
    const x=cv.getContext('2d'),im=x.createImageData(160,160);for(let y=0;y<160;y++)im.data.set(px.subarray((159-y)*640,(160-y)*640),y*640);x.putImageData(im,0,0)}).catch(()=>{});
