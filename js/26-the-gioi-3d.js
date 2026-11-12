@@ -323,7 +323,17 @@ function khoi(){
    cv.addEventListener('pointerdown',e=>{keo=e.clientX;cv.setPointerCapture(e.pointerId)});cv.addEventListener('pointermove',e=>{if(keo!==null){quay+=(e.clientX-keo)*.012;keo=e.clientX}});cv.addEventListener('pointerup',()=>keo=null);cv.addEventListener('pointercancel',()=>keo=null);
    const doi=tc=>{tcNay=tc;mau('TuyChinh').then(gl=>{if(tc!==tcNay||!song)return;if(q){sc.remove(q.rig);q.mx.stopAllAction()}const rig=SU.clone(gl.scene);khoac(rig,tc,false);rig.traverse(o=>{if(o.isMesh)o.frustumCulled=false});
     q={rig,mx:new THREE.AnimationMixer(rig)};const a=gl.animations.find(c=>c.name==='Idle');a&&q.mx.clipAction(a).play();q.mx.update(.01);q.rig.rotation.y=quay;sc.add(rig)}).catch(()=>{})};
-   ve();return{doi,dung(){song=false;rr.dispose()}}};
+   ve();return{doi,anh:anhNV,dung(){song=false;rr.dispose()}}};
+  // ảnh nhỏ cho từng lựa chọn (tóc, mặt, áo, quần, dáng): một bộ vẽ ẩn dùng chung, vẽ xong chép sang canvas của nút
+  let rrA=null,scA=null,hangA=Promise.resolve();
+  const KHUNG={toc:[[.62,1.32,.62],[0,1.16,0],.3],mat:[[0,1.13,.8],[0,1.12,0],.2],ao:[[.35,.86,1.4],[0,.8,0],.36],quan:[[.35,.45,1.5],[0,.4,0],.43],d:[[.5,.75,2.6],[0,.68,0],.72]};
+  function anhNV(tc,khung,dich){hangA=hangA.then(()=>mau('TuyChinh')).then(gl=>{
+    if(!rrA){rrA=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});rrA.setSize(160,160);rrA.outputColorSpace=THREE.SRGBColorSpace;
+     scA=new THREE.Scene();const l=new THREE.DirectionalLight(0xfff1e0,2.6);l.position.set(2,4,5);scA.add(l,new THREE.HemisphereLight(0xfff6ea,0xd9c6a8,2.4))}
+    const [vt,nh,k]=KHUNG[khung]||KHUNG.d,cm=new THREE.OrthographicCamera(-k,k,k,-k,.1,20);cm.position.set(...vt);cm.lookAt(...nh);
+    const rig=SU.clone(gl.scene),ms=khoac(rig,tc,false),mx=new THREE.AnimationMixer(rig),a=gl.animations.find(c=>c.name==='Idle');if(a){mx.clipAction(a).play();mx.update(.5)}
+    scA.add(rig);rrA.render(scA,cm);scA.remove(rig);mx.stopAllAction();ms.forEach(m=>m.dispose());
+    const x=dich.getContext('2d');x.clearRect(0,0,dich.width,dich.height);x.drawImage(rrA.domElement,0,0,dich.width,dich.height)}).catch(()=>{})}
 
   // ---- vòng ring vàng dưới chân "Bạn" và vòng chạm đất khi bấm: dời sang cảnh đang xem
   const vongVang=new THREE.Mesh(new THREE.RingGeometry(.42,.6,48),new THREE.MeshBasicMaterial({color:0xFFD98A,transparent:true,opacity:.85,toneMapped:false,depthWrite:false,depthTest:false}));vongVang.rotation.x=-Math.PI/2;vongVang.renderOrder=9;   // không thử chiều sâu: đứng sát bậc, mép bệ thì vòng không bị mặt đá che nửa chừng

@@ -28,19 +28,23 @@
  window.ssNVTC={doc:doc,CHON:CHON,MAU:MAU};
 
  var el=null,cv=null,xem=null,c=null,tab='d',xongCb=null,truoc=null;
- var TAB=[['d','Dáng'],['toc','Tóc'],['mat','Mặt'],['ao','Áo'],['quan','Quần']],MAUTAB={toc:['mt','Màu tóc'],mat:['da','Màu da'],ao:['ma','Màu áo'],quan:['mq','Màu quần']};
- function nut(ds,k){return '<div class="tnv-chon" role="group">'+ds.map(function(o){return '<button type="button" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(c[k]===o[0])+'">'+esc(o[1])+'</button>'}).join('')+'</div>'}
- function mau(k,ten){return '<h4>'+ten+'</h4><div class="tnv-mau" role="group" aria-label="'+ten+'">'+MAU[k].map(function(o){return '<button type="button" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(c[k]===o[0])+'" aria-label="'+esc(o[1])+'" title="'+esc(o[1])+'" style="--m:#'+o[0]+'"></button>'}).join('')+'</div>'}
+ var TAB=[['d','Dáng'],['toc','Tóc'],['mat','Mặt'],['ao','Áo'],['quan','Quần']],TEN={d:'Dáng',toc:'Kiểu tóc',mat:'Khuôn mặt',ao:'Kiểu áo',quan:'Quần, váy'},
+  IC={d:'<circle cx="12" cy="5" r="2.6"/><path d="M8 21v-6l-2-1 1.5-5h9L18 14l-2 1v6M12 15v6"/>',toc:'<path d="M5 13c0-5 3-8 7-8s7 3 7 8c0 1-1 2-2 1-1-3-3-4-5-4s-4 1-5 4c-1 1-2 0-2-1z"/><path d="M7 14c.5 3.5 2.5 6 5 6s4.5-2.5 5-6"/>',
+   mat:'<circle cx="12" cy="12" r="8.5"/><path d="M9 10v.5M15 10v.5M8.5 14.5c2 2 5 2 7 0"/>',ao:'<path d="M8 4l-5 3 2 4 2-1v10h10V10l2 1 2-4-5-3c-.5 1.5-2 2.5-4 2.5S8.5 5.5 8 4z"/>',quan:'<path d="M7 3h10l1.5 18h-4L12 9l-2.5 12h-4z"/>'},
+  SV=function(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'},MAUTAB={toc:['mt','Màu tóc'],mat:['da','Màu da'],ao:['ma','Màu áo'],quan:['mq','Màu quần']};
+ // lựa chọn là hình 3D chụp từ chính nhân vật (js/26 ss3dNV.anh); chữ chỉ để đọc màn hình và khi máy không vẽ được 3D
+ function nut(ds,k){return '<div class="tnv-chon k-'+k+'" role="group" aria-label="'+esc(TEN[k])+'">'+ds.map(function(o){return '<button type="button" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(c[k]===o[0])+'" aria-label="'+esc(o[1])+'" title="'+esc(o[1])+'"><canvas width="160" height="160" aria-hidden="true"></canvas><span>'+esc(o[1])+'</span></button>'}).join('')+'</div>'}
+ function mau(k,ten){return '<div class="tnv-mau" role="group" aria-label="'+ten+'">'+MAU[k].map(function(o){return '<button type="button" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(c[k]===o[0])+'" aria-label="'+esc(o[1])+'" title="'+esc(o[1])+'" style="--m:#'+o[0]+'"></button>'}).join('')+'</div>'}
  function esc(s){return String(s).replace(/[&<>"']/g,function(x){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]})}
- function ve(){el.querySelector('.tnv-tab').innerHTML=TAB.map(function(t){return '<button type="button" role="tab" data-tab="'+t[0]+'" aria-selected="'+(tab===t[0])+'">'+t[1]+'</button>'}).join('');
-  el.querySelector('.tnv-bang').innerHTML=nut(CHON[tab],tab)+(MAUTAB[tab]?mau(MAUTAB[tab][0],MAUTAB[tab][1]):'');
-  if(xem)xem.doi(viet(c))}
+ function ve(){el.querySelector('.tnv-tab').innerHTML=TAB.map(function(t){return '<button type="button" role="tab" data-tab="'+t[0]+'" aria-selected="'+(tab===t[0])+'" aria-label="'+t[1]+'" title="'+t[1]+'">'+SV(IC[t[0]])+'</button>'}).join('');
+  el.querySelector('.tnv-bang').innerHTML=(MAUTAB[tab]?mau(MAUTAB[tab][0],MAUTAB[tab][1]):'')+nut(CHON[tab],tab);
+  if(xem){xem.doi(viet(c));[].forEach.call(el.querySelectorAll('.tnv-chon button'),function(b){var t={};for(var k in c)t[k]=c[k];t[b.dataset.k]=b.dataset.v;xem.anh(viet(t),b.dataset.k,b.querySelector('canvas'))})}}
  function dung(){
   el=document.createElement('div');el.id='taoNV';el.className='tnv';el.hidden=true;el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.setAttribute('aria-labelledby','tnvTieuDe');
   el.innerHTML='<div class="tnv-hop"><div class="tnv-xem"><canvas aria-label="Xem trước nhân vật, kéo để xoay"></canvas><p class="tnv-goi">Kéo để xoay</p></div>'+
    '<div class="tnv-ben"><header><h2 id="tnvTieuDe">Nhân vật của bạn</h2><p>Nhân vật này đi cùng bạn trong Song Song, người cùng viếng sẽ thấy.</p><button type="button" class="tnv-dong" aria-label="Đóng">×</button></header>'+
    '<div class="tnv-tab" role="tablist"></div><div class="tnv-bang" role="tabpanel"></div>'+
-   '<footer><button type="button" class="tnv-nn">Ngẫu nhiên</button><button type="button" class="tnv-xong">Xong</button></footer></div></div>';
+   '<footer><button type="button" class="tnv-nn" aria-label="Ngẫu nhiên" title="Ngẫu nhiên"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r="1.2" fill="currentColor"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/></svg></button><button type="button" class="tnv-xong">Xong</button></footer></div></div>';
   document.body.appendChild(el);cv=el.querySelector('canvas');
   el.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
    if(b.dataset.tab){tab=b.dataset.tab;ve();var t=el.querySelector('[data-tab="'+tab+'"]');t&&t.focus();return}
