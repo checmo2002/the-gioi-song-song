@@ -375,7 +375,7 @@ function khoi(){
   function vlNha(mau,d){const c=new THREE.Color(mau),v=new THREE.MeshStandardMaterial({color:c,roughness:.9,metalness:0,envMapIntensity:0});v.onBeforeCompile=sh=>AGX(sh,true);
    v.userData.goc=c.clone();v.userData.nha=1;if(d)d.cy.push(v);return v}
   function nhuom(o,mau,d){o.traverse(m=>{if(!m.isMesh)return;const t=m.material.name;m.material=vlNha(mau[t]||'#'+m.material.color.getHexString(),d)})}
-  function taoNha(gl,h,d){const ks=gl.scene.getObjectByName('nha_'+h.style)?h.style:'bagian',cs=h.cap===1||h.cap===3?'_'+h.cap:'',v=(gl.scene.getObjectByName('nha_'+ks+cs)||gl.scene.getObjectByName('nha_'+ks)).clone(true);nhuom(v,{mai:h.roof,mai2:new THREE.Color(h.roof).multiplyScalar(.72),tuong:h.wall},d);
+  function taoNha(gl,h,d){const ks=gl.scene.getObjectByName('nha_'+h.style)?h.style:'bagian',cs=h.cap===1||h.cap===3?'_'+h.cap:'',goc=t=>gl.scene.children.find(o=>o.name===t),v=(goc('nha_'+ks+cs)||goc('nha_'+ks)).clone(true);   /* chỉ tìm vật gốc: mảnh con của lưới nhiều vật liệu cũng tên nha_<kiểu>_<số> */nhuom(v,{mai:h.roof,mai2:new THREE.Color(h.roof).multiplyScalar(.72),tuong:h.wall},d);
    const oc=v.getObjectByName('o_cua_'+ks+cs)||v.getObjectByName('o_cua_'+ks),cm=gl.scene.getObjectByName('cua_'+(h.cua||'go'))||gl.scene.getObjectByName('cua_go');
    if(oc&&cm){const c=cm.clone(true);nhuom(c,{},d);c.position.copy(oc.position);v.add(c)}return v}
   async function dungNha(){const d=DL.ho;if(!d||!window.ssHo||!ssHo.nha)return;const gl=await mauNha().catch(()=>null);if(!gl||!DL.ho)return;
