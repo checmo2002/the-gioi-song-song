@@ -4,7 +4,8 @@ Ra: {"o": [[i, j, tên vật thấy sau khi bỏ, pháp tuyến z]]}. Ô nào th
 import bpy, sys, json
 from mathutils import Vector
 RA = sys.argv[sys.argv.index('--') + 1]
-BO_COT = {'cot', 'chanCot', 'cotHien', 'chanCotH', 'xa', 'xaD'}   # giống nuong-canh-3d.py
+BO_COT = {'cot', 'chanCot', 'cotHien', 'chanCotH', 'xa', 'xaD'}   # giống nuong-canh-3d.py; thêm tham số thứ hai 'a,b' để bỏ vật khác
+if len(sys.argv) > sys.argv.index('--') + 2: BO_COT = set(sys.argv[sys.argv.index('--') + 2].split(','))
 QUA = {'xaLau', 'tanBd', 'tre', 'cay', 'may', 'cau', 'bach', 'thanB', 'tanS'}   # tán cây, xà lầu: người đi bên dưới (mái SS_Mai web làm mờ)
 sc = max(bpy.data.scenes, key=lambda s: len(s.objects))
 for x in [x for x in bpy.data.scenes if x != sc]: bpy.data.scenes.remove(x)   # còn một cảnh để depsgraph của context là cảnh này

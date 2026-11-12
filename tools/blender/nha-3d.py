@@ -22,7 +22,7 @@ MAU = {'mai': (1, 1, 1), 'tuong': (1, 1, 1), 'go': (.42, .27, .16), 'da': (.72, 
        'kinh': (.22, .32, .4), 'toi': (.18, .15, .13), 'vang': (.85, .66, .28), 'do': (.72, .16, .12),
        'la': (.36, .55, .27), 'hong': (.96, .67, .76), 'nuoc': (.5, .72, .78), 'tre': (.62, .58, .34), 'kim': (.7, .72, .75), 'den': (.98, .85, .55),
        'mai2': (.78, .78, .78), 'gom': (.62, .33, .22), 'go2': (.3, .16, .1), 'su': (.93, .93, .95), 'xanhsu': (.2, .3, .58),
-       'lua': (.86, .2, .22), 'xanh': (.36, .42, .26), 'len': (.55, .27, .22), 'chop': (.24, .45, .36), 'co': (.48, .62, .34)}
+       'lua': (.86, .2, .22), 'xanh': (.36, .42, .26), 'len': (.55, .27, .22), 'chop': (.24, .45, .36), 'co': (.48, .62, .34), 'rao': (.56, .68, .4), 'gach': (.62, .3, .2), 'vang2': (.95, .78, .3)}
 MAT = {}
 def mat(t):
     if t not in MAT:
@@ -367,6 +367,36 @@ def aolen():      # áo len mẹ đan: thân rộng, sọc kem, cổ tròn
     hop(.53, .19, .08, 0, 0, 1.0, 'toi')
 DO = [('dao', dao), ('sen', sen), ('cau', cau), ('rao', rao), ('den', den), ('xemay', xemay), ('xedap', xedap), ('oto', oto), ('binhsen', binhsen),
       ('truongky', truongky), ('sap', sap), ('tuche', tuche), ('tuao', tuao), ('aodai', aodai), ('quanphuc', quanphuc), ('aolen', aolen)]
+# ---------------- ranh giới ô đất (thay hàng rào xanh nướng sẵn): gốc ở tâm bãi cỏ 10 x 10 của ô, chừa lối vào 2.4 m phía trước ----------------
+def vong(dung):   # gọi dung(x0, y0, x1, y1) cho từng đoạn: sau, hai bên, hai nửa trước
+    a, b = 4.85, 1.2
+    for x0, y0, x1, y1 in ((-a, a, a, a), (-a, -a, -a, a), (a, -a, a, a), (-a, -a, -b, -a), (b, -a, a, -a)): dung(x0, y0, x1, y1)
+def doan_hop(x0, y0, x1, y1, d, h, t, z=0):
+    hop(abs(x1 - x0) + d, abs(y1 - y0) + d, h, (x0 + x1) / 2, (y0 + y1) / 2, z, t)
+def ranh_xanh(): vong(lambda *p: doan_hop(*p, .46, .5, 'rao'))
+def ranh_gach():
+    def d(x0, y0, x1, y1):
+        doan_hop(x0, y0, x1, y1, .3, .55, 'gach'); doan_hop(x0, y0, x1, y1, .38, .07, 'da', .55)
+        n = max(1, round(max(abs(x1 - x0), abs(y1 - y0)) / 2.4))
+        for i in range(n + 1): hop(.42, .42, .8, x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, 0, 'gach')
+    vong(d)
+def ranh_tre():
+    def d(x0, y0, x1, y1):
+        n = max(1, round(max(abs(x1 - x0), abs(y1 - y0)) / .6))
+        for i in range(n + 1): tru(.05, .8, x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, 0, 'tre', n=6)
+        for z in (.3, .62): doan_hop(x0, y0, x1, y1, .06, .06, 'tre', z)
+    vong(d)
+def ranh_hoa():
+    def d(x0, y0, x1, y1):
+        doan_hop(x0, y0, x1, y1, .5, .22, 'da'); doan_hop(x0, y0, x1, y1, .4, .06, 'toi', .22)
+        n = max(1, round(max(abs(x1 - x0), abs(y1 - y0)) / .55))
+        for i in range(n + 1):
+            x, y = x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n
+            cau_(.2, x, y, .38, 'la', sz=(1, 1, .8)); cau_(.09, x + .06, y - .05, .55, ('hong', 'vang2', 'cot')[i % 3])
+    vong(d)
+RANH = [('xanh', ranh_xanh), ('gach', ranh_gach), ('tre', ranh_tre), ('hoa', ranh_hoa)]
+for i, (k, f) in enumerate(RANH):
+    f(); o = gom('ranh_' + k, X=i * 12); o.location.y = 30
 for i, (k, f) in enumerate(DO):
     f(); o = gom('do_' + k, X=i * 4); o.location.y = 12
 
