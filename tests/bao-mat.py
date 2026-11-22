@@ -33,6 +33,13 @@ for f in ma:
             for m in re.finditer(r'\$\{\s*(?!esc\()([^{}]*?\b(?:p|q|m|n|u|user|ME\.user)\.(?:name|place|story|letter|cite|note|title|b|d)\b(?!\s*\?)[^{}]*)\}', dong):
                 loi.append(f'{f}:{i}: chưa esc() dữ liệu người dùng: ${{{m.group(1)[:50]}}}')
 
+# workflow GitHub: phải giới hạn quyền token, không chạy mã PR lạ với quyền ghi
+for f in files:
+    if f.startswith('.github/workflows/') and f.endswith(('.yml', '.yaml')):
+        s = open(f, encoding='utf-8').read()
+        if not re.search(r'^permissions:', s, re.M): loi.append(f'{f}: thiếu khối permissions: ở cấp trên cùng')
+        if 'pull_request_target' in s: loi.append(f'{f}: dùng pull_request_target')
+
 # ---------- 2. Thử tấn công XSS ----------
 P = '"><img src=x onerror="window.__xss=(window.__xss||0)+1"><svg onload="window.__xss=(window.__xss||0)+1">'
 ME = {'user': {'name': 'Nguyễn ' + P, 'place': P, 'phone': '0900000000'},
