@@ -99,6 +99,9 @@ html:not(.sanh-on) .sanh-tip{display:none}
 .hall[data-ws="dien"] .w-bar .w-up,.hall[data-ws="lang"] .w-bar .w-up,.hall[data-ws="nha"] .w-bar .w-up,.hall[data-ws="tho"] .w-bar .w-up,.hall[data-ws="sanh"] .w-bar .w-up{display:none!important}
 .hall:not([data-ws="lang"]) .w-bar .w-venui{display:none!important}
 .hall:not([data-ws="nha"]) .w-bar .w-ralang{display:none!important}
+/* nút Thắp nến: chỉ ở thánh đường, vì giá nến nằm ngoài khung nhìn ban đầu (#14) */
+.hall:not([data-ws="tho"]) .w-bar .w-nen{display:none!important}
+.hall .w-bar [data-w].w-nen:not(.w-up):not(.w-down):not(.mo-btn){background:linear-gradient(180deg,#8FA6D6,#4E6698)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 8px 20px rgba(78,102,152,.4)}
 .hall:not([data-ws="dien"]):not([data-ws="nha"]):not([data-ws="tho"]) .w-bar [data-w="chap"],.hall:not([data-ws="dien"]):not([data-ws="nha"]):not([data-ws="tho"]) .w-bar [data-w="lay"],.hall:not([data-ws="dien"]):not([data-ws="nha"]):not([data-ws="tho"]) .w-bar [data-w="ngoi"]{display:none!important}
 /* thanh trên: biểu tượng */
 .hall .hall-act .hnav span{display:none}
