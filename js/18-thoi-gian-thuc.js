@@ -4,6 +4,9 @@
  var CITY={hn:['Hà Nội',21.03,105.85,'b'],hp:['Hải Phòng',20.86,106.68,'b'],hue:['Huế',16.46,107.59,'t'],dn:['Đà Nẵng',16.05,108.2,'t'],nt:['Nha Trang',12.24,109.19,'t'],dl:['Đà Lạt',11.94,108.44,'c'],hcm:['TP. Hồ Chí Minh',10.78,106.7,'n'],ct:['Cần Thơ',10.03,105.78,'n']};
  var KEY='ss-wx',cfg={};try{cfg=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}cfg.city=cfg.city||'hn';
  function sv(){try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(e){}}
+ // giờ Việt Nam (UTC+7) cho mọi máy, khớp nút lịch (js/02 vnToday): Date có giờ địa phương = giờ VN
+ function vnNow(){var n=new Date();return new Date(n.getTime()+(420+n.getTimezoneOffset())*6e4)}
+ var THS=['CN','T2','T3','T4','T5','T6','T7'];
  var THU=['Chủ nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
  // ---------- biểu tượng ----------
  var SUN='<circle cx="12" cy="12" r="4.2" fill="#FFC94A"/><g stroke="#FFC94A" stroke-width="1.8" stroke-linecap="round"><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M5.3 18.7l1.5-1.5M17.2 6.8l1.5-1.5"/></g>',
@@ -20,7 +23,7 @@
  function fromWMO(c){return c===0?'clear':c<=2?'part':c===3?'cloud':c<=48?'fog':c<=57?'drizzle':c<=67?'rain':c<=77?'snow':c<=82?'rain':'storm'}
  // ---------- mô phỏng theo khí hậu vùng (khi không lấy được dữ liệu thật) ----------
  function hash(n){n=Math.sin(n*127.1)*43758.5;return n-Math.floor(n)}
- function climate(){var c=CITY[cfg.city],d=new Date(),m=d.getMonth()+1,h=d.getHours()+d.getMinutes()/60,day=Math.floor(d.getTime()/864e5),r=hash(day+cfg.city.length),R=c[3];
+ function climate(){var c=CITY[cfg.city],d=vnNow(),m=d.getMonth()+1,h=d.getHours()+d.getMinutes()/60,day=Math.floor(d.getTime()/864e5),r=hash(day+cfg.city.length),R=c[3];
   var T={b:[17,18,20,24,28,30,30,29,28,26,22,19],t:[20,21,23,26,28,29,29,29,27,25,23,21],c:[16,17,18,19,20,20,19,19,19,18,17,16],n:[26,27,28,29,29,28,28,28,27,27,27,26]}[R][m-1];
   var tem=T+3.5*Math.sin((h-9)/24*2*Math.PI),k='clear';
   var wet={b:m>=5&&m<=9,t:m>=9&&m<=12,c:m>=5&&m<=10,n:m>=5&&m<=11}[R];
@@ -49,9 +52,9 @@
  function lunar(d){try{var l=window.ssToLunar&&ssToLunar(d.getDate(),d.getMonth()+1,d.getFullYear());return l?l.d+'/'+l.m+(l.leap?' (nhuận)':''):''}catch(e){return ''}}
  function phase(h){return h<5?'dem':h<7?'sang':h<17?'ngay':h<19?'chieu':'dem'}
  var PH={dem:'Đêm',sang:'Bình minh',ngay:'Ban ngày',chieu:'Hoàng hôn'};
- function paint(){var d=new Date(),h=d.getHours(),mi=d.getMinutes(),day=h>=6&&h<18,w=W||climate();
+ function paint(){var d=vnNow(),h=d.getHours(),mi=d.getMinutes(),day=h>=6&&h<18,w=W||climate();
   var hh=String(h).padStart(2,'0')+':'+String(mi).padStart(2,'0'),dd=d.getDate()+'/'+(d.getMonth()+1),lu=lunar(d);
-  pill.innerHTML=icon(w.k,day)+'<b>'+w.t+'°</b><span class="sep"></span><b>'+hh+'</b><span class="sep"></span><small>'+THU[d.getDay()].replace('Thứ ','T').replace('Chủ nhật','CN')+' '+dd+(lu?' · ÂL '+lu:'')+'</small>';
+  pill.innerHTML=icon(w.k,day)+'<b>'+w.t+'°</b><span class="sep"></span><b>'+hh+'</b><span class="sep"></span><small>'+THS[d.getDay()]+' '+dd+(lu?' · ÂL '+lu:'')+'</small>';
   pos();pill.setAttribute('aria-label','Bây giờ '+hh+', '+THU[d.getDay()]+' '+dd+', '+DESC[w.k]+' '+w.t+' độ. Bấm để xem chi tiết');
   if(!pop.hidden)popInner(d,w,hh,lu);
   scene(w,h+mi/60)}
@@ -98,5 +101,5 @@
  new MutationObserver(function(){pos();paint()}).observe(hall,{attributes:true,attributeFilter:['data-ws','hidden','class']});
  setInterval(paint,20000);setInterval(fetchWx,15*60e3);
  setTimeout(function(){size();pos();fetchWx();paint()},800);
- window.ssWx={now:function(){return W},set:function(k,t){W={k:k,t:t||W&&W.t||28,w:8,real:false};paint()},city:function(c){cfg.city=c;cfg.cache=null;sv();fetchWx()}};
+ window.ssWx={now:function(){return W},vnNow:vnNow,set:function(k,t){W={k:k,t:t||W&&W.t||28,w:8,real:false};paint()},city:function(c){cfg.city=c;cfg.cache=null;sv();fetchWx()}};
 })();

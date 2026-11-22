@@ -111,7 +111,7 @@ function khoi(){
   const KHI={clear:[1,0,0,0],cloud:[.86,.4,0,0],drizzle:[.78,.55,10,.35],rain:[.6,.75,18,1],storm:[.5,.85,22,1.3],fog:[.94,.75,30,0],snow:[.9,.5,10,0]};
   const XAM=new THREE.Color('#9fa5ab'),TRANG=new THREE.Color(1,1,1),cyM=new THREE.Color(),TR={tint:new THREE.Color(1,1,1),tren:new THREE.Color(),duoi:new THREE.Color(),nang:3,toa:4.2,dom:.5,gan:0,mua:0,set:false},DICH={tint:new THREE.Color(),tren:new THREE.Color(),duoi:new THREE.Color()};
   const cvT=TROI.image,xT=cvT.getContext('2d');let tinhT=0,sam=0,samSau=0;
-  function mucTieu(){const n=new Date(),h=n.getHours()+n.getMinutes()/60,w=(window.ssWx&&ssWx.now&&ssWx.now())||{k:'clear'},k=KHI[w.k]||KHI.clear;
+  function mucTieu(){const n=window.ssWx&&ssWx.vnNow?ssWx.vnNow():new Date(),h=n.getHours()+n.getMinutes()/60,w=(window.ssWx&&ssWx.now&&ssWx.now())||{k:'clear'},k=KHI[w.k]||KHI.clear;
    let i=0;while(i<GIO.length-2&&GIO[i+1][0]<=h)i++;const a=GIO[i],b=GIO[i+1],f=(h-a[0])/Math.max(1e-6,b[0]-a[0]);
    DICH.tint.copy(a[1]).lerp(b[1],f).multiplyScalar(k[0]);DICH.tren.copy(a[2]).lerp(b[2],f);DICH.duoi.copy(a[3]).lerp(b[3],f);
    const sang=(DICH.duoi.r+DICH.duoi.g+DICH.duoi.b)/3;DICH.tren.lerp(XAM.clone().multiplyScalar(sang*1.3),k[1]);DICH.duoi.lerp(XAM.clone().multiplyScalar(sang*1.25),k[1]);
