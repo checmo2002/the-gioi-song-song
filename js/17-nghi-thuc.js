@@ -58,9 +58,9 @@
  // ---------- PHẬT GIÁO ----------
  function phat(pid){var N=3,T=6;
   function pick(){head('Dâng hương','Chọn số nén hương',T,0);
-   body.innerHTML='<div class="hg-sub" style="margin:10px 0 6px">Theo tục lệ, thắp số nén lẻ</div><div class="hg-pick"><button type="button" data-n="1"><b>1</b>nén<small>Ngày thường</small></button><button type="button" data-n="3"><b>3</b>nén<small>Phổ biến</small></button><button type="button" data-n="5"><b>5</b>nén<small>Lễ trọng</small></button></div><div class="hg-foot"><button type="button" class="quick">Thắp nhanh</button></div>';
+   body.innerHTML='<div class="hg-sub" style="margin:10px 0 6px">Theo tục lệ, thắp số nén lẻ</div><div class="hg-pick"><button type="button" data-n="1"><b>1</b>nén<small>Ngày thường</small></button><button type="button" data-n="3"><b>3</b>nén<small>Phổ biến</small></button><button type="button" data-n="5"><b>5</b>nén<small>Lễ trọng</small></button></div><div class="hg-foot"><button type="button" class="hg-quick">Thắp nhanh</button></div>';
    body.querySelectorAll('[data-n]').forEach(function(b){b.addEventListener('click',function(){N=+b.dataset.n;scene()})});
-   q('.quick').addEventListener('click',function(){finish(pid,true,'huong',3,'')})}
+   q('.hg-quick').addEventListener('click',function(){finish(pid,true,'huong',3,'')})}
   var svg,bd,flG,emG,smG,plG,lampF,st=0,raf=0,last=0,hold=false,prog=0,base=[200,250],ang=0,flameS=1,bows=0,drag=null,ringH;
   function scene(){body.innerHTML='<div class="hg-stage"></div><div class="hg-tip"></div><div class="hg-sub"></div><div class="hg-foot"><button type="button" class="skip">Bỏ qua bước này</button></div>';
    svg=el('svg',{viewBox:'0 0 360 400'},q('.hg-stage'));defs(svg);
@@ -127,9 +127,9 @@
  // ---------- CÔNG GIÁO ----------
  function nen(pid){var C='#F4EEE0',T=6,CL={trang:['#F4EEE0','Trắng','Cầu nguyện'],do:['#C8402E','Đỏ','Tạ ơn'],xanh:['#5A86C8','Xanh','Cầu bình an']};
   function pick(){head('Thắp nến','Chọn cây nến',T,0);
-   body.innerHTML='<div class="hg-sub" style="margin:10px 0 6px">Mỗi màu nến mang một ý nguyện</div><div class="hg-pick">'+Object.keys(CL).map(function(k){return '<button type="button" data-c="'+k+'"><i class="dot" style="background:'+CL[k][0]+'"></i><b style="font-size:15px">'+CL[k][1]+'</b><small>'+CL[k][2]+'</small></button>'}).join('')+'</div><div class="hg-foot"><button type="button" class="quick">Thắp nhanh</button></div>';
+   body.innerHTML='<div class="hg-sub" style="margin:10px 0 6px">Mỗi màu nến mang một ý nguyện</div><div class="hg-pick">'+Object.keys(CL).map(function(k){return '<button type="button" data-c="'+k+'"><i class="dot" style="background:'+CL[k][0]+'"></i><b style="font-size:15px">'+CL[k][1]+'</b><small>'+CL[k][2]+'</small></button>'}).join('')+'</div><div class="hg-foot"><button type="button" class="hg-quick">Thắp nhanh</button></div>';
    body.querySelectorAll('[data-c]').forEach(function(b){b.addEventListener('click',function(){C=CL[b.dataset.c][0];scene()})});
-   q('.quick').addEventListener('click',function(){finish(pid,true,'nen',1,'')})}
+   q('.hg-quick').addEventListener('click',function(){finish(pid,true,'nen',1,'')})}
   var svg,cd,fl,hand,wind,st=0,raf=0,last=0,hold=false,prog=0,base=[200,300],drag=null,ringH,pts,lines,ci=0,hint;
   function scene(){body.innerHTML='<div class="hg-stage"></div><div class="hg-tip"></div><div class="hg-sub"></div><div class="hg-foot"><button type="button" class="skip">Bỏ qua bước này</button></div>';
    svg=el('svg',{viewBox:'0 0 360 400'},q('.hg-stage'));defs(svg);
