@@ -12,7 +12,7 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
   const dead=()=>ME.members.filter(m=>m.d);
   const surname=()=>(ME.user&&ME.user.name.trim().split(/\s+/)[0])||'';
   const isClan=()=>dead().length>=2;
-  const yrs=m=>m.d?`${m.b||'?'} – ${m.d}`:`${m.b||'?'} · còn sống`;
+  const yrs=m=>esc(m.d?`${m.b||'?'} – ${m.d}`:`${m.b||'?'} · còn sống`);  // trả về HTML đã lọc
   const hk=m=>m.houseOf&&get(m.houseOf)?m.houseOf:m.id;
   function save(){try{const hs={};dead().forEach(m=>{const k=hk(m);if(homes[k])hs[k]=homes[k]});localStorage.setItem(KEY,JSON.stringify({user:ME.user,members:ME.members,seq:ME.seq,balance,homes:hs}))}catch(e){}}
   function restore(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(!d||!d.user)return false;ME.user=d.user;ME.members=d.members||[];ME.seq=d.seq||ME.members.length+1;if(typeof d.balance==='number')setBalance(d.balance);Object.assign(homes,d.homes||{});ME.members.forEach(reg);return true}catch(e){return false}}

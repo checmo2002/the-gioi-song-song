@@ -18,7 +18,7 @@ const IC={
 };
 const goods=SS_DATA.goods;
 let balance=500,shopK='all';
-$('#recipient').innerHTML=people.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+$('#recipient').innerHTML=people.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
 function renderGoods(){
   const list=goods.filter(g=>shopK==='all'||g.k===shopK);
   let html=list.map((g,i)=>`<div class="good" style="--i:${i}"><div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${IC[g.id]}</svg></div><h3>${g.n}</h3><p>${g.t}</p><div class="foot"><span class="price">${g.p} <small>nén</small></span><button class="btn" data-g="${g.id}" style="padding:8px 14px">Dâng tặng</button></div></div>`).join('');

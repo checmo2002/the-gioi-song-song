@@ -28,14 +28,14 @@ function renderMap(){
   // nhóm các điểm trùng nhau
   const seen={};
   $('#vmapMarks').innerHTML=list.map(({p,pt})=>{const [x,y]=vp(pt[0],pt[1]);const k=x.toFixed(0)+','+y.toFixed(0);const n=seen[k]=(seen[k]||0)+1;const ox=(n-1)*7,oy=-(n-1)*3;const c=ZBY[p.c].col;const on=p.id===current;
-    return `<g class="mk${on?' on':''}" data-id="${p.id}" transform="translate(${x+ox},${y+oy})"><circle class="pulse" r="8" stroke="${c}"/><circle class="o" r="7" stroke="${c}"/><circle class="i" r="3.2" fill="${c}"/>${on?`<text font-family="Be Vietnam Pro, sans-serif" x="12" y="4">${p.name}</text>`:''}</g>`}).join('');
+    return `<g class="mk${on?' on':''}" data-id="${p.id}" transform="translate(${x+ox},${y+oy})"><circle class="pulse" r="8" stroke="${c}"/><circle class="o" r="7" stroke="${c}"/><circle class="i" r="3.2" fill="${c}"/>${on?`<text font-family="Be Vietnam Pro, sans-serif" x="12" y="4">${esc(p.name)}</text>`:''}</g>`}).join('');
   // đưa điểm đang chọn lên trên cùng
   const on=$('#vmapMarks .mk.on');if(on)on.parentNode.appendChild(on);
   const p=byId[current],g=GEO[current]||{};const pt=g[vLayer];
-  $('#vcard').innerHTML=`<span class="eyebrow">${CAT[p.c]} · ${ZBY[p.c].name}</span><h3>${p.name}</h3><div>${p.b} – ${p.d}</div>`+
-    (pt?`<div><b>${vLayer==='g'?'Mộ phần':'Quê quán'}:</b> ${vLayer==='g'?pt[2]:p.place}</div><div class="coord">${pt[0].toFixed(3)}° B, ${pt[1].toFixed(3)}° Đ · tọa độ gần đúng, dữ liệu mẫu</div><div class="row"><a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${pt[0]},${pt[1]}">Mở Google Maps</a><a class="btn ghost" href="#cong-vien" id="vToVillage">Xem trong làng</a></div>`
+  $('#vcard').innerHTML=`<span class="eyebrow">${CAT[p.c]} · ${ZBY[p.c].name}</span><h3>${esc(p.name)}</h3><div>${esc(p.b)} – ${esc(p.d)}</div>`+
+    (pt?`<div><b>${vLayer==='g'?'Mộ phần':'Quê quán'}:</b> ${esc(vLayer==='g'?pt[2]:p.place)}</div><div class="coord">${pt[0].toFixed(3)}° B, ${pt[1].toFixed(3)}° Đ · tọa độ gần đúng, dữ liệu mẫu</div><div class="row"><a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${pt[0]},${pt[1]}">Mở Google Maps</a><a class="btn ghost" href="#cong-vien" id="vToVillage">Xem trong làng</a></div>`
       :`<div><b>Mộ phần:</b> gia đình chưa tìm được. Hồ sơ đang mở công khai để đồng đội cũ có thể bổ sung thông tin.</div><div class="row"><a class="btn ghost" href="#ky-uc" data-tab="msg">Gửi thông tin</a></div>`);
-  $('#vlist').innerHTML=people.map(q=>{const gp=GEO[q.id]&&GEO[q.id][vLayer];return `<li><button data-id="${q.id}" aria-current="${q.id===current}"><i style="background:${ZBY[q.c].col}"></i><div><div>${q.name}</div><span>${gp?(vLayer==='g'?gp[2]:q.place):'Chưa tìm được mộ'}</span></div><span>${q.b}–${q.d}</span></button></li>`}).join('');
+  $('#vlist').innerHTML=people.map(q=>{const gp=GEO[q.id]&&GEO[q.id][vLayer];return `<li><button data-id="${q.id}" aria-current="${q.id===current}"><i style="background:${ZBY[q.c].col}"></i><div><div>${esc(q.name)}</div><span>${esc(gp?(vLayer==='g'?gp[2]:q.place):'Chưa tìm được mộ')}</span></div><span>${esc(q.b)}–${esc(q.d)}</span></button></li>`}).join('');
   const tv=$('#vToVillage');if(tv)tv.addEventListener('click',()=>park&&park.focus(current));
   const gt=$('#vcard [data-tab]');if(gt)gt.addEventListener('click',()=>showTab('msg'));
 }

@@ -91,6 +91,6 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 ## Phụ thuộc bên ngoài
 
 - Font Be Vietnam Pro (Google Fonts).
-- morphicons (jsdelivr), lỗi thì giữ icon cũ.
+- morphicons 1.7.1, đã tải về `js/thu-vien/` (không gọi jsdelivr nữa), lỗi thì giữ icon cũ.
 - Open-Meteo cho thời tiết, lỗi thì mô phỏng.
 - `window.claude` (chỉ có khi chạy trong claude.ai): phòng chung (`room`) để thấy người khác đang online, `downloads`, `user`. Trên tên miền riêng các tính năng này tự tắt; muốn giữ phải làm backend thay thế.
