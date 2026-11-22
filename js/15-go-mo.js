@@ -92,9 +92,10 @@
  function path(){var l=lvOf(st.tot),h='<div class="mo-path-h"><b>Lộ trình 9 phẩm sen</b><button type="button" class="mo-path-x" aria-label="Đóng">×</button></div><ol>';
   LV.forEach(function(v,i){var sk='';for(var k in SK)if(SK[k][3]===i&&i)sk=' · mõ '+SK[k][2];h+='<li class="'+(i<l?'ok':i===l?'cur':'lock')+'">'+lotus(i)+'<div><b>'+v[1]+'</b><small>'+(i<=l?(i===l?'Phẩm hiện tại':'Đã đạt'):v[0].toLocaleString('vi-VN')+' công đức')+sk+'</small></div></li>'});
   var e=q('.mo-path');e.innerHTML=h+'</ol>';e.hidden=false}
+ function esc(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
  function showHH(){var L=(window.ssPerson?ssPerson.all():[]).slice(0,6),cur=window.ssPerson&&ssPerson.get(),h='';
   if(cur)L=[cur].concat(L.filter(function(p){return p.id!==cur.id})).slice(0,6);
-  L.forEach(function(p){h+='<button type="button" data-hh="'+p.id+'">'+p.name+'</button>'});h+='<button type="button" data-hh="ls">Anh linh các liệt sĩ</button><button type="button" data-hh="cs">Tất cả chúng sinh</button>';
+  L.forEach(function(p){h+='<button type="button" data-hh="'+esc(p.id)+'">'+esc(p.name)+'</button>'});h+='<button type="button" data-hh="ls">Anh linh các liệt sĩ</button><button type="button" data-hh="cs">Tất cả chúng sinh</button>';
   hh.querySelector('div').innerHTML=h;hh.hidden=false}
  hh.addEventListener('click',function(e){var b=e.target.closest('[data-hh]');if(!b)return;st.hh[b.dataset.hh]=(st.hh[b.dataset.hh]||0)+1;save();hh.hidden=true;
   say('Đã hồi hướng cho '+b.textContent+' · '+st.hh[b.dataset.hh]+' tràng','nt');window.toast&&toast('Hồi hướng công đức cho '+b.textContent)});
