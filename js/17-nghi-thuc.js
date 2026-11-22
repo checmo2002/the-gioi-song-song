@@ -157,7 +157,7 @@
    if(n===4){cross()}
    if(n===5){stop();prayStep(pid,'nen',1,5,T)}
    loop()}
-  function next(){if(st===1){prog=1}else if(st===2){prog=1}else if(st===3){putDown()}else if(st===4){ci=4;doneCross()}}
+  function next(){if(st===1){prog=0;crackle();base=[200,300];place();go(2)}else if(st===2){prog=0;ting(800);go(3)}else if(st===3){putDown()}else if(st===4){ci=4;doneCross()}}
   function putDown(){base=[241,338];place();hint.remove();ting(700);st=9;setTimeout(function(){go(4)},700)}
   function cross(){tip('cross','Làm dấu Thánh giá','Chạm lần lượt: trán → ngực → vai trái → vai phải');q('.hg-sub').textContent='';ci=0;
    var g=el('g',{},svg);el('rect',{x:0,y:0,width:360,height:400,fill:'rgba(10,14,30,.72)'},g);

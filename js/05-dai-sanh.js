@@ -9,7 +9,10 @@
     sc.style.transformOrigin=((r.left+r.width/2-sr.left)/sr.width*100)+'% '+((r.top+r.height/2-sr.top)/sr.height*100)+'%';h.classList.add('go');
     setTimeout(function(){a._go=true;a.click();a._go=false},720);return}
   if(a){close();return}if(e.target.closest('[data-hall-close]')){close();window.setView&&setView('intro',null,false)}});
- addEventListener('keydown',function(e){if(e.key==='Escape'&&!h.hidden&&!document.querySelector('dialog[open]'))close()});
+ // Esc: các bảng (nghi thức, gõ mõ, cài đặt…) tự đóng bằng hidden ở document, chạy trước window.
+ // Đếm [hidden] trước và sau: có bảng vừa đóng thì Esc đã dùng xong, không đóng cả thế giới (#79)
+ var escAn=0;addEventListener('keydown',function(e){if(e.key==='Escape')escAn=document.querySelectorAll('[hidden]').length},true);
+ addEventListener('keydown',function(e){if(e.key==='Escape'&&!h.hidden&&!document.querySelector('dialog[open]')&&document.querySelectorAll('[hidden]').length===escAn)close()});
  // "Đại sảnh" trên thanh tab và logo mở lại đại sảnh
  document.addEventListener('click',function(e){var a=e.target.closest('a.tb[href="#dau-trang"],a.brand');if(!a||(window.ssGate&&ssGate.pending))return;e.preventDefault();e.stopPropagation();open()},true);
  addEventListener('ss-gate-done',function(){setTimeout(open,60)});
