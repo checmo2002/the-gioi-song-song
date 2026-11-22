@@ -100,7 +100,7 @@
    if(dpx>1.5){var sp=scaleAt(p.y)*st.sh*(st.map?3.0*(window.ss3dTocDo||1)*(k==='me'?1.7:1):.8)*dt,u=Math.min(1,sp/dpx),nx=p.x+dx*u,ny=p.y+dy*u;if(st.map){var g=SC[scene].grid;if(!walk(Math.floor(nx*g.w),Math.floor(ny*g.h))){if(walk(Math.floor(nx*g.w),Math.floor(p.y*g.h)))ny=p.y;else if(walk(Math.floor(p.x*g.w),Math.floor(ny*g.h)))nx=p.x}}p.x=nx;p.y=ny;p.d=dirOf(dx,dy);if(p.a!=='di'){p.a='di';p.f=0}p.f+=dt*10;p.arr=0}
    else{if(p.a==='di'){p.a=p.want||'dung';p.f=0;if(p.faceUp)p.d=4}
     if(p.a==='lay'){p.f+=dt*2.6;if(p.f>=5.99){p.a='chap';p.f=0}}}
-   if(p.me&&pend&&dpx<=1.5&&!(p.path&&p.path.length)){var q=pend;pend=null;q()}
+   if(p.me&&pend&&dpx<=1.5&&!(p.path&&p.path.length)){var q=pend;pend=null;if(!hall.hidden)q()}   // đã rời thế giới trong lúc đi: bỏ việc đang chờ (#80)
    draw(p)});
   if(st.map&&on())follow(false);
   requestAnimationFrame(tick)}
@@ -124,7 +124,7 @@ var seen={me:1},n=1,here=1;upsert('me',me,true);
  stage.addEventListener('click',function(ev){var ls=hall.querySelector('.hall-list.open');if(ls){ls.classList.remove('open');hall.classList.remove('list-open');return}if(ev.target.closest('.wh'))return;var r=stage.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width,y=(ev.clientY-r.top)/r.height,f=SC[scene].floor[O];
   if(!st.map&&y<f.t-.25)return;pend=null;goTo(x,y,'dung');var c=clampFloor(x,y),pg=document.createElement('i');pg.className='w-ping';pg.style.left=c[0]*100+'%';pg.style.top=c[1]*100+'%';fl.appendChild(pg);setTimeout(function(){pg.remove()},700)});
  // ---- chuyển cảnh
- function setScene(s,spawn){scene=s;me.s=s;hall.dataset.ws=s;clearSigns();Object.keys(av).forEach(function(k){av[k].el.remove();delete av[k]});layout();
+ function setScene(s,spawn){pend=null;scene=s;me.s=s;hall.dataset.ws=s;clearSigns();Object.keys(av).forEach(function(k){av[k].el.remove();delete av[k]});layout();
   var sp=spawn||SC[s].spawn;if(SC[s].map)sp=gridNear(sp[0],sp[1]);me.x=me.tx=sp[0]+(SC[s].map?0:(Math.random()-.5)*.06);me.y=me.ty=sp[1];me.a='dung';sync();var p=av.me;p.x=me.x;p.y=me.y;p.tx=me.tx;p.ty=me.ty;p.d=4;draw(p);if(st.map)follow(true);send()}
  // 3D: thay màn chuyển bằng đoạn phim "Bạn" đi bộ (js/26); không chiếu được thì dùng màn ảnh cũ. xong: gọi khi đã sang cảnh mới
  function phim(kieu,s,label,spawn,xong){if(trans.classList.contains('on'))return true;if(reduce||!window.ss3dPhim)return false;

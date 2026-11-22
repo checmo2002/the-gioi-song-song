@@ -22,6 +22,7 @@
   var on=box.querySelector('[aria-pressed="true"]');on&&on.scrollIntoView&&on.scrollIntoView({inline:'center',block:'nearest'})}
  function open(id){if(id)pick=id;render();box.hidden=false}
  function close(){box.hidden=true}
+ document.addEventListener('keydown',function(e){if(!box.hidden&&e.key==='Escape')close()});
  function light(){var w=cg()?'Thắp nến':'Thắp nhang';
   if(pick!=='all'&&window.ssPerson){ssPerson.select(pick);var b=document.getElementById('incBtn');b&&b.click()}
   else{window.ssBell&&ssBell();window.toast&&toast(cg()?'Đã thắp một ngọn nến cho mọi linh hồn':'Đã dâng một nén hương cho mọi vong linh')}
