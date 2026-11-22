@@ -14,7 +14,7 @@
  hall.appendChild(fx);hall.appendChild(box);hall.appendChild(cta);
  var pick='all';
  function render(){var L=window.ssPerson?ssPerson.all():[],w=cg()?'Thắp nến':'Thắp nhang';
-  cta.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 21V10M12 21V8M15 21V10M5 21h14"/></svg>'+w;
+  cta.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">'+(cg()?'<path d="M9 21h6M10 21V11h4v10"/><path d="M12 3c1.6 2 2 3.3 2 4.3a2 2 0 0 1-4 0c0-1 .4-2.3 2-4.3z"/>':'<path d="M9 21V10M12 21V8M15 21V10M5 21h14"/>')+'</svg>'+w;
   box.innerHTML='<button type="button" class="rit-x" aria-label="Đóng">×</button><h3>'+(cg()?'Thắp nến cầu nguyện':'Dâng hương')+'</h3><div class="rit-ppl">'
    +'<button type="button" class="rit-p" data-rp="all" aria-pressed="'+(pick==='all')+'"><i style="--c:#7A5A2A">✦</i>'+(cg()?'Mọi linh hồn':'Mọi vong linh')+'</button>'
    +L.map(function(p){var ini=p.name.trim().split(/\s+/).pop()[0];return '<button type="button" class="rit-p" data-rp="'+esc(p.id)+'" aria-pressed="'+(pick===p.id)+'"><i style="--c:'+(COL[p.c]||'#8B5A2B')+'">'+esc(ini)+'</i>'+esc(p.name.trim().split(/\s+/).slice(-2).join(' '))+'</button>'}).join('')
