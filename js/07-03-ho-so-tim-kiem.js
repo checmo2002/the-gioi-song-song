@@ -6,7 +6,7 @@ function houseNames(id){const k=(byId[id]&&byId[id].houseOf)||id;return people.f
 function renderResults(){
   const q=$('#q').value.trim().toLowerCase();
   const list=people.filter(p=>!p.mine&&(catF==='all'||p.c===catF)&&(!q||(p.name+' '+p.place).toLowerCase().includes(q)));
-  $('#results').innerHTML=list.map(p=>`<li><button data-id="${p.id}" aria-current="${p.id===current}"><span class="n">${p.name}</span><span class="m">${p.b} – ${p.d} · ${p.place}</span><span class="c">${CAT[p.c]}</span></button></li>`).join('')||'<li style="padding:8px 10px;color:var(--ink-soft);font-size:13px">Không tìm thấy. Thử tên khác hoặc tạo hồ sơ mới.</li>';
+  $('#results').innerHTML=list.map(p=>`<li><button data-id="${p.id}" aria-current="${p.id===current}"><span class="n">${esc(p.name)}</span><span class="m">${esc(p.b)} – ${esc(p.d)} · ${esc(p.place)}</span><span class="c">${CAT[p.c]}</span></button></li>`).join('')||'<li style="padding:8px 10px;color:var(--ink-soft);font-size:13px">Không tìm thấy. Thử tên khác hoặc tạo hồ sơ mới.</li>';
   park&&park.filter(new Set(list.map(p=>p.id)));
 }
 $('#q').addEventListener('input',renderResults);
@@ -20,11 +20,11 @@ function renderProfile(){
   $('#pBio').textContent=p.bio||p.ch.map(c=>c[2]).join(' ');
   $('#lmOld').classList.toggle('no-helmet',p.c==='nt');$('#lmOldCap').textContent='Ảnh gốc · '+(p.c==='nt'?'ảnh cũ gia đình':p.ch[0][0]);
   const i=people.indexOf(p),pv=people[(i+people.length-1)%people.length],nx=people[(i+1)%people.length];$('#lmPrev').textContent='« '+pv.name;$('#lmPrev').dataset.id=pv.id;$('#lmNext').textContent=nx.name+' »';$('#lmNext').dataset.id=nx.id;
-  $('#pFacts').innerHTML=p.facts.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
-  $('#pChapters').innerHTML=p.ch.map(([y,h,t])=>`<div class="chap"><div class="y">${y}</div><div><h3>${h}</h3><p>${t}</p></div></div>`).join('');
-  $('#pLetter').innerHTML=`${p.letter}<cite>${p.cite}</cite>`;
+  $('#pFacts').innerHTML=p.facts.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+  $('#pChapters').innerHTML=p.ch.map(([y,h,t])=>`<div class="chap"><div class="y">${esc(y)}</div><div><h3>${esc(h)}</h3><p>${esc(t)}</p></div></div>`).join('');
+  $('#pLetter').innerHTML=`${esc(p.letter)}<cite>${esc(p.cite)}</cite>`;
   $('#incCount').textContent=fmt(p.inc);$('#incNote').textContent='';$('#incBtn').classList.toggle('lit',!!p.lit);
-  $('#storyText').innerHTML=p.story.map(s=>`<p>${s}</p>`).join('');
+  $('#storyText').innerHTML=p.story.map(s=>`<p>${esc(s)}</p>`).join('');
   $('#parkCard').classList.remove('hide');$('#pcCat').textContent=CAT[p.c];$('#pcName').textContent=p.name;$('#pcMeta').textContent=`${p.b} – ${p.d} · ${p.place}`;
   $('#homeTag').textContent='Ngôi nhà của '+houseNames(p.id);
   $('#recipient').value=p.id;
@@ -51,7 +51,8 @@ function select(id,fly){
 /* ---------------- Ký ức ---------------- */
 const notes=SS_DATA.notes;
 function renderWall(){const n=notes[current]||[];$('#wall').innerHTML=n.length?n.map(([t,a,d])=>`<div class="note"><p>${esc(t)}</p><footer>${esc(a)} · ${d}</footer></div>`).join(''):'<p style="color:var(--ink-soft)">Chưa có lời nhắn nào. Hãy là người đầu tiên.</p>'}
-function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+// mọi chữ do người dùng nhập (tên, quê, năm…) phải qua esc trước khi vào innerHTML
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 $('#msgForm').addEventListener('submit',e=>{e.preventDefault();const t=new Date();(notes[current]||(notes[current]=[])).unshift([$('#mText').value,$('#mName').value,t.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'})]);$('#mText').value='';renderWall();toast('Đã gửi lời nhắn tới '+byId[current].name)});
 function showTab(p){$$('#memTabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p===p));$$('[data-pane]').forEach(d=>d.hidden=d.dataset.pane!==p)}
 $('#memTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showTab(b.dataset.p)});

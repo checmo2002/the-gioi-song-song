@@ -65,7 +65,7 @@
  function drawAnh(){var a=hall.querySelector('.w-anh');   // hall: thế giới 3D (js/26) chuyển di ảnh sang lớp riêng
  if(scene!=='nha'){a&&a.remove();return}if(!a){a=document.createElement('div');a.className='w-anh';stage.insertBefore(a,fl)}
   var r=SC.nha.anh[O],p=window.ssPerson&&ssPerson.get();a.style.left=r[0]*100+'%';a.style.top=r[1]*100+'%';a.style.width=(r[2]-r[0])*100+'%';a.style.height=(r[3]-r[1])*100+'%';
-  var C={ls:'#8B3A1E',tb:'#2F5D8A',dh:'#4E7A3A',nt:'#7A4A8C'};a.style.setProperty('--c',p&&C[p.c]||'#8B5A2B');a.innerHTML=p?'<i>'+String(p.name).trim().split(/\s+/).pop()[0]+'</i>':'';a.title=p?p.name:''}
+  var C={ls:'#8B3A1E',tb:'#2F5D8A',dh:'#4E7A3A',nt:'#7A4A8C'};a.style.setProperty('--c',p&&C[p.c]||'#8B5A2B');a.innerHTML='';if(p){var i=document.createElement('i');i.textContent=String(p.name).trim().split(/\s+/).pop()[0]||'';a.appendChild(i)};a.title=p?p.name:''}
  function drawHot(){var c=SC[scene];hot.innerHTML='';var list=c.hot[O].slice();
   if(c.map&&c.slots&&window.ssPerson){var used={};ssPerson.all().forEach(function(p){var sl=c.slots[p.c];if(!sl)return;used[p.c]=used[p.c]||0;var q=sl[used[p.c]++];if(!q)return;list.push({x:q.top[0],y:q.top[1],id:'p:'+p.id,t:p.name,s:p.c==='ls'?'Mộ liệt sĩ':'Nhà tưởng niệm',pn:1})})}
   list.forEach(function(h){var a=document.createElement(h.id?'button':'a');a.className='wh'+(h.main?' main':'')+(h.pn?' pn':'')+(h.z?' zn':'');if(h.id)a.type='button',a.dataset.w=h.id;else a.href=h.h;if(h.cal)a.setAttribute('data-open-cal','');
