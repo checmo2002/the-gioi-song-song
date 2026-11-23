@@ -48,7 +48,8 @@ Gói miễn phí Workers: 100.000 lượt yêu cầu và 13.000 GB-giây mỗi n
 - Mỗi kết nối tính 1 lượt. Tin nhận vào tính 20 tin = 1 lượt. Tin gửi đi không tính. Mỗi lần alarm (30 giây một lần khi còn người) tính 1 lượt, khoảng 2.900 lượt/ngày.
 - Người đứng yên: trang gửi 1 tin/15 giây, khoảng 290 lượt/ngày.
 - Người đi lại liên tục ở nhịp tối đa (5 tin/giây): 21.600 lượt/ngày. Gói miễn phí đủ cho khoảng 100 giờ đi lại liên tục mỗi ngày, cộng dồn mọi người.
-- Một người cố phá (2 kết nối, sát nhịp đuổi): khoảng 43.000 lượt/ngày. Chưa đủ làm cạn gói miễn phí một mình, nhưng nhiều tài khoản phá cùng lúc thì có thể. Khi đó cần bật gói trả phí hoặc chặn tài khoản (chưa làm).
+- Một người cố phá (2 kết nối, sát nhịp đuổi): khoảng 43.000 lượt/ngày. Chưa đủ làm cạn gói miễn phí một mình, nhưng nhiều tài khoản phá cùng lúc thì có thể. Khi đó cần bật gói trả phí hoặc chặn tài khoản (chưa làm). Hai tài khoản gửi sát nhịp đuổi suốt cả ngày (khoảng 50.000 lượt/tài khoản) là đủ làm cạn gói miễn phí. Nếu xảy ra: thêm hạn mức tin mỗi ngày cho mỗi tài khoản.
+- Tên: bộ lọc từ xấu luôn có cách lách. Tên có chữ ngoài bảng Latin/tiếng Việt hiện thành "Khách viếng". Sau này nên có nút ẩn hoặc báo cáo người khác.
 - Vượt hạn mức thì kết nối phòng chung lỗi tới 7 giờ sáng (0 giờ UTC). Trang vẫn chạy, mỗi người đi một mình.
 
 ## Đưa lên mạng (làm một lần)

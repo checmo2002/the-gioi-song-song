@@ -100,7 +100,9 @@ async function ve(env, req, ben) {
 const XAU = new Set(['đụ', 'địt', 'đit', 'lồn', 'lon', 'cặc', 'cac', 'buồi', 'đĩ', 'đéo', 'deo', 'đm', 'dm', 'đcm', 'dcm', 'vl', 'vcl', 'clm', 'cc', 'loz', 'fuck', 'shit', 'bitch',
   'admin', 'quantri', 'quảntrị', 'mod', 'moderator', 'songsong', 'bqt']);
 export function tenGoi(ten) {
-  const w = String(ten || '').normalize('NFC').replace(/[^\p{L}\p{N} ]/gu, ' ').trim().split(/\s+/), g = w.pop() || '', ca = w.concat(g).join('').toLowerCase();
+  const t = String(ten || '').normalize('NFC');
+  if (/[^\P{L}\p{Script=Latin}]/u.test(t)) return 'Khách viếng';   // chữ ngoài bảng Latin/tiếng Việt (ví dụ "а" Kirin giả "a")
+  const w = t.replace(/[^\p{L}\p{N}\s]/gu, '').trim().split(/\s+/), g = w.pop() || '', ca = w.concat(g).join('').toLowerCase();   // "L.ồ.n" → "Lồn"
   if (!g || XAU.has(g.toLowerCase()) || /admin|quảntrị|quantri|songsong/.test(ca)) return 'Khách viếng';
   return g.slice(0, 20);
 }
