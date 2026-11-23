@@ -44,7 +44,8 @@ for f in files:
 P = '"><img src=x onerror="window.__xss=(window.__xss||0)+1"><svg onload="window.__xss=(window.__xss||0)+1">'
 ME = {'user': {'name': 'Nguyễn ' + P, 'place': P, 'phone': '0900000000'},
       'members': [{'id': 'xss0', 'self': True, 'name': 'Nguyễn ' + P, 'b': '1985'},
-                  {'id': 'xss1', 'name': 'Nguyễn Văn ' + P, 'b': P, 'd': '1972', 'ls': True, 'g': 'm'},
+                  {'id': 'xss1', 'name': 'Nguyễn Văn ' + P, 'b': P, 'd': '1972', 'ls': True, 'g': 'm',
+                   'huy': P, 'tu': P, 'thuy': P, 'chi': P, 'an': P, 'nm': '5/3', 'nmAl': True, 'spouse': 'xss2', 'sp2': ['xss3']},
                   {'id': 'xss2', 'name': P, 'b': '1930', 'd': P, 'g': 'f'},
                   {'id': 'xss3', 'name': 'Còn sống ' + P, 'b': '1990'}],
       'seq': 4, 'balance': 100}
@@ -64,6 +65,8 @@ with sync_playwright() as p:
         pg.wait_for_timeout(1500)
         for t in TRANG:
             pg.evaluate(f"location.hash='{t}'"); pg.wait_for_timeout(500)
+            if t == 'ca-nhan':  # mở bảng chi tiết gia phả (tên húy, chi, nơi an táng, vợ/chồng thứ)
+                pg.evaluate("var n=document.querySelector('.tn[data-id=\"xss1\"]');n&&n.dispatchEvent(new MouseEvent('click',{bubbles:true}))"); pg.wait_for_timeout(300)
             if t in ('ho-so', 'ban-do'):
                 for pid in ('xss1', 'xss2'):
                     pg.evaluate(f"window.ssPerson&&ssPerson.select('{pid}')"); pg.wait_for_timeout(300)

@@ -48,7 +48,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `07-09-vong-ky-uc.js` | Vòng ký ức ảnh/video quay quanh tâm |
 | `07-10-den-troi-menu.js` | Đèn trời sau lời mời, menu điện thoại |
 | `07-11-am-thanh.js` | Âm thanh thanh tịnh (Web Audio) |
-| `07-12-trang-ca-nhan.js` | Ảnh chân dung, trang cá nhân: gia phả, làng dòng họ, ví nén |
+| `07-12-trang-ca-nhan.js` | Ảnh chân dung, trang cá nhân: gia phả, làng dòng họ, ví nén. Gia phả kiểu Việt: bố + mẹ (`parent`, `mother`), nhiều vợ/chồng (`spouse` là người đầu, `sp2` là người thứ), đời tự tính, chi/ngành, con thứ, con nuôi, tên húy/tự/thụy hiệu, ngày sinh/mất (`ns`, `nm`, `nmAl` = âm lịch), ngày giỗ âm lịch tự tính (`ssGio(d,m)` cho lịch vạn niên), nơi an táng; sửa thông tin từng người |
 | `07-13-khoi-tao.js` | Khởi tạo, chuyển động toàn trang |
 | `08-icon-bien-hinh.js` | Icon biến hình (morphicons, tải từ jsdelivr) |
 | `09-trang-nguoi-than.js` | Trang Người thân |

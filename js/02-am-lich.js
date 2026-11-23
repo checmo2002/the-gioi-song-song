@@ -114,7 +114,7 @@ return{jdFromDate:jdFromDate,jdToDate:jdToDate,toLunar:toLunar,canChiNgay:canChi
   SOL={'1/1':'Tết Dương lịch','30/4':'Ngày Giải phóng miền Nam','1/5':'Quốc tế Lao động','2/9':'Quốc khánh','27/7':'Ngày Thương binh – Liệt sĩ','22/12':'Ngày thành lập Quân đội'},
   LUN={'1/1':'Tết Nguyên đán','2/1':'Mùng 2 Tết','3/1':'Mùng 3 Tết','15/1':'Rằm tháng Giêng','10/3':'Giỗ Tổ Hùng Vương','15/4':'Lễ Phật đản','5/5':'Tết Đoan ngọ','15/7':'Lễ Vu Lan','15/8':'Tết Trung thu','23/12':'Ông Công ông Táo'};
  function vnToday(){var t=new Date(Date.now()+7*36e5);return[t.getUTCDate(),t.getUTCMonth()+1,t.getUTCFullYear()]}
- function info(d,m,y){var l=LV.toLunar(d,m,y),f=[];if(SOL[d+'/'+m])f.push(SOL[d+'/'+m]);if(!l.leap&&LUN[l.d+'/'+l.m])f.push(LUN[l.d+'/'+l.m]);
+ function info(d,m,y){var l=LV.toLunar(d,m,y),f=[];if(SOL[d+'/'+m])f.push(SOL[d+'/'+m]);if(!l.leap&&LUN[l.d+'/'+l.m])f.push(LUN[l.d+'/'+l.m]);if(!l.leap&&window.ssGio)f=f.concat(ssGio(l.d,l.m));
   var tk=LV.tietKhi(l.jd);if(tk==='Thanh minh'&&LV.tietKhi(l.jd-1)!=='Thanh minh')f.push('Tiết Thanh minh');return{l:l,f:f,tk:tk}}
  function mName(l){return(l.m===1?'Giêng':l.m===12?'Chạp':l.m)+(l.leap?' (nhuận)':'')}
  function lText(l){return(l.d<=10?'Mùng ':'')+l.d+' tháng '+mName(l)}
@@ -128,15 +128,16 @@ return{jdFromDate:jdFromDate,jdToDate:jdToDate,toLunar:toLunar,canChiNgay:canChi
   $('#lvnLunar').textContent=lText(l);$('#lvnLunarY').textContent='Năm '+LV.canChiNam(l.y);
   var fe=$('#lvnFest');fe.hidden=!x.f.length;fe.textContent=x.f.join(' · ');
   $('#lvnCCd').textContent=LV.canChiNgay(jd);$('#lvnCCm').textContent=LV.canChiThang(l.m,l.y);$('#lvnTK').textContent=x.tk;$('#lvnHD').textContent=LV.gioHD(jd).join(', ')}
+ function E(x){return String(x).replace(/[&<>"']/g,function(c){return '&#'+c.charCodeAt(0)+';'})}   // tên ngày giỗ do người dùng nhập
  function drawGrid(){var m=view[0],y=view[1],first=LV.jdFromDate(1,m,y),start=first-((first+1)%7+6)%7,dim=LV.jdFromDate(1,m%12+1,m===12?y+1:y)-first,end=start+Math.ceil((first-start+dim)/7)*7,tj=LV.jdFromDate(t[0],t[1],t[2]),sj=LV.jdFromDate(sel[0],sel[1],sel[2]),h='';
   ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(w,i){h+='<div class="wd'+(i===6?' su':'')+'" role="columnheader">'+w+'</div>'});
   for(var j=start;j<end;j++){var s=LV.jdToDate(j),x=info(s[0],s[1],s[2]),l=x.l,c=[];
    if(s[1]!==m)c.push('out');if((j+1)%7===0)c.push('su');if(l.d===1)c.push('m1');if(l.d===15)c.push('m15');if(x.f.length)c.push('fest');if(j===tj)c.push('now');
-   h+='<button type="button" class="'+c.join(' ')+'" data-jd="'+j+'" aria-pressed="'+(j===sj)+'" aria-label="'+WD[(j+1)%7]+' '+s[0]+'/'+s[1]+', âm lịch '+lText(l)+(x.f.length?', '+x.f.join(', '):'')+'"><b>'+s[0]+'</b><small>'+(l.d===1||l.d===15?'<svg viewBox="-12 -12 24 24">'+moon(l.d,11)+'</svg>':'')+(l.d===1?l.d+'/'+l.m:l.d)+'</small></button>'}
+   h+='<button type="button" class="'+c.join(' ')+'" data-jd="'+j+'" aria-pressed="'+(j===sj)+'" aria-label="'+WD[(j+1)%7]+' '+s[0]+'/'+s[1]+', âm lịch '+lText(l)+(x.f.length?', '+E(x.f.join(', ')):'')+'"><b>'+s[0]+'</b><small>'+(l.d===1||l.d===15?'<svg viewBox="-12 -12 24 24">'+moon(l.d,11)+'</svg>':'')+(l.d===1?l.d+'/'+l.m:l.d)+'</small></button>'}
   $('#lvnGrid').innerHTML=h;$('#lvnTitle').textContent='Tháng '+m+', '+y}
  function drawNext(){var j0=LV.jdFromDate(t[0],t[1],t[2]),out=[],seen={};
   for(var j=j0+1;j<j0+400&&out.length<3;j++){var s=LV.jdToDate(j),x=info(s[0],s[1],s[2]),l=x.l,name=x.f[0]||(l.d===1?'Mùng 1 tháng '+mName(l):l.d===15?'Rằm tháng '+mName(l):'');
-   if(!name||seen[name])continue;if(out.length>=2&&!x.f.length)continue;seen[name]=1;out.push('<li><span><b>'+name+'</b><small>'+WD[(j+1)%7]+', '+s[0]+'/'+s[1]+'/'+s[2]+' · âm '+l.d+'/'+l.m+'</small></span><em>còn '+(j-j0)+' ngày</em></li>')}
+   if(!name||seen[name])continue;if(out.length>=2&&!x.f.length)continue;seen[name]=1;out.push('<li><span><b>'+E(name)+'</b><small>'+WD[(j+1)%7]+', '+s[0]+'/'+s[1]+'/'+s[2]+' · âm '+l.d+'/'+l.m+'</small></span><em>còn '+(j-j0)+' ngày</em></li>')}
   $('#lvnNext').innerHTML=out.join('')}
  function open(){$('#lvnGo').textContent=document.documentElement.classList.contains('hall-on')?'Quay lại':'Vào Thế Giới Song Song';t=vnToday();drawNext();drawGrid();showDay(sel[0],sel[1],sel[2]);if(!dlg.open)dlg.showModal()}
  $('#lvnGrid').addEventListener('click',function(e){var b=e.target.closest('button[data-jd]');if(!b)return;var s=LV.jdToDate(+b.dataset.jd);sel=s;if(s[1]!==view[0]){view=[s[1],s[2]]}drawGrid();showDay(s[0],s[1],s[2])});
