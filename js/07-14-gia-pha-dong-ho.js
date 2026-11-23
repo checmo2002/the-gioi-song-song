@@ -1,4 +1,4 @@
-/* Gia phả dòng họ trên máy chủ (functions/api, docs/gia-pha-dong-ho.md): tài khoản máy chủ, lập / vào dòng họ bằng mã mời,
+/* Gia phả dòng họ trên máy chủ (functions/api, docs/gia-pha-dong-ho.md): đăng nhập Firebase (gọi thẳng REST của Google, không nạp thư viện), lập / vào dòng họ bằng mã mời,
    trưởng họ và người được giao sửa thẳng, thành viên gửi đề xuất chờ duyệt. Không có máy chủ (mở bằng http.server) thì ẩn cả khung. */
 (function(){
   const host=$('[data-mp="tree"]');if(!host||!window.ssMe)return;
@@ -6,8 +6,21 @@
   let toi=null,ds=[],dh=null,nhap=false,mo='';   // dh: {id,ten,vai,phien_ban}; nhap: thành viên có thay đổi chưa gửi; mo: phần đang mở (de-xuat, thanh-vien, moi)
   try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){dh=s.dh||null;nhap=!!s.nhap}}catch(e){}
   const luu=()=>{try{localStorage.setItem(KEY,JSON.stringify({dh,nhap}))}catch(e){}};
+  // ---------- Firebase Authentication (REST) ----------
+  let CH=null,FB=null;   // CH: {apiKey, projectId} từ máy chủ; FB: {rt mã làm mới, id mã đăng nhập, het, email}
+  try{FB=JSON.parse(localStorage.getItem('ss-fb')||'null')}catch(e){}
+  const luuFb=()=>{try{FB?localStorage.setItem('ss-fb',JSON.stringify(FB)):localStorage.removeItem('ss-fb')}catch(e){}};
+  const VIET={EMAIL_EXISTS:'Email này đã có tài khoản. Hãy đăng nhập.',INVALID_LOGIN_CREDENTIALS:'Sai email hoặc mật khẩu.',INVALID_PASSWORD:'Sai email hoặc mật khẩu.',EMAIL_NOT_FOUND:'Sai email hoặc mật khẩu.',
+    INVALID_EMAIL:'Email chưa đúng.',MISSING_PASSWORD:'Hãy nhập mật khẩu.',USER_DISABLED:'Tài khoản này đã bị khoá.',TOO_MANY_ATTEMPTS_TRY_LATER:'Thử quá nhiều lần. Hãy đợi ít phút rồi thử lại.'};
+  const viet=m=>VIET[(m||'').split(' ')[0]]||(/WEAK_PASSWORD/.test(m||'')?'Mật khẩu cần từ 6 ký tự.':'Chưa đăng nhập được. Hãy thử lại.');
+  async function fb(lenh,body){let r,d={};try{r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:'+lenh+'?key='+encodeURIComponent(CH.apiKey),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});d=await r.json()}catch(e){throw new Error('Không kết nối được máy chủ đăng nhập. Hãy kiểm tra mạng.')}
+    if(!r.ok)throw new Error(viet(d.error&&d.error.message));return d}
+  const nhanMa=d=>{FB={rt:d.refreshToken,id:d.idToken,het:Date.now()+(+d.expiresIn||3600)*1e3,email:d.email};luuFb()};
+  async function maDn(moi){if(!FB||!CH)return null;if(!moi&&FB.het-6e4>Date.now())return FB.id;   // mã đăng nhập sống 1 giờ: hết thì xin mã mới bằng mã làm mới
+    try{const r=await fetch('https://securetoken.googleapis.com/v1/token?key='+encodeURIComponent(CH.apiKey),{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(FB.rt)});
+      if(!r.ok){FB=null;luuFb();return null}const d=await r.json();FB={rt:d.refresh_token,id:d.id_token,het:Date.now()+(+d.expires_in||3600)*1e3,email:FB.email};luuFb();return FB.id}catch(e){return FB.id}}
   const box=document.createElement('section');box.className='dh-box';box.hidden=true;box.setAttribute('aria-label','Gia phả của cả dòng họ');host.insertBefore(box,host.firstChild);
-  async function api(m,url,body){try{const r=await fetch('/api/'+url,{method:m,credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});
+  async function api(m,url,body){try{const h=body?{'Content-Type':'application/json'}:{},t=await maDn();if(t)h.Authorization='Bearer '+t;const r=await fetch('/api/'+url,{method:m,headers:h,body:body?JSON.stringify(body):undefined});
     let d={};try{d=await r.json()}catch(e){}return{st:r.status,d}}catch(e){return{st:0,d:{loi:'Không kết nối được máy chủ. Hãy kiểm tra mạng.'}}}}
   const ME=()=>ssMe.tree();
   // cây gửi lên: bỏ đồ riêng của máy, gắn người "là tôi" với tài khoản
@@ -32,9 +45,12 @@
   const nut=(k,t,cls)=>`<button type="button" class="btn${cls?' '+cls:''}" data-dh="${k}">${t}</button>`;
   async function ve(){if(box.hidden)return;let h='';
     if(!toi){const u=ME().user||{};h=`<details class="dh-dn"${mo==='dn'?' open':''}><summary><b>Gia phả của cả dòng họ</b><span>Lưu gia phả lên máy chủ để người trong họ cùng xem và bổ sung. Trưởng họ duyệt mọi thay đổi.</span></summary>
-      <form class="me-form dh-form" novalidate><div class="row2"><label>Số điện thoại hoặc email<input name="lh" autocomplete="username" maxlength="80" value="${esc(u.contact||'')}"></label>
-      <label>Mật khẩu máy chủ<input name="mk" type="password" autocomplete="current-password" maxlength="128" placeholder="Từ 8 ký tự"></label></div>
-      <p class="err" role="alert"></p><div class="me-act">${nut('dang-nhap','Đăng nhập')}${nut('dang-ky','Tạo tài khoản','ghost')}</div></form></details>`}
+      <form class="me-form dh-form" novalidate><div class="row2"><label>Email<input name="em" type="email" autocomplete="email" maxlength="120" value="${esc(/@/.test(u.contact||'')?u.contact:'')}"></label>
+      <label>Mật khẩu<input name="mk" type="password" autocomplete="current-password" maxlength="128" placeholder="Từ 6 ký tự"></label></div>
+      <p class="err" role="alert"></p><div class="me-act">${nut('dang-nhap','Đăng nhập')}${nut('dang-ky','Tạo tài khoản','ghost')}${nut('quen','Quên mật khẩu','ghost dh-nho')}</div>
+      <p class="dh-chu">Đăng nhập do Google Firebase đảm nhận. Song Song không lưu mật khẩu của bạn.</p></form></details>`}
+    else if(!toi.xac_minh){h=`<div class="dh-hd"><b>Xác nhận email</b><span>Song Song đã gửi thư xác nhận tới <b>${esc(FB&&FB.email||'')}</b>. Hãy bấm đường link trong thư, rồi bấm "Tôi đã xác nhận".</span></div>
+      <div class="me-act dh-hang">${nut('da-xac-nhan','Tôi đã xác nhận')}${nut('gui-lai','Gửi lại thư','ghost')}${nut('dang-xuat','Đăng xuất','ghost')}</div>`}
     else if(!dh){const u=ME().user||{},ho=(u.name||'').trim().split(/\s+/)[0]||'';
       h=`<div class="dh-hd"><b>Gia phả của cả dòng họ</b><span>Đã đăng nhập máy chủ: ${esc(toi.ten)} · ${nut('dang-xuat','Đăng xuất','ghost dh-nho')}</span></div>
       ${ds.length?`<div class="dh-ds">${ds.map(d=>`<button type="button" class="dh-dong" data-mo="${esc(d.id)}"><b>${esc(d.ten)}</b><small>${VAI[d.vai]||''}</small></button>`).join('')}</div>`:''}
@@ -53,7 +69,7 @@
   async function phan(k){mo=k;const el=box.querySelector('.dh-them');if(!el)return;el.textContent='Đang tải…';
     if(k==='moi'){const r=await api('POST','dong-ho/'+dh.id+'/loi-moi',{});if(r.st!==201){el.textContent=r.d.loi||'Chưa tạo được mã.';return}
       el.innerHTML=`<p class="dh-ma">Mã mời: <b>${esc(r.d.ma)}</b> · dùng được tới ${new Date(r.d.het).toLocaleDateString('vi-VN')}</p><p>Gửi mã này cho người trong họ. Họ mở trang Gia đình → Gia phả, đăng nhập máy chủ rồi nhập mã.</p>`;
-      try{navigator.clipboard&&navigator.clipboard.writeText(r.d.ma)}catch(e){}return}
+      try{navigator.clipboard.writeText(r.d.ma).catch(()=>{})}catch(e){}return}
     if(k==='thanh-vien'){const r=await api('GET','dong-ho/'+dh.id+'/thanh-vien');if(r.st!==200){el.textContent=r.d.loi||'Chưa tải được.';return}
       el.innerHTML='<ul class="dh-tv">'+r.d.thanh_vien.map(t=>`<li><span>${esc(t.ten)}</span>${dh.vai==='truong'&&t.nguoi_id!==toi.id?`<select data-vai="${esc(t.nguoi_id)}" aria-label="Vai của ${esc(t.ten)}">${Object.keys(VAI).map(v=>`<option value="${v}"${v===t.vai?' selected':''}>${VAI[v]}</option>`).join('')}</select>`:`<small>${VAI[t.vai]}</small>`}</li>`).join('')+'</ul>';return}
     if(k==='de-xuat'){const r=await api('GET','dong-ho/'+dh.id+'/de-xuat');if(r.st!==200){el.textContent=r.d.loi||'Chưa tải được.';return}
@@ -64,8 +80,11 @@
         ${dh.vai!=='thanh-vien'?`<div class="me-act"><button class="btn" data-duyet="${esc(x.id)}">Duyệt</button><button class="btn ghost" data-tuchoi="${esc(x.id)}">Từ chối</button></div>`:''}</li>`).join('')+'</ul>'}}
 
   async function vao(k,f,err){const v=n=>(f.elements[n]&&f.elements[n].value||'').trim();
-    if(k==='dang-nhap'||k==='dang-ky'){const u=ME().user||{},r=await api('POST',k,{ten:u.name||'Bạn',lien_he:v('lh'),mat_khau:f.elements.mk.value});
-      if(r.st!==200&&r.st!==201){err.textContent=r.d.loi||'Chưa đăng nhập được.';return}toi=r.d.nguoi;await batDau();return}
+    if(k==='dang-nhap'||k==='dang-ky'||k==='quen'){const em=v('em');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){err.textContent='Hãy nhập email.';return}
+      try{if(k==='quen'){await fb('sendOobCode',{requestType:'PASSWORD_RESET',email:em});err.textContent='Nếu email này có tài khoản, Google đã gửi thư đặt lại mật khẩu. Hãy xem hộp thư.';return}
+        nhanMa(await fb(k==='dang-ky'?'signUp':'signInWithPassword',{email:em,password:f.elements.mk.value,returnSecureToken:true}));
+        if(k==='dang-ky'){await fb('sendOobCode',{requestType:'VERIFY_EMAIL',idToken:FB.id});const u=ME().user;if(u&&u.name)await api('PUT','toi',{ten:u.name})}}
+      catch(x){err.textContent=x.message;return}await batDau();return}
     if(k==='lap'){if(!v('ten')){err.textContent='Hãy đặt tên dòng họ.';return}const r=await api('POST','dong-ho',{ten:v('ten'),cay:cayRa()});
       if(r.st!==201){err.textContent=r.d.loi||'Chưa lập được dòng họ.';return}dh={id:r.d.id,ten:r.d.ten,vai:r.d.vai,phien_ban:r.d.phien_ban};nhap=false;luu();toast('Đã lập '+r.d.ten+'. Hãy tạo mã mời gửi người trong họ.');await tai();return}
     if(k==='vao'){const r=await api('POST','tham-gia',{ma:v('ma')});if(r.st!==200){err.textContent=r.d.loi||'Chưa vào được.';return}
@@ -80,8 +99,10 @@
     if(b.dataset.mo){dh={id:b.dataset.mo,ten:b.querySelector('b').textContent};nhap=false;luu();await tai();return}
     if(b.dataset.duyet||b.dataset.tuchoi){b.disabled=true;const id=b.dataset.duyet||b.dataset.tuchoi,r=await api('POST','dong-ho/'+dh.id+'/de-xuat/'+id+'/'+(b.dataset.duyet?'duyet':'tu-choi'),{});
       toast(r.st===200?(b.dataset.duyet?'Đã duyệt. Gia phả chung đã cập nhật.':'Đã từ chối đề xuất.'):(r.d.loi||'Chưa xử lý được.'));await tai();return}
-    if(!k)return;if(f&&['dang-nhap','dang-ky','lap','vao','gui'].includes(k)){e.preventDefault();err.textContent='';b.disabled=true;try{await vao(k,f,err)}finally{b.disabled=false}return}
-    if(k==='dang-xuat'){await api('POST','dang-xuat',{});toi=null;dh=null;nhap=false;luu();ve();return}
+    if(!k)return;if(f&&['dang-nhap','dang-ky','quen','lap','vao','gui'].includes(k)){e.preventDefault();err.textContent='';b.disabled=true;try{await vao(k,f,err)}finally{b.disabled=false}return}
+    if(k==='dang-xuat'){FB=null;luuFb();toi=null;dh=null;nhap=false;luu();ve();return}
+    if(k==='da-xac-nhan'){await maDn(true);await batDau();if(!toi||!toi.xac_minh)toast('Chưa thấy email được xác nhận. Hãy bấm đường link trong thư trước.');return}
+    if(k==='gui-lai'){try{await fb('sendOobCode',{requestType:'VERIFY_EMAIL',idToken:await maDn()});toast('Đã gửi lại thư xác nhận.')}catch(x){toast(x.message)}return}
     if(k==='roi'){dh=null;nhap=false;mo='';luu();ve();toast('Đã ngắt dòng họ khỏi máy này. Gia phả trên máy vẫn giữ nguyên.');return}
     if(k==='bo'){nhap=false;luu();await tai();return}
     if(k==='tai'){await tai();return}
@@ -89,8 +110,10 @@
   box.addEventListener('submit',e=>e.preventDefault());
   box.addEventListener('change',async e=>{const s=e.target.closest('[data-vai]');if(!s)return;const r=await api('POST','dong-ho/'+dh.id+'/vai',{nguoi_id:s.dataset.vai,vai:s.value});toast(r.st===200?'Đã đổi vai.':(r.d.loi||'Chưa đổi được.'))});
 
-  async function batDau(){const r=await api('GET','toi');if(r.st!==200||!r.d||!('nguoi' in r.d)){box.hidden=true;return}   // không có máy chủ: chạy như trước
+  async function batDau(){if(!CH){const c=await api('GET','cau-hinh');if(c.st!==200||!c.d.apiKey){box.hidden=true;return}CH=c.d}   // không có máy chủ: chạy như trước
+    const r=await api('GET','toi');if(r.st!==200||!r.d||!('nguoi' in r.d)){box.hidden=true;return}
     box.hidden=false;toi=r.d.nguoi;ds=r.d.dong_ho||[];
-    if(dh&&toi){const c=ds.find(d=>d.id===dh.id);if(c){dh.vai=c.vai;await tai();return}dh=null;luu()}ve()}
+    if(dh&&toi&&toi.xac_minh){const c=ds.find(d=>d.id===dh.id);if(c){dh.vai=c.vai;await tai();return}dh=null;luu()}ve()}
+  addEventListener('ss-auth-done',()=>{if(!box.hidden)ve()});   // vừa đăng ký trên trang: điền sẵn email
   batDau();
 })();
