@@ -20,7 +20,7 @@ body:not(.signed) #ca-nhan>.wrap:not(.gd-wrap),body:not(.signed) .gd-out{display
 .tree-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-soft)}
 .tree-bar .btn{padding:7px 12px;font-size:12.5px}
 .tree-bar .btn[hidden]{display:none}
-.tree-stage{overflow:auto;padding:22px 18px;max-height:560px;background:radial-gradient(ellipse at 50% 0,#FBF3E2,transparent 70%)}
+.tree-stage{overflow:auto;padding:22px 18px;max-height:640px;background:radial-gradient(ellipse at 50% 0,#FBF3E2,transparent 70%)}
 .tree-stage svg{display:block;min-width:100%;overflow:visible}
 .tree-stage.keo{cursor:grabbing;user-select:none}
 .tree-tools{display:flex;gap:6px;align-items:center;flex:1 1 100%;justify-content:flex-end;min-width:0}
@@ -33,19 +33,49 @@ body:not(.signed) #ca-nhan>.wrap:not(.gd-wrap),body:not(.signed) .gd-out{display
 .tree-empty{padding:0 18px 18px;color:var(--ink-soft);font-size:13.5px}
 .tree-empty[hidden]{display:none}
 #treeSvg .tg{font-size:11px;font-weight:600;letter-spacing:.06em;fill:#9A8C78;text-transform:uppercase}
-#treeSvg .tl{fill:none;stroke:#C9B48E;stroke-width:1.5}
+#treeSvg .tgl{stroke:#E6D9BF;stroke-width:1;stroke-dasharray:2 6}
+/* cây mọc lên: tán lá mờ, thân và rễ nâu đồng, cành cong to dần về gốc, lá ngọc giữa cành */
+#treeSvg .tan{fill:#4F7A6A;opacity:.1}#treeSvg .tan.t2{opacity:.05}
+#treeSvg .than path{fill:#8C6324}#treeSvg .than .re{fill:none;stroke:#8C6324;stroke-width:3;stroke-linecap:round}
+#treeSvg .dat{stroke:#C9B48E;stroke-width:1.5;stroke-dasharray:1 5;stroke-linecap:round}
+#treeSvg .tl{fill:none;stroke:#A07A3C;stroke-linecap:round;transition:stroke .3s}
+#treeSvg .la{fill:#4F7A6A;opacity:.6;transform-box:fill-box;transform-origin:0 50%}
+#treeSvg .tlg.to .tl{stroke:#B8862F}#treeSvg .tlg.to .la{opacity:.95}
 #treeSvg .ts{stroke:#B8862F;stroke-width:1.5}
-#treeSvg .tsd{fill:#B8862F}
+#treeSvg .tsd{transform-box:fill-box;transform-origin:center}#treeSvg .tsd circle{fill:#FFFDF8;stroke:#B8862F;stroke-width:1.6}#treeSvg .tsd circle+circle{fill:rgba(184,134,47,.35)}
 #treeSvg .tn{cursor:pointer;outline:none}
-#treeSvg .tn rect{fill:#FFFDF8;stroke:rgba(43,36,28,.2);stroke-width:1;transition:stroke .2s,fill .2s}
-#treeSvg .tn.dead rect{fill:#F4E9D3;stroke:#C9A86A}
-#treeSvg .tn.self rect{stroke:#2B241C;stroke-width:1.8}
-#treeSvg .tn.on rect,#treeSvg .tn:focus-visible rect{stroke:#B8862F;stroke-width:2.4;fill:#FFF6E2}
-#treeSvg .tn:hover rect{stroke:#B8862F}
-#treeSvg .ic{fill:#B8862F}#treeSvg .tn:not(.dead) .ic{fill:#4F7A6A}
-#treeSvg .n{font-size:13.5px;font-weight:500;fill:#2B241C}
-#treeSvg .y{font-size:11.5px;fill:#7A6E5E}
-#treeSvg .star{font-size:12px;fill:#9A3B2B}
+#treeSvg .tb{transition:transform .25s ease}
+#treeSvg .nhan{fill:#FFFDF8;fill-opacity:.94;stroke:rgba(43,36,28,.12);transition:stroke .2s,fill .2s}
+#treeSvg .tn.on .nhan,#treeSvg .tn:focus-visible .nhan{fill:#FFF6E2;stroke:#B8862F;stroke-width:1.6}
+#treeSvg .av{fill:#4F7A6A;stroke:#FFFDF8;stroke-width:3;filter:drop-shadow(0 2px 3px rgba(43,36,28,.18));transition:stroke .2s}
+#treeSvg .tn.dead .av{fill:#9A6E22}#treeSvg .tn.ls .av{fill:#8B3A1E}
+#treeSvg .tn.self .av{stroke:#2B241C}
+#treeSvg .tn.to .av{stroke:#B8862F}
+#treeSvg .tn.on .av,#treeSvg .tn:focus-visible .av{stroke:#B8862F;stroke-width:3.5}
+#treeSvg .tn:hover .tb{transform:translateY(-2px)}#treeSvg .tn:hover .av{stroke:#B8862F}
+#treeSvg .hl{fill:none;stroke:#B8862F;stroke-width:2;opacity:.5;transform-box:fill-box;transform-origin:center;animation:gp-tho 2.6s ease-in-out infinite}
+#treeSvg .avc{font-size:17px;font-weight:600;fill:#FFFDF8;text-anchor:middle}
+#treeSvg .bd circle{fill:#FFFDF8;stroke:#E3D3B2}
+#treeSvg .bd .nen{fill:#B8862F}#treeSvg .bd .lua{fill:#E0892B;transform-box:fill-box;transform-origin:50% 100%;animation:gp-lua 1.8s ease-in-out infinite}
+#treeSvg .bd .mam{fill:#6E9A7F;stroke:#4F7A6A;stroke-width:.9;stroke-linecap:round;transform-box:fill-box;transform-origin:50% 100%;animation:gp-mam 4s ease-in-out infinite}
+#treeSvg .n{font-size:13px;font-weight:500;fill:#2B241C;text-anchor:middle}
+#treeSvg .y{font-size:11px;fill:#7A6E5E;text-anchor:middle}
+#treeSvg .star{font-size:13px;fill:#9A3B2B;text-anchor:middle}
+/* người mới hiện ra: quả nở ra theo từng đời từ gốc lên, cành vẽ dần từ dưới lên */
+#treeSvg .tn.moi .tb{animation:gp-moc .55s cubic-bezier(.2,.8,.3,1.25) both;animation-delay:calc(var(--d,0)*.16s + .15s)}
+#treeSvg .than.moi{animation:gp-hien .5s ease-out both}
+#treeSvg .tlg.moi .tl{stroke-dasharray:1;animation:gp-ve .6s ease-out both;animation-delay:calc(var(--d,0)*.16s - .05s)}
+#treeSvg .tlg.moi .la,#treeSvg .tsd.moi{animation:gp-la .4s ease-out both;animation-delay:calc(var(--d,0)*.16s + .4s)}
+@keyframes gp-moc{from{opacity:0;transform:translateY(8px) scale(.6)}}
+@keyframes gp-ve{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes gp-la{from{opacity:0;transform:scale(0)}}
+@keyframes gp-lua{0%,100%{transform:scale(1,1)}30%{transform:scale(.88,1.12)}60%{transform:scale(1.08,.92)}}
+@keyframes gp-mam{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+@keyframes gp-tho{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:.6;transform:scale(1.08)}}
+.ic-n{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:6px}
+.tree-side.vao>*{animation:gp-hien .35s ease-out both}.tree-side.vao>*:nth-child(2){animation-delay:.04s}.tree-side.vao>*:nth-child(n+3){animation-delay:.08s}
+@keyframes gp-hien{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){#treeSvg *,.tree-side.vao>*{animation:none!important;transition:none!important}#treeSvg .tn:hover .tb{transform:none}#treeSvg .tlg .tl{stroke-dasharray:none}}
 .tree-side{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px}
 .tree-side h3{font-size:24px;font-weight:300}
 .me-y{color:var(--ink-soft);font-size:14px}
