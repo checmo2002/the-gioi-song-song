@@ -32,6 +32,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 |---|---|
 | `01-man-cho.js` | Màn chờ có thanh phần trăm; máy có 3D thì chờ cảnh 3D sắp vào nạp xong (tối đa 60 giây), cảnh khác nạp ngầm |
 | `02-am-lich.js` | Lịch âm Việt Nam (thuật toán Hồ Ngọc Đức, UTC+7), biến toàn cục `LV` |
+| `02-09-phong-chung.js` | Phòng chung trên máy chủ Song Song (`window.ssPhong`): chỉ người đã đăng nhập Google; cùng cách gọi với phòng của claude.ai để `03`, `04-01` vẽ người khác. Máy chủ: `phong/` (Durable Object), `docs/phong-chung.md` |
 | `03-nhac-nen.js` | Nhạc nền tự soạn bằng Web Audio theo lối (đàn tranh / organ) |
 | `04-00-du-lieu-canh.js` | Dữ liệu 7 cảnh (`window.SS_CANH`): lưới đi được, tỉ lệ, điểm bấm theo toạ độ ảnh camera iso (ảnh 2D đã bỏ, chỉ còn 3D). Sửa cảnh là sửa file này |
 | `04-01-the-gioi-nui.js` | Thế giới núi: chân núi → lên núi → chính điện, nhân vật, di chuyển |
