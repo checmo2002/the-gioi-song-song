@@ -1,9 +1,9 @@
-/* Gia phả dòng họ trên máy chủ (functions/api, docs/gia-pha-dong-ho.md): đăng nhập bằng Zalo (máy chủ lo, phiên trong cookie HttpOnly), lập / vào dòng họ bằng mã mời,
+/* Gia phả dòng họ trên máy chủ (functions/api, docs/gia-pha-dong-ho.md): đăng nhập bằng Google (hoặc Zalo khi máy chủ bật; máy chủ lo, phiên trong cookie HttpOnly), lập / vào dòng họ bằng mã mời,
    trưởng họ và người được giao sửa thẳng, thành viên gửi đề xuất chờ duyệt. Không có máy chủ (mở bằng http.server) thì ẩn cả khung. */
 (function(){
   const host=$('[data-mp="tree"]');if(!host||!window.ssMe)return;
   const KEY='ss-dong-ho',VAI={truong:'Trưởng họ',duyet:'Người duyệt','thanh-vien':'Thành viên'};
-  let toi=null,ds=[],dh=null,nhap=false,mo='';   // dh: {id,ten,vai,phien_ban}; nhap: thành viên có thay đổi chưa gửi; mo: phần đang mở (de-xuat, thanh-vien, moi)
+  let toi=null,ds=[],cach=[],dh=null,nhap=false,mo='';   // dh: {id,ten,vai,phien_ban}; nhap: thành viên có thay đổi chưa gửi; mo: phần đang mở (de-xuat, thanh-vien, moi)
   try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){dh=s.dh||null;nhap=!!s.nhap}}catch(e){}
   const luu=()=>{try{localStorage.setItem(KEY,JSON.stringify({dh,nhap}))}catch(e){}};
   async function api(m,url,body){try{const h=body?{'Content-Type':'application/json'}:{};const r=await fetch('/api/'+url,{method:m,headers:h,body:body?JSON.stringify(body):undefined});
@@ -28,12 +28,14 @@
     toast(r.d.loi||'Chưa lưu được lên máy chủ.')}
   addEventListener('ss-gp-doi',()=>{if(!dh||!toi)return;if(dh.vai==='thanh-vien'){nhap=true;luu();ve()}else ghi()});
 
+  // nút đăng nhập: chỉ các bên máy chủ đang bật (cach từ /api/toi). Chữ G nhiều màu là nhận diện Google bắt buộc trên nút
+  const DN={google:['<svg class="dh-g" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.7H.9v2.3A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.9 10.8a5.4 5.4 0 010-3.6V4.9H.9a9 9 0 000 8.2z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.5 1.4l2.6-2.6A9 9 0 00.9 4.9l3 2.3C4.6 5.1 6.6 3.6 9 3.6z"/></svg>','Google'],zalo:['','Zalo']};
   const nut=(k,t,cls)=>`<button type="button" class="btn${cls?' '+cls:''}" data-dh="${k}">${t}</button>`;
   const box=document.createElement('section');box.className='dh-box';box.hidden=true;box.setAttribute('aria-label','Gia phả của cả dòng họ');host.insertBefore(box,host.firstChild);
   async function ve(){if(box.hidden)return;let h='';
     if(!toi){const u=ME().user||{};h=`<details class="dh-dn"${mo==='dn'?' open':''}><summary><b>Gia phả của cả dòng họ</b><span>Lưu gia phả lên máy chủ để người trong họ cùng xem và bổ sung. Trưởng họ duyệt mọi thay đổi.</span></summary>
-      <div class="me-act dh-hang"><a class="btn dh-zalo" href="/api/zalo/bat-dau">Đăng nhập bằng Zalo</a></div>
-      <p class="dh-chu">${/dang-nhap=het-han/.test(location.search)?'Lượt đăng nhập đã quá 10 phút. Hãy bấm lại. ':/dang-nhap=loi/.test(location.search)?'Chưa đăng nhập được bằng Zalo. Hãy thử lại. ':''}Zalo xác nhận bạn là ai; Song Song không nhận mật khẩu hay số điện thoại của bạn.</p></details>`}
+      <div class="me-act dh-hang">${cach.map(k=>DN[k]?`<a class="btn dh-${k}" href="/api/${k}/bat-dau">${DN[k][0]}Đăng nhập bằng ${DN[k][1]}</a>`:'').join('')}</div>
+      <p class="dh-chu">${/dang-nhap=het-han/.test(location.search)?'Lượt đăng nhập đã quá 10 phút. Hãy bấm lại. ':/dang-nhap=loi/.test(location.search)?'Chưa đăng nhập được. Hãy thử lại. ':''}${cach.map(k=>DN[k]&&DN[k][1]).filter(Boolean).join(' hoặc ')} xác nhận bạn là ai; Song Song không nhận mật khẩu của bạn, chỉ nhận tên hiển thị.</p></details>`}
     else if(!dh){const u=ME().user||{},ho=(u.name||'').trim().split(/\s+/)[0]||'';
       h=`<div class="dh-hd"><b>Gia phả của cả dòng họ</b><span>Đã đăng nhập máy chủ: ${esc(toi.ten)} · ${nut('dang-xuat','Đăng xuất','ghost dh-nho')}</span></div>
       ${ds.length?`<div class="dh-ds">${ds.map(d=>`<button type="button" class="dh-dong" data-mo="${esc(d.id)}"><b>${esc(d.ten)}</b><small>${VAI[d.vai]||''}</small></button>`).join('')}</div>`:''}
@@ -94,7 +96,7 @@
   box.addEventListener('change',async e=>{const s=e.target.closest('[data-vai]');if(!s)return;const r=await api('POST','dong-ho/'+dh.id+'/vai',{nguoi_id:s.dataset.vai,vai:s.value});toast(r.st===200?'Đã đổi vai.':(r.d.loi||'Chưa đổi được.'))});
 
   async function batDau(){const r=await api('GET','toi');if(r.st!==200||!r.d||!('nguoi' in r.d)){box.hidden=true;return}   // không có máy chủ: chạy như trước
-    box.hidden=false;toi=r.d.nguoi;ds=r.d.dong_ho||[];
+    box.hidden=false;toi=r.d.nguoi;ds=r.d.dong_ho||[];cach=Array.isArray(r.d.cach)?r.d.cach:[];
     if(dh&&toi){const c=ds.find(d=>d.id===dh.id);if(c){dh.vai=c.vai;await tai();return}dh=null;luu()}ve()}
   document.addEventListener('click',e=>{if(e.target.closest('[data-logout]')){if(toi)api('POST','dang-xuat',{});toi=null;dh=null;nhap=false;mo='';try{localStorage.removeItem(KEY)}catch(_){}ve()}},true);   // bấm Thoát trên trang: thoát luôn máy chủ gia phả (máy dùng chung)
   batDau();

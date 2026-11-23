@@ -3,7 +3,7 @@
 Chủ dự án chốt ngày 23/11/2026:
 - Máy chủ chạy trên **Cloudflare**, trong tài khoản Cloudflare riêng của Song Song (dự án Pages `thegioisongsong`), dùng gói miễn phí. Phần xử lý là Pages Functions, dữ liệu nằm trong D1.
 - Khi người trong họ sửa gia phả, **trưởng họ duyệt**.
-- **Đăng nhập bằng Zalo** (chốt lại cùng ngày, bỏ Firebase vì Firebase đòi thẻ thanh toán). Theo `docs/bao-mat.md`: không tự viết phần mật khẩu, Zalo giữ mật khẩu và lo việc quên mật khẩu, đăng nhập sai nhiều lần. Máy chủ chỉ nhận từ Zalo mã người dùng và tên hiển thị; không xin số điện thoại.
+- **Đăng nhập bằng Google** (chủ dự án chốt cùng ngày: bỏ Firebase vì đòi thẻ thanh toán; Zalo làm xong nhưng chưa muốn dùng, mã để sẵn, chỉ bật khi gắn khoá Zalo). Theo `docs/bao-mat.md`: không tự viết phần mật khẩu, Google/Zalo giữ mật khẩu và lo việc quên mật khẩu, đăng nhập sai nhiều lần. Máy chủ chỉ xin phạm vi `openid profile`: mã tài khoản và tên hiển thị, không xin email, số điện thoại.
 
 ## Ai làm được gì
 
@@ -27,7 +27,7 @@ Chủ dự án chốt ngày 23/11/2026:
 
 - Mỗi dòng họ lưu **một cây** dạng JSON, có cùng các trường với gia phả trên máy (xem `docs/tinh-nang.md`, phần `07-12`), và một `phien_ban` tăng dần sau mỗi lần sửa.
   - Những trường riêng của từng máy (`self`, nhà 3D) không được đưa lên.
-  - Người trong cây gắn với tài khoản qua trường `tk` (mã tài khoản trên máy chủ: `z` + mã người dùng Zalo).
+  - Người trong cây gắn với tài khoản qua trường `tk` (mã tài khoản trên máy chủ: `g` + mã Google, hoặc `z` + mã Zalo).
 - Một đề xuất là **cả cây đề xuất**, kèm một dòng ghi chú. Đề xuất chỉ nhận khi được làm trên đúng phiên bản hiện tại.
 - Khi duyệt:
   - Nếu cây chưa đổi từ lúc đề xuất được gửi, cây đề xuất thay cây hiện tại.
@@ -36,9 +36,9 @@ Chủ dự án chốt ngày 23/11/2026:
 - Mỗi người gửi tối đa 30 đề xuất một ngày và có tối đa 20 đề xuất đang chờ.
 
 Các bảng D1 (`migrations/0001_gia_pha.sql`):
-- `nguoi_dung`: `z` + mã người dùng Zalo, và tên hiển thị. Không lưu số điện thoại, email hay mật khẩu.
+- `nguoi_dung`: `g` + mã Google (hoặc `z` + mã Zalo), và tên hiển thị. Không lưu email, số điện thoại hay mật khẩu.
 - `phien`: phiên đăng nhập. Chỉ lưu SHA-256 của mã phiên, hạn 30 ngày.
-- `zalo_cho`: lượt đăng nhập Zalo đang dở (SHA-256 của `state`, `code_verifier` của PKCE), hạn 10 phút, dùng một lần.
+- `dn_cho`: lượt đăng nhập đang dở (SHA-256 của `state`, bên đăng nhập, `code_verifier` của PKCE), hạn 10 phút, dùng một lần.
 - `dong_ho`: dòng họ, gồm cây và phiên bản.
 - `thanh_vien`: ai thuộc dòng họ nào, với vai gì.
 - `loi_moi`: mã mời. Chỉ lưu SHA-256 của mã, không lưu mã gốc.
@@ -52,10 +52,10 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
 
 | Lệnh | Việc |
 |---|---|
-| `GET /api/zalo/bat-dau` | Bắt đầu đăng nhập: tạo `state` và PKCE, chuyển sang trang đăng nhập của Zalo |
-| `GET /api/zalo/ve` | Zalo chuyển về đây kèm `code`. Máy chủ đổi `code` lấy mã truy cập, hỏi Zalo tên người dùng, tạo phiên rồi chuyển về `/#ca-nhan` |
+| `GET /api/google/bat-dau` | Bắt đầu đăng nhập: tạo `state` và PKCE, chuyển sang trang đăng nhập của Google. Zalo: `/api/zalo/bat-dau`, chỉ chạy khi có khoá Zalo |
+| `GET /api/google/ve` | Google chuyển về đây kèm `code`. Máy chủ đổi `code` lấy mã truy cập, hỏi Google mã và tên người dùng, tạo phiên rồi chuyển về `/#ca-nhan` |
 | `POST /api/dang-xuat` | Xoá phiên |
-| `GET /api/toi` | Tài khoản (`null` nếu chưa đăng nhập), các dòng họ đang tham gia |
+| `GET /api/toi` | Tài khoản (`null` nếu chưa đăng nhập), các dòng họ đang tham gia, `cach`: các bên đăng nhập đang bật (trang chỉ hiện nút của các bên này) |
 | `PUT /api/toi` | Đổi tên hiển thị: `{ten}` |
 | `POST /api/dong-ho` | Lập dòng họ từ cây trên máy: `{ten, cay}` |
 | `GET /api/dong-ho/:id` | Cây, phiên bản, vai của mình |
@@ -75,15 +75,16 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
 
 ## Bảo mật
 
-- **Đăng nhập Zalo (OAuth v4 + PKCE):**
-  - `state` ngẫu nhiên vừa nằm trong cookie `__Host-ss_zalo` của chính trình duyệt đó, vừa lưu (dạng SHA-256) ở `zalo_cho`. Lúc Zalo chuyển về, hai bên phải khớp, nên kẻ khác không gài được lượt đăng nhập của họ vào máy người dùng.
+- **Đăng nhập Google (OAuth 2.0 + PKCE S256), Zalo (OAuth v4 + PKCE) dùng chung luồng:**
+  - `state` ngẫu nhiên vừa nằm trong cookie `__Host-ss_dn` của chính trình duyệt đó, vừa lưu (dạng SHA-256, kèm tên bên đăng nhập) ở `dn_cho`. Lúc Google/Zalo chuyển về, hai bên phải khớp, và phải về đúng đường của bên đã bắt đầu, nên kẻ khác không gài được lượt đăng nhập của họ vào máy người dùng.
   - Mỗi lượt dùng một lần, hạn 10 phút. `code_verifier` không rời máy chủ.
-  - Khoá bí mật của ứng dụng Zalo (`ZALO_APP_SECRET`) chỉ nằm ở biến bí mật của Cloudflare, không ở repo, không ở trang.
-  - Mã truy cập Zalo chỉ dùng một lần để hỏi tên, không lưu.
+  - Khoá bí mật (`GOOGLE_CLIENT_SECRET`, `ZALO_APP_SECRET`) chỉ nằm ở biến bí mật của Cloudflare, không ở repo, không ở trang.
+  - Mã truy cập chỉ dùng một lần để hỏi mã và tên người dùng, không lưu.
+  - Mã người dùng phải đúng dạng (Google: chữ/số tới 60 ký tự, Zalo: số) mới tạo tài khoản.
 - **Phiên:** mã phiên 32 byte ngẫu nhiên, cookie HttpOnly (trang và mã độc chèn vào trang không đọc được).
 - **Tiền tố `__Host-`** cho cả hai cookie: `pages.dev` là hậu tố công cộng nên mọi bản xem trước `<nhánh>.thegioisongsong.pages.dev` là tên miền con của trang chính. Không có tiền tố này, mã trên một bản xem trước ném được cookie phiên/state của kẻ xấu vào trang chính (gài đăng nhập, cố định phiên). Cookie trùng tên lọt tới thì máy chủ bỏ cả hai. Cơ sở dữ liệu chỉ giữ SHA-256 của mã. Đăng xuất là xoá phiên ở máy chủ.
 - **Chống trang khác gửi yêu cầu thay người dùng:** cookie là SameSite=Lax, và mọi lệnh ghi còn bắt buộc có `Origin` trùng tên miền của trang và `Content-Type: application/json`.
-- **Đăng nhập sai nhiều lần, quên mật khẩu:** Zalo lo.
+- **Đăng nhập sai nhiều lần, quên mật khẩu:** Google/Zalo lo.
 - **Kiểm cây ở máy chủ trước khi lưu:**
   - tối đa 2.000 người và 1 MB;
   - chỉ giữ các trường đã biết, đúng kiểu, độ dài có giới hạn;
@@ -91,7 +92,7 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
   - quan hệ phải trỏ tới người có trong cây, không trỏ vào chính mình, không có vòng cha – con;
   - không nhận id `__proto__`, `constructor`, `prototype`.
 - **Hiển thị:** chữ người dùng nhập vẫn đi qua `esc()` khi đưa lên trang.
-- **Kiểm thử:** `tests/may-chu.py` dựng một "Zalo giả" (kiểm `secret_key`, `app_id` và PKCE như Zalo thật) và thử trên máy chủ thật chạy ở máy. Gồm: gài `state` của trình duyệt khác, cookie không có tiền tố `__Host-` hoặc trùng tên, sai `code_verifier`, dùng lại `state`, phiên giả, đăng xuất, quyền của từng vai, cây xấu, giả mạo yêu cầu, thu hồi mã mời, người bị mời ra vào lại.
+- **Kiểm thử:** `tests/may-chu.py` dựng "Google giả" và "Zalo giả" (kiểm khoá bí mật, mã ứng dụng, `redirect_uri` và PKCE như thật) và thử trên máy chủ thật chạy ở máy. Gồm: dùng `state` của bên này cho bên kia, bên đăng nhập lạ, gài `state` của trình duyệt khác, cookie không có tiền tố `__Host-` hoặc trùng tên, sai `code_verifier`, dùng lại `state`, phiên giả, đăng xuất, quyền của từng vai, cây xấu, giả mạo yêu cầu, thu hồi mã mời, người bị mời ra vào lại.
 
 ## Chạy thử ở máy
 
@@ -111,7 +112,7 @@ database_name = "gia-pha-thu"
 database_id = "00000000-0000-0000-0000-000000000000"
 migrations_dir = "migrations"
 EOF
-printf 'ZALO_APP_ID=app-thu\nZALO_APP_SECRET=bi-mat-thu\nZALO_OAUTH=http://localhost:8790\nZALO_GRAPH=http://localhost:8790\n' > .dev.vars
+printf 'GOOGLE_CLIENT_ID=gg-thu\nGOOGLE_CLIENT_SECRET=gg-bi-mat\nGOOGLE_THU=http://localhost:8790\nZALO_APP_ID=app-thu\nZALO_APP_SECRET=bi-mat-thu\nZALO_OAUTH=http://localhost:8790\nZALO_GRAPH=http://localhost:8790\n' > .dev.vars
 npx wrangler d1 migrations apply gia-pha-thu --local
 npx wrangler pages dev --port 8788 &
 cd <repo> && python3 tests/may-chu.py           # chỉ cần thư viện chuẩn của python
@@ -119,17 +120,20 @@ cd <repo> && python3 tests/may-chu.py           # chỉ cần thư viện chuẩ
 
 ## Đưa lên mạng (làm một lần, cần chủ dự án)
 
-1. **Ứng dụng Zalo**, việc chủ dự án làm (miễn phí) ở developers.zalo.me:
-   - Tạo ứng dụng, lấy **App ID** và **khoá bí mật** (Secret Key).
-   - Bật "Đăng nhập", thêm địa chỉ gọi lại `https://thegioisongsong.pages.dev/api/zalo/ve` (thêm tên miền riêng khi có).
-   - Bản xem trước của PR có tên miền khác nên không đăng nhập Zalo được; thử đăng nhập trên `thegioisongsong.pages.dev`.
+1. **Ứng dụng Google**, việc chủ dự án làm (miễn phí, không cần bật thanh toán) ở console.cloud.google.com:
+   - Tạo dự án (ví dụ "Song Song").
+   - Vào **Google Auth Platform** (OAuth consent screen): loại người dùng **External**, tên ứng dụng "Thế Giới Song Song", email hỗ trợ, tên miền `thegioisongsong.pages.dev`. Chỉ dùng phạm vi `openid` và `profile`. Đây là phạm vi không nhạy cảm, nên không phải chờ Google duyệt.
+   - Còn ở chế độ "Testing" thì chỉ người có tên trong danh sách thử đăng nhập được. Mở cho mọi người: bấm **Publish app**.
+   - Tạo **OAuth client ID** loại **Web application**. Authorized redirect URI: `https://thegioisongsong.pages.dev/api/google/ve` (thêm tên miền riêng khi có). Lấy **Client ID** và **Client secret**.
+   - Bản xem trước của PR có tên miền khác nên không đăng nhập được; thử đăng nhập trên `thegioisongsong.pages.dev`.
+   - Zalo (để sau): ứng dụng ở developers.zalo.me, địa chỉ gọi lại `https://thegioisongsong.pages.dev/api/zalo/ve`, rồi gắn `ZALO_APP_ID`, `ZALO_APP_SECRET` như dưới. Không gắn thì không có nút Zalo.
 2. **Hai cơ sở dữ liệu D1 riêng:**
    - `songsong-gia-pha` cho Production.
    - `songsong-gia-pha-thu` cho Preview, **chỉ chứa dữ liệu hư cấu**. Mọi nhánh, mọi PR đều có bản xem trước, nên không bao giờ gắn D1 thật cho Preview.
    - Chạy `migrations/0001_gia_pha.sql` trên cả hai.
 3. **Gắn vào dự án Pages**, ở Settings → Bindings / Variables:
    - biến `DB` trỏ tới D1 tương ứng với từng môi trường;
-   - `ZALO_APP_ID` (biến thường) và `ZALO_APP_SECRET` (chọn **Encrypt**, là biến bí mật). **Chỉ đặt ở Production.** Mã của mọi nhánh chạy ở Preview, nên đặt khoá ở đó là nhánh nào cũng đọc được khoá. Preview không có khoá thì `/api` trả 503, khung tự ẩn.
+   - `GOOGLE_CLIENT_ID` (biến thường) và `GOOGLE_CLIENT_SECRET` (chọn **Encrypt**, là biến bí mật). Zalo khi cần: `ZALO_APP_ID`, `ZALO_APP_SECRET` (Encrypt). **Chỉ đặt ở Production.** Mã của mọi nhánh chạy ở Preview, nên đặt khoá ở đó là nhánh nào cũng đọc được khoá. Preview không có khoá thì `/api` trả 503, khung tự ẩn.
 
 Khi chưa gắn, `/api/*` trả lỗi 503 và khung "Gia phả của cả dòng họ" tự ẩn; phần còn lại của trang chạy như cũ.
 
@@ -137,7 +141,7 @@ Khi chưa gắn, `/api/*` trả lỗi 503 và khung "Gia phả của cả dòng 
 
 Khung "Gia phả của cả dòng họ" nằm trên cây, trong tab Gia phả của trang Gia đình. Khung tự ẩn khi `/api/toi` không trả lời được, ví dụ khi mở bằng `python3 -m http.server`.
 
-1. **Chưa đăng nhập:** khung đóng gọn. Mở ra thì có nút xanh "Đăng nhập bằng Zalo" (một đường dẫn tới `/api/zalo/bat-dau`, không nạp thư viện ngoài). Nếu lượt đăng nhập lỗi hoặc quá 10 phút, khung báo lại.
+1. **Chưa đăng nhập:** khung đóng gọn. Mở ra thì có nút "Đăng nhập bằng Google" theo mẫu nút của Google (một đường dẫn tới `/api/google/bat-dau`, không nạp thư viện ngoài). Nút Zalo chỉ hiện khi máy chủ bật Zalo (`cach` từ `/api/toi`). Nếu lượt đăng nhập lỗi hoặc quá 10 phút, khung báo lại.
 2. **Chưa nối dòng họ:** danh sách dòng họ đang tham gia, ô lập dòng họ từ cây trên máy, ô vào dòng họ bằng mã mời. Nếu trên máy đã có gia phả, phải bấm hai lần để đồng ý thay bằng cây chung của họ.
 3. **Đã nối dòng họ:**
    - Trưởng họ hoặc người duyệt sửa trên cây là lưu thẳng lên máy chủ. Nếu người khác vừa sửa trước, trang tải bản mới và báo lại.
@@ -149,7 +153,7 @@ Trang không giữ mã đăng nhập nào (phiên nằm trong cookie HttpOnly). 
 ## Chưa làm
 
 - Người vào dòng họ chưa tự đánh dấu được "đây là tôi" trên cây chung (trường `tk`). Hiện chỉ người lập dòng họ được gắn sẵn.
-- Cách đăng nhập khác ngoài Zalo (Google, số điện thoại).
+- Bật đăng nhập Zalo (mã có sẵn, chỉ cần gắn khoá). Đăng nhập bằng số điện thoại.
 - Chạy máy chủ trên máy riêng của chủ dự án (wrangler + Cloudflare Tunnel): cần tên miền trước.
 - Ảnh và ký ức lưu trên máy chủ.
 - Thấy người khác đang trực tuyến.

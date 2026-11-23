@@ -1,6 +1,7 @@
-"""Kiểm máy chủ gia phả dòng họ (functions/api, docs/gia-pha-dong-ho.md): đăng nhập Zalo, phiên, quyền, cây xấu, giả mạo yêu cầu.
-Bài thử tự dựng "Zalo giả" ở http://localhost:8790 (đổi mã lấy token có kiểm PKCE, trả thông tin người dùng).
+"""Kiểm máy chủ gia phả dòng họ (functions/api, docs/gia-pha-dong-ho.md): đăng nhập Google/Zalo, phiên, quyền, cây xấu, giả mạo yêu cầu.
+Bài thử tự dựng "Google giả" và "Zalo giả" ở http://localhost:8790 (đổi mã lấy token có kiểm khoá bí mật và PKCE, trả thông tin người dùng).
 Máy chủ thử phải chạy với biến môi trường (file .dev.vars cạnh wrangler.toml, xem docs/gia-pha-dong-ho.md mục "Chạy thử ở máy"):
+    GOOGLE_CLIENT_ID=gg-thu   GOOGLE_CLIENT_SECRET=gg-bi-mat   GOOGLE_THU=http://localhost:8790
     ZALO_APP_ID=app-thu   ZALO_APP_SECRET=bi-mat-thu   ZALO_OAUTH=http://localhost:8790   ZALO_GRAPH=http://localhost:8790
 Chạy: python3 tests/may-chu.py [http://localhost:8788]"""
 import json, sys, random, threading, base64, hashlib, http.server, urllib.request, urllib.error, urllib.parse
@@ -8,23 +9,28 @@ import json, sys, random, threading, base64, hashlib, http.server, urllib.reques
 GOC = (sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8788').rstrip('/')
 loi = []
 
-# ---------- Zalo giả ----------
-CHO = {}   # mã code -> {cc, zid, ten}
-class Zalo(http.server.BaseHTTPRequestHandler):
+# ---------- Google giả, Zalo giả ----------
+CHO = {}   # mã code -> {cc, zid, ten, ve}
+class Gia(http.server.BaseHTTPRequestHandler):
     def tra(s, o, st=200):
         b = json.dumps(o).encode(); s.send_response(st); s.send_header('Content-Type', 'application/json'); s.end_headers(); s.wfile.write(b)
-    def do_POST(s):   # /v4/access_token
+    def do_POST(s):   # Google: /token, Zalo: /v4/access_token
         f = urllib.parse.parse_qs(s.rfile.read(int(s.headers.get('Content-Length', 0))).decode())
         g = lambda k: (f.get(k) or [''])[0]; c = CHO.pop(g('code'), None)
         cc = base64.urlsafe_b64encode(hashlib.sha256(g('code_verifier').encode()).digest()).rstrip(b'=').decode()
-        if s.headers.get('secret_key') != 'bi-mat-thu' or g('app_id') != 'app-thu' or not c or c['cc'] != cc: return s.tra({'error': -14014, 'error_name': 'invalid'}, 400)
-        s.tra({'access_token': 'at-' + c['zid'], 'refresh_token': 'rt', 'expires_in': '3600'}); NGUOI['at-' + c['zid']] = c
-    def do_GET(s):    # /v2.0/me
+        if s.path == '/token':
+            if g('client_id') != 'gg-thu' or g('client_secret') != 'gg-bi-mat' or g('grant_type') != 'authorization_code' or not c or c['cc'] != cc or g('redirect_uri') != c['ve']:
+                return s.tra({'error': 'invalid_grant'}, 400)
+        elif s.headers.get('secret_key') != 'bi-mat-thu' or g('app_id') != 'app-thu' or not c or c['cc'] != cc: return s.tra({'error': -14014, 'error_name': 'invalid'}, 400)
+        s.tra({'access_token': 'at-' + c['zid'], 'expires_in': 3600}); NGUOI['at-' + c['zid']] = c
+    def do_GET(s):    # Google: /v1/userinfo (Bearer), Zalo: /v2.0/me
+        if s.path.startswith('/v1/userinfo'):
+            c = NGUOI.get((s.headers.get('Authorization') or '')[7:]); return s.tra({'sub': c['zid'], 'name': c['ten']} if c else {'error': 'invalid_token'}, 200 if c else 401)
         c = NGUOI.get(s.headers.get('access_token'))
         s.tra({'id': c['zid'], 'name': c['ten']} if c else {'error': 452, 'message': 'Access token is invalid'})
     def log_message(s, *a): pass
 NGUOI = {}
-threading.Thread(target=http.server.HTTPServer(('127.0.0.1', 8790), Zalo).serve_forever, daemon=True).start()
+threading.Thread(target=http.server.HTTPServer(('127.0.0.1', 8790), Gia).serve_forever, daemon=True).start()
 
 
 class KhongTheo(urllib.request.HTTPRedirectHandler):
@@ -56,14 +62,15 @@ def ky(ten, dk, st, du_kien):
     else: print(f'  ✓ {ten}')
 
 
-def zalo(ten, n=None, sua=None):
-    """Đi trọn luồng đăng nhập Zalo; sua(n, state, code) để thử luồng hỏng."""
-    n = n or Nguoi(); n.goi('GET', '/api/zalo/bat-dau')
+def dn(ten, ben='google', n=None, sua=None):
+    """Đi trọn luồng đăng nhập (Google hoặc Zalo); sua(n, state, code) để thử luồng hỏng."""
+    n = n or Nguoi(); n.goi('GET', f'/api/{ben}/bat-dau')
     q = urllib.parse.parse_qs(urllib.parse.urlparse(n.vi_tri).query); g = lambda k: (q.get(k) or [''])[0]
-    if g('app_id') != 'app-thu' or not g('code_challenge') or not g('redirect_uri').endswith('/api/zalo/ve'): loi.append(f'URL sang Zalo thiếu tham số: {n.vi_tri[:120]}')
-    code = 'ma-%d' % random.randint(1, 10**12); CHO[code] = {'cc': g('code_challenge'), 'zid': str(random.randint(10**15, 10**16)), 'ten': ten}
+    ok = (g('client_id') == 'gg-thu' and g('code_challenge_method') == 'S256' and g('scope') == 'openid profile') if ben == 'google' else g('app_id') == 'app-thu'
+    if not ok or not g('code_challenge') or not g('redirect_uri').endswith(f'/api/{ben}/ve'): loi.append(f'URL sang {ben} thiếu tham số: {n.vi_tri[:160]}')
+    code = 'ma-%d' % random.randint(1, 10**12); CHO[code] = {'cc': g('code_challenge'), 'zid': str(random.randint(10**15, 10**16)), 'ten': ten, 've': g('redirect_uri')}
     st, code = (sua(n, g('state'), code) if sua else (g('state'), code))
-    n.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': code, 'state': st}))
+    n.goi('GET', f'/api/{ben}/ve?' + urllib.parse.urlencode({'code': code, 'state': st}))
     return n
 
 
@@ -72,31 +79,41 @@ CAY = {'members': [{'id': 'u1', 'name': 'Phạm Văn Lễ', 'g': 'm', 'b': 1890,
                    {'id': 'u3', 'name': '<img src=x onerror=alert(1)>', 'g': 'm', 'b': 1922, 'parent': 'u1'}], 'seq': 4}
 sao = lambda c: json.loads(json.dumps(c))
 
-# ---------- đăng nhập Zalo, phiên ----------
+# ---------- đăng nhập Google / Zalo, phiên ----------
 st, r = Nguoi().goi('GET', '/api/toi'); ky('chưa đăng nhập: /toi vẫn trả', r, st, 200)
 if r.get('nguoi') is not None: loi.append('chưa đăng nhập mà /toi có người')
-A = zalo('Trưởng họ'); st, r = A.goi('GET', '/api/toi'); ky('đăng nhập Zalo thành công', r, st, 200)
-if not (r.get('nguoi') or {}).get('id', '').startswith('z'): loi.append(f'đăng nhập Zalo xong mà chưa có phiên: {r}')
-if '__Host-ss_zalo=' in A.ck: loi.append('đăng nhập xong vẫn còn cookie __Host-ss_zalo')
-B, C = zalo('Thành viên B'), zalo('Người ngoài C')
-gai = Nguoi(); gai.goi('GET', '/api/zalo/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(gai.vi_tri).query)
-nan = Nguoi(); st, r = nan.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': 'ma-bat-ky', 'state': q['state'][0]}))
+A = dn('Trưởng họ'); st, r = A.goi('GET', '/api/toi'); ky('đăng nhập Google thành công', r, st, 200)
+if not (r.get('nguoi') or {}).get('id', '').startswith('g'): loi.append(f'đăng nhập Google xong mà chưa có phiên: {r}')
+if sorted(r.get('cach') or []) != ['google', 'zalo']: loi.append(f'/toi phải báo các cách đăng nhập đang bật: {r.get("cach")}')
+Z = dn('Người dùng Zalo', 'zalo'); st, r = Z.goi('GET', '/api/toi')
+if not (r.get('nguoi') or {}).get('id', '').startswith('z'): loi.append(f'đăng nhập Zalo (để sẵn) không chạy: {r}')
+else: print('  ✓ đăng nhập Zalo vẫn chạy khi có khoá')
+X = Nguoi(); X.goi('GET', '/api/google/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(X.vi_tri).query)
+code = 'ma-%d' % random.randint(1, 10**12); CHO[code] = {'cc': q['code_challenge'][0], 'zid': '42', 'ten': 'Lẫn bên', 've': q['redirect_uri'][0]}
+X.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': code, 'state': q['state'][0]}))
+if '__Host-ss_phien=' in X.ck: loi.append('state của lượt Google dùng được ở đường về của Zalo')
+else: print('  ✓ state của bên này không dùng được cho bên kia')
+st, r = A.goi('GET', '/api/facebook/bat-dau'); ky('bên đăng nhập lạ bị từ chối', r, st, 404)
+if '__Host-ss_dn=' in A.ck: loi.append('đăng nhập xong vẫn còn cookie __Host-ss_dn')
+B, C = dn('Thành viên B'), dn('Người ngoài C')
+gai = Nguoi(); gai.goi('GET', '/api/google/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(gai.vi_tri).query)
+nan = Nguoi(); st, r = nan.goi('GET', '/api/google/ve?' + urllib.parse.urlencode({'code': 'ma-bat-ky', 'state': q['state'][0]}))
 if '__Host-ss_phien=' in nan.ck or 'dang-nhap=loi' not in nan.vi_tri: loi.append('trình duyệt khác dùng state của người khác vẫn đăng nhập được (gài đăng nhập)')
 else: print('  ✓ chặn gài đăng nhập bằng state của trình duyệt khác')
-D = zalo('Sai PKCE', sua=lambda n, st, code: (CHO[code].update(cc='sai'), (st, code))[1])
+D = dn('Sai PKCE', sua=lambda n, st, code: (CHO[code].update(cc='sai'), (st, code))[1])
 if '__Host-ss_phien=' in D.ck: loi.append('mã code không khớp PKCE mà vẫn đăng nhập được')
 else: print('  ✓ chặn mã code không khớp PKCE')
-E = Nguoi(); E.goi('GET', '/api/zalo/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(E.vi_tri).query); ck = E.ck
-E.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': 'x', 'state': q['state'][0]})); E.ck = ck
-E.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': 'x', 'state': q['state'][0]}))
+E = Nguoi(); E.goi('GET', '/api/google/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(E.vi_tri).query); ck = E.ck
+E.goi('GET', '/api/google/ve?' + urllib.parse.urlencode({'code': 'x', 'state': q['state'][0]})); E.ck = ck
+E.goi('GET', '/api/google/ve?' + urllib.parse.urlencode({'code': 'x', 'state': q['state'][0]}))
 if 'dang-nhap=het-han' not in E.vi_tri: loi.append(f'dùng lại state lần hai phải báo hết hạn: {E.vi_tri}')
 else: print('  ✓ state chỉ dùng được một lần')
 st, r = Nguoi('__Host-ss_phien=' + '0' * 64).goi('POST', '/api/dong-ho', {'ten': 'Họ X', 'cay': CAY}); ky('phiên giả bị từ chối', r, st, 401)
 # cookie ném từ tên miền con (bản xem trước) không có tiền tố __Host-, hoặc trùng tên: phải bị bỏ qua
-gai = Nguoi(); gai.goi('GET', '/api/zalo/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(gai.vi_tri).query)
+gai = Nguoi(); gai.goi('GET', '/api/google/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(gai.vi_tri).query)
 code = 'ma-%d' % random.randint(1, 10**12); CHO[code] = {'cc': q['code_challenge'][0], 'zid': '1234567890123456', 'ten': 'Kẻ xấu'}
-nan = Nguoi('ss_zalo=' + q['state'][0]); nan.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': code, 'state': q['state'][0]}))
-if '__Host-ss_phien=' in nan.ck: loi.append('cookie ss_zalo ném từ tên miền con gài được đăng nhập')
+nan = Nguoi('ss_dn=' + q['state'][0]); nan.goi('GET', '/api/google/ve?' + urllib.parse.urlencode({'code': code, 'state': q['state'][0]}))
+if '__Host-ss_phien=' in nan.ck: loi.append('cookie ss_dn ném từ tên miền con gài được đăng nhập')
 else: print('  ✓ bỏ qua cookie state không có tiền tố __Host-')
 tk = [x for x in B.ck.split('; ') if x.startswith('__Host-ss_phien=')][0].split('=', 1)[1]
 st, r = Nguoi('ss_phien=' + tk).goi('GET', '/api/toi')
