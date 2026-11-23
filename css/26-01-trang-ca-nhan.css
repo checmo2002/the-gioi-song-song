@@ -59,6 +59,9 @@ body:not(.signed) #ca-nhan>.wrap:not(.gd-wrap),body:not(.signed) .gd-out{display
 .me-form .chk input{width:18px;height:18px;accent-color:#B8862F}
 .me-form .err{color:#9A3B2B;font-size:13px;min-height:1em}
 .me-form .btn{justify-content:center}
+.me-form .gp-more{border:1px dashed var(--line);border-radius:8px;padding:9px 10px}
+.me-form .gp-more summary{cursor:pointer;font-size:13px;font-weight:600;color:#8C6324}
+.me-form .gp-more>*+*{margin-top:10px}
 .me-info{max-width:460px}
 .me-lock{background:var(--card);border:1px dashed rgba(184,134,47,.5);border-radius:10px;padding:28px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;max-width:620px}
 .me-lock b{font-size:20px;font-weight:400}.me-lock p{color:var(--ink-soft)}
