@@ -227,3 +227,4 @@ a.nav-user{text-decoration:none}
 .msheet-links a.on .ms-ic{background:#B8862F;color:#fff;border-color:#B8862F}
 .dh-chu{margin:0;font-size:12px;color:var(--ink-soft)}.dh-hang{display:flex;flex-wrap:wrap;gap:8px}
 .dh-box .btn.dh-zalo{background:#0068FF;border-color:#0068FF;color:#fff;text-decoration:none}.dh-box .btn.dh-zalo:hover{background:#0057d6}
+.dh-box .btn.dh-google{display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid #747775;color:#1F1F1F;text-decoration:none;font-weight:500}.dh-box .btn.dh-google:hover{background:#F2F2F2}.dh-g{width:18px;height:18px;flex:none}

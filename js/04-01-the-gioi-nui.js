@@ -110,16 +110,16 @@
 if(!isMe){var tx=+pr.tx,ty=+pr.ty;if(isFinite(tx)&&isFinite(ty)&&(tx!==p._gx||ty!==p._gy)){p._gx=tx;p._gy=ty;if(st.map){var pa=pathTo(p.x,p.y,tx,ty),f0=pa.shift()||[tx,ty];p.tx=f0[0];p.ty=f0[1];p.path=pa}else{p.tx=tx;p.ty=ty}}p.want=['chap','lay','ngoi','dung'].indexOf(pr.a)>=0?pr.a:'dung';p.faceUp=pr.a==='chap'||pr.a==='lay';
    if(p.want!==p._lastWant){p._lastWant=p.want;if(Math.hypot(p.tx-p.x,p.ty-p.y)<.003){p.a=p.want;p.f=0;if(p.faceUp)p.d=4}}}
   p.el.querySelector('.wa-tag').textContent=isMe?'Bạn':(typeof pr.n==='string'&&pr.n.trim()?pr.n.trim().slice(0,22):'Khách viếng');
-  var EMO={pray:'🙏',heart:'❤️',flower:'🌸',light:'✨'},b=p.el.querySelector('.wa-bub'),e=EMO[pr.e];
+  var EMO={pray:'🙏',heart:'❤️',flower:'🌸',light:'✨'},b=p.el.querySelector('.wa-bub'),e=Object.prototype.hasOwnProperty.call(EMO,pr.e)?EMO[pr.e]:'';
   if(e&&(!b||b.textContent!==e)){b&&b.remove();b=document.createElement('span');b.className='wa-bub';b.textContent=e;p.el.appendChild(b)}else if(!e&&b)b.remove();return p}
  function sync(){if(!on())return;if(!me.tc&&window.ssNV)me.tc=ssNV.get();   // js/31 nạp sau file này
 var seen={me:1},n=1,here=1;upsert('me',me,true);
-  if(room)room.peers().forEach(function(pe){if(pe.kind!=='viewer'||(pe.isMe&&pe.sameTab))return;var pr=pe.presence||{};n++;if(pr.li&&window.ssLit)ssLit.peer(pe.peer,pr.li);if(pr.w!==1||pr.s!==(window.ssHoKey?ssHoKey(scene):scene)||pr.h!==1)return;here++;upsert(pe.peer,pr,false);seen[pe.peer]=1});
+  if(room)room.peers().forEach(function(pe){if(pe.kind!=='viewer'||(pe.isMe&&pe.sameTab))return;var pr=pe.presence||{};n++;if(pr.li&&window.ssLit)ssLit.peer(pe.peer,pr.li);if(pr.w!==1||scene==='ho'||pr.s!==scene||pr.h!==1)return;/* làng riêng là của riêng mình: không vẽ người khác ở đó */here++;upsert(pe.peer,pr,false);seen[pe.peer]=1});
   // NPC (js/25-npc.js): người trong cảnh, chỉ chạy trên máy này, không tính vào số người trực tuyến
   if(window.ssNpcList)ssNpcList(scene).forEach(function(q){var p=upsert(q.id,q,false);p.el.classList.add('wa-npc');seen[q.id]=1});
   Object.keys(av).forEach(function(k){if(!seen[k]){av[k].el.remove();delete av[k]}});
   var o=document.getElementById('hallOnline');if(o){o.hidden=n<2;o.querySelector('b').textContent=n;o.title=here+' người đang ở '+(scene==='dien'?'Chính điện':'chân núi')+' · '+n+' người trực tuyến'}}
- function send(){if(!room||!on())return;var p=av.me||me;room.presence({w:1,f:'phat',s:(window.ssHoKey?ssHoKey(scene):scene),h:hall.hidden?0:1,x:+p.x.toFixed(3),y:+p.y.toFixed(3),tx:+me.tx.toFixed(3),ty:+me.ty.toFixed(3),a:me.a,k:me.k,tc:me.tc,e:me.e,n:myName(),li:window.ssLit?ssLit.mine():0}).catch(function(){})}
+ function send(){if(!room||!on())return;var p=av.me||me;room.presence({w:1,f:'phat',s:scene,h:hall.hidden?0:1,x:+p.x.toFixed(3),y:+p.y.toFixed(3),tx:+me.tx.toFixed(3),ty:+me.ty.toFixed(3),a:me.a,k:me.k,tc:me.tc,e:me.e,n:myName(),li:window.ssLit?ssLit.mine():0}).catch(function(){})}
  function goTo(x,y,act){var c=clampFloor(x,y);me.tx=c[0];me.ty=c[1];me.a=act||'dung';var p=av.me;if(p){p.tx=me.tx;p.ty=me.ty;p.path=null;if(st.map){var pa=pathTo(p.x,p.y,me.tx,me.ty);var f0=pa.shift()||[me.tx,me.ty];p.tx=f0[0];p.ty=f0[1];p.path=pa}p.want=me.a;p.faceUp=me.a==='chap'||me.a==='lay';if(Math.hypot(p.tx-p.x,p.ty-p.y)<.003){p.a=me.a;p.f=0;if(p.faceUp)p.d=4}}send()}
  stage.addEventListener('click',function(ev){var ls=hall.querySelector('.hall-list.open');if(ls){ls.classList.remove('open');hall.classList.remove('list-open');return}if(ev.target.closest('.wh'))return;var r=stage.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width,y=(ev.clientY-r.top)/r.height,f=SC[scene].floor[O];
   if(!st.map&&y<f.t-.25)return;pend=null;goTo(x,y,'dung');var c=clampFloor(x,y),pg=document.createElement('i');pg.className='w-ping';pg.style.left=c[0]*100+'%';pg.style.top=c[1]*100+'%';fl.appendChild(pg);setTimeout(function(){pg.remove()},700)});
@@ -179,5 +179,6 @@ var seen={me:1},n=1,here=1;upsert('me',me,true);
  document.addEventListener('click',function(ev){var tg=ev.target.closest('.wl-toggle');if(!tg)return;ev.preventDefault();ev.stopPropagation();var l=tg.closest('.hall-list');l.classList.toggle('open');hall.classList.toggle('list-open',l.classList.contains('open'));tg.setAttribute('aria-expanded',l.classList.contains('open'))},true);
  window._wdbg=function(){return {me:me,av:av.me&&{x:av.me.x,y:av.me.y,tx:av.me.tx,ty:av.me.ty,a:av.me.a},st:st,scene:scene,O:O}};
  requestAnimationFrame(tick);setTimeout(refresh,60);
- if(window.claude&&claude.use)claude.use('room').then(function(r){if(!r)return;room=r;r.onPeers(function(){sync()},function(){room=null});send();setInterval(send,15000)}).catch(function(){});
+ var vao=window.claude&&claude.use?claude.use('room'):window.ssPhong&&ssPhong();   // claude.ai: phòng của bản thử; trang thật: máy chủ Song Song (js/02-09)
+ if(vao)vao.then(function(r){if(!r)return;room=r;r.onPeers(function(){sync()},function(){room=null});send();setInterval(send,15000)}).catch(function(){});
 })();

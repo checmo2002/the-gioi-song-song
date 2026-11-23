@@ -1,5 +1,5 @@
-// Máy chủ gia phả dòng họ: Cloudflare Pages Functions + D1 (binding DB). Đăng nhập bằng Zalo (OAuth v4 + PKCE): Zalo giữ mật khẩu,
-// máy chủ chỉ cấp phiên (cookie HttpOnly) sau khi Zalo xác nhận người dùng (docs/bao-mat.md: không tự viết mật khẩu). Thiết kế: docs/gia-pha-dong-ho.md
+// Máy chủ gia phả dòng họ: Cloudflare Pages Functions + D1 (binding DB). Đăng nhập bằng Google (OAuth 2.0 + PKCE), Zalo để sẵn (bật khi có khoá):
+// Google/Zalo giữ mật khẩu, máy chủ chỉ cấp phiên (cookie HttpOnly) sau khi họ xác nhận người dùng (docs/bao-mat.md: không tự viết mật khẩu). Thiết kế: docs/gia-pha-dong-ho.md
 const NGAY = 864e5, MOI_HAN = 14 * NGAY, DX_NGAY = 30;
 const enc = new TextEncoder();
 
@@ -25,7 +25,7 @@ export function kiemCay(c) {
     return { id: m.id, name: chu(m.name, 60, true), g: m.g === 'f' ? 'f' : 'm', b: so(m.b, 1000, 2100), d: so(m.d, 1000, 2100), ls: co(m.ls),
       parent: chu(m.parent, 24), mother: chu(m.mother, 24), spouse: chu(m.spouse, 24), sp2: (m.sp2 || []).map(x => chu(x, 24, true)),
       ns, nm, nmAl: co(m.nmAl), huy: chu(m.huy, 40), tu: chu(m.tu, 40), thuy: chu(m.thuy, 60), chi: chu(m.chi, 40),
-      thu: so(m.thu, 1, 30), nuoi: co(m.nuoi), an: chu(m.an, 120), tk: chu(m.tk, 24) };
+      thu: so(m.thu, 1, 30), nuoi: co(m.nuoi), an: chu(m.an, 120), tk: chu(m.tk, 70) };
   });
   for (const m of ms) for (const r of [m.parent, m.mother, m.spouse, ...m.sp2]) if (r != null && (!ids.has(r) || r === m.id)) throw 0;
   const cha = new Map(ms.map(m => [m.id, m.parent]));   // không cho vòng cha – con
@@ -34,7 +34,7 @@ export function kiemCay(c) {
   if (JSON.stringify(out).length > 1e6) throw 0;
   return out;
 }
-// ---------- đăng nhập bằng Zalo; phiên do máy chủ cấp ----------
+// ---------- đăng nhập bằng Google / Zalo; phiên do máy chủ cấp ----------
 const PHIEN_HAN = 30 * NGAY, CHO_HAN = 10 * 6e4;
 const hex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('');
 const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -43,43 +43,74 @@ const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(
 const banh = (req, k) => { const c = (req.headers.get('Cookie') || '').split(/;\s*/).filter(x => x.startsWith(k + '='));
   return c.length === 1 && /^[0-9a-f]{64}$/.test(c[0].slice(k.length + 1)) ? c[0].slice(k.length + 1) : null };
 const cookie = (k, v, han) => `${k}=${v}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${han}`;
-const PHIEN = '__Host-ss_phien', ZCHO = '__Host-ss_zalo';
+const PHIEN = '__Host-ss_phien', DCHO = '__Host-ss_dn';
 async function ai(env, req) {
   const t = banh(req, PHIEN); if (!t) return null;
   return env.DB.prepare('SELECT n.id, n.ten FROM phien p JOIN nguoi_dung n ON n.id = p.nguoi_id WHERE p.ma_bam = ? AND p.het > ?').bind(await sha(t), Date.now()).first();
 }
 const chuyen = (url, cks) => { const h = new Headers({ Location: url, 'Cache-Control': 'no-store' }); for (const c of cks) h.append('Set-Cookie', c); return new Response(null, { status: 302, headers: h }) };
-const OAUTH = env => env.ZALO_OAUTH || 'https://oauth.zaloapp.com', GRAPH = env => env.ZALO_GRAPH || 'https://graph.zalo.me';   // đổi được để thử với Zalo giả
-async function zaloBatDau(env, req) {
+const form = (url, body, h = {}) => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...h }, body: new URLSearchParams(body) }).then(x => x.json()).catch(() => ({}));
+const lay = (url, h) => fetch(url, { headers: h }).then(x => x.json()).catch(() => ({}));
+// mỗi bên đăng nhập: bật khi có khoá; vao() = địa chỉ trang đăng nhập của họ; doi() = đổi code lấy {id, ten}. *_THU: địa chỉ giả để kiểm thử
+const BEN = {
+  google: { kt: 'g', id: /^[0-9A-Za-z_-]{1,60}$/, bat: env => env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET,
+    vao: (env, ve, st, cc) => (env.GOOGLE_THU || 'https://accounts.google.com') + '/o/oauth2/v2/auth?' + new URLSearchParams({ client_id: env.GOOGLE_CLIENT_ID, redirect_uri: ve,
+      response_type: 'code', scope: 'openid profile', state: st, code_challenge: cc, code_challenge_method: 'S256', prompt: 'select_account' }),
+    async doi(env, ve, code, cv) {
+      const t = await form((env.GOOGLE_THU || 'https://oauth2.googleapis.com') + '/token', { code, client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: ve, grant_type: 'authorization_code', code_verifier: cv });
+      if (!t || typeof t.access_token !== 'string') return null;
+      const me = await lay((env.GOOGLE_THU || 'https://openidconnect.googleapis.com') + '/v1/userinfo', { Authorization: 'Bearer ' + t.access_token });
+      return me && { id: me.sub, ten: me.name } } },
+  zalo: { kt: 'z', id: /^\d{1,30}$/, bat: env => env.ZALO_APP_ID && env.ZALO_APP_SECRET,
+    vao: (env, ve, st, cc) => (env.ZALO_OAUTH || 'https://oauth.zaloapp.com') + '/v4/permission?' + new URLSearchParams({ app_id: env.ZALO_APP_ID, redirect_uri: ve, code_challenge: cc, state: st }),
+    async doi(env, ve, code, cv) {
+      const t = await form((env.ZALO_OAUTH || 'https://oauth.zaloapp.com') + '/v4/access_token', { code, app_id: env.ZALO_APP_ID, grant_type: 'authorization_code', code_verifier: cv }, { secret_key: env.ZALO_APP_SECRET });
+      if (!t || typeof t.access_token !== 'string') return null;
+      const me = await lay((env.ZALO_GRAPH || 'https://graph.zalo.me') + '/v2.0/me?fields=id,name', { access_token: t.access_token });
+      return me && { id: me.id, ten: me.name } } },
+};
+const cachBat = env => Object.keys(BEN).filter(k => BEN[k].bat(env));
+async function batDau(env, req, ben) {
   const st = hex(32), cv = hex(32), cc = b64url(await crypto.subtle.digest('SHA-256', enc.encode(cv))), goc = new URL(req.url).origin;
-  await env.DB.batch([env.DB.prepare('DELETE FROM zalo_cho WHERE het < ?').bind(Date.now()),
-    env.DB.prepare('INSERT INTO zalo_cho (state_bam, cv, het) VALUES (?, ?, ?)').bind(await sha(st), cv, Date.now() + CHO_HAN)]);
-  const u = new URL(OAUTH(env) + '/v4/permission');
-  u.search = new URLSearchParams({ app_id: env.ZALO_APP_ID, redirect_uri: goc + '/api/zalo/ve', code_challenge: cc, state: st });
-  return chuyen(u.href, [cookie(ZCHO, st, CHO_HAN / 1000)]);
+  await env.DB.batch([env.DB.prepare('DELETE FROM dn_cho WHERE het < ?').bind(Date.now()),
+    env.DB.prepare('INSERT INTO dn_cho (state_bam, ben, cv, het) VALUES (?, ?, ?, ?)').bind(await sha(st), ben, cv, Date.now() + CHO_HAN)]);
+  return chuyen(BEN[ben].vao(env, goc + '/api/' + ben + '/ve', st, cc), [cookie(DCHO, st, CHO_HAN / 1000)]);
 }
-async function zaloVe(env, req) {
-  const u = new URL(req.url), st = u.searchParams.get('state') || '', code = u.searchParams.get('code') || '', bo = cookie(ZCHO, '', 0);
+async function ve(env, req, ben) {
+  const u = new URL(req.url), st = u.searchParams.get('state') || '', code = u.searchParams.get('code') || '', bo = cookie(DCHO, '', 0);
   const hong = ly => chuyen(u.origin + '/?dang-nhap=' + ly + '#ca-nhan', [bo]);
   // state phải khớp cookie của chính trình duyệt này: chặn kẻ xấu gài người khác đăng nhập vào tài khoản của hắn
-  if (!/^[0-9a-f]{64}$/.test(st) || banh(req, ZCHO) !== st || !code || code.length > 2000) return hong('loi');
-  const r = await env.DB.prepare('DELETE FROM zalo_cho WHERE state_bam = ? AND het > ? RETURNING cv').bind(await sha(st), Date.now()).first();
+  if (!/^[0-9a-f]{64}$/.test(st) || banh(req, DCHO) !== st || !code || code.length > 2000) return hong('loi');
+  const r = await env.DB.prepare('DELETE FROM dn_cho WHERE state_bam = ? AND ben = ? AND het > ? RETURNING cv').bind(await sha(st), ben, Date.now()).first();
   if (!r) return hong('het-han');
-  const t = await fetch(OAUTH(env) + '/v4/access_token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', secret_key: env.ZALO_APP_SECRET },
-    body: new URLSearchParams({ code, app_id: env.ZALO_APP_ID, grant_type: 'authorization_code', code_verifier: r.cv }) }).then(x => x.json()).catch(() => ({}));
-  if (!t || typeof t.access_token !== 'string') return hong('loi');
-  const me = await fetch(GRAPH(env) + '/v2.0/me?fields=id,name', { headers: { access_token: t.access_token } }).then(x => x.json()).catch(() => ({}));
-  if (!me || typeof me.id !== 'string' || !/^\d{1,30}$/.test(me.id)) return hong('loi');
-  const id = 'z' + me.id, tk = hex(32), now = Date.now();
+  const me = await BEN[ben].doi(env, u.origin + '/api/' + ben + '/ve', code, r.cv);
+  if (!me || typeof me.id !== 'string' || !BEN[ben].id.test(me.id)) return hong('loi');
+  // mã tài khoản = HMAC(TK_KHOA, bên:mã): mã Google (sub) dùng chung mọi dịch vụ, không để lộ cho người trong dòng họ. Không đổi TK_KHOA sau khi có người dùng
+  const k = await crypto.subtle.importKey('raw', enc.encode(env.TK_KHOA), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const id = BEN[ben].kt + b64url(await crypto.subtle.sign('HMAC', k, enc.encode(ben + ':' + me.id))), tk = hex(32), now = Date.now();
   await env.DB.batch([
-    env.DB.prepare('INSERT OR IGNORE INTO nguoi_dung (id, ten, tao) VALUES (?, ?, ?)').bind(id, String(me.name || '').replace(LA, '').trim().slice(0, 60) || 'Bạn', now),
+    env.DB.prepare('INSERT OR IGNORE INTO nguoi_dung (id, ten, tao) VALUES (?, ?, ?)').bind(id, String(me.ten || '').replace(LA, '').trim().slice(0, 60) || 'Bạn', now),
     env.DB.prepare('INSERT INTO phien (ma_bam, nguoi_id, het) VALUES (?, ?, ?)').bind(await sha(tk), id, now + PHIEN_HAN),
     env.DB.prepare('DELETE FROM phien WHERE het < ?').bind(now)]);
-  return chuyen(u.origin + '/#ca-nhan', [cookie(PHIEN, tk, PHIEN_HAN / 1000), bo]);
+  return chuyen(u.origin + '/?dang-nhap=ok#ca-nhan', [cookie(PHIEN, tk, PHIEN_HAN / 1000), bo]);   // dang-nhap=ok: trang vào luôn tài khoản trên máy (js/07-07)
 }
 
+// phòng chung (docs/phong-chung.md): người lạ chỉ thấy tên gọi (chữ cuối), bỏ chữ tục và tên giả ban quản trị
+const XAU = new Set(['đụ', 'địt', 'đit', 'lồn', 'lon', 'cặc', 'cac', 'buồi', 'đĩ', 'đéo', 'deo', 'đm', 'dm', 'đcm', 'dcm', 'vl', 'vcl', 'clm', 'cc', 'loz', 'fuck', 'shit', 'bitch',
+  'admin', 'quantri', 'quảntrị', 'mod', 'moderator', 'songsong', 'bqt']);
+export function tenGoi(ten) {
+  const t = String(ten || '').normalize('NFC');
+  if (/[^\P{L}\p{Script=Latin}]/u.test(t)) return 'Khách viếng';   // chữ ngoài bảng Latin/tiếng Việt (ví dụ "а" Kirin giả "a")
+  const w = t.replace(/[^\p{L}\p{N}\s]/gu, '').trim().split(/\s+/), g = w.pop() || '', ca = w.concat(g).join('').toLowerCase();   // "L.ồ.n" → "Lồn"
+  if (!g || XAU.has(g.toLowerCase()) || /admin|quảntrị|quantri|songsong/.test(ca)) return 'Khách viếng';
+  return g.slice(0, 20);
+}
+const dongPhong = (env, id) => env.PHONG ? env.PHONG.get(env.PHONG.idFromName('chung')).fetch('https://phong/dong', { method: 'POST', headers: { 'X-Id': id } }).catch(() => { }) : null;
+
 // trường tk (người trong cây là tài khoản nào): chỉ được gắn với chính mình, tk của người khác giữ nguyên như bản đang lưu
-function giuTk(cay, cu, minh) { const C = new Map((cu ? cu.members : []).map(m => [m.id, m.tk])); for (const m of cay.members) if (m.tk !== (C.get(m.id) || null) && m.tk !== minh) m.tk = C.get(m.id) || null; return cay }
+function giuTk(cay, cu, minh) { const C = new Map((cu ? cu.members : []).map(m => [m.id, m.tk]));
+  for (const m of cay.members) { const c = C.get(m.id) || null; if (c && c !== minh) m.tk = c; else if (m.tk != null && m.tk !== minh) m.tk = c } return cay }   // người đã gắn với người khác: không ai đè được
 // lưu bản cũ trước khi thay cây, giữ 30 bản gần nhất để trưởng họ khôi phục
 const luuCu = (env, id, toi) => [env.DB.prepare('INSERT OR IGNORE INTO lich_su (dong_ho_id, phien_ban, cay, luc, boi) SELECT id, phien_ban, cay, ?, ? FROM dong_ho WHERE id = ?').bind(Date.now(), toi.id, id),
   env.DB.prepare('DELETE FROM lich_su WHERE dong_ho_id = ? AND phien_ban <= (SELECT MAX(phien_ban) - 30 FROM lich_su WHERE dong_ho_id = ?)').bind(id, id)];
@@ -93,21 +124,29 @@ async function xuLy(env, req, duong, toi) {
   let body = {};
   if (M !== 'GET') { if (+(req.headers.get('Content-Length') || 0) > 1.2e6) return loi(413, 'Dữ liệu quá lớn.'); const t = await req.text(); if (enc.encode(t).length > 1.2e6) return loi(413, 'Dữ liệu quá lớn.'); try { body = t ? JSON.parse(t) : {} } catch { return loi(400, 'Dữ liệu không đọc được.') } if (!body || typeof body !== 'object') return loi(400, 'Dữ liệu không đọc được.') }
 
-  if (a === 'zalo' && id === 'bat-dau' && M === 'GET') return zaloBatDau(env, req);
-  if (a === 'zalo' && id === 've' && M === 'GET') return zaloVe(env, req);
+  if (Object.hasOwn(BEN, a) && BEN[a].bat(env) && M === 'GET' && !b) { if (id === 'bat-dau') return batDau(env, req, a); if (id === 've') return ve(env, req, a) }
   if (a === 'dang-xuat' && M === 'POST') {
     const t = banh(req, PHIEN); if (t) await env.DB.prepare('DELETE FROM phien WHERE ma_bam = ?').bind(await sha(t)).run();
+    if (toi) await dongPhong(env, toi.id);   // kết nối phòng chung đang mở cũng phải ra
     return json({ ok: true }, 200, { 'Set-Cookie': cookie(PHIEN, '', 0) });
   }
   if (a === 'toi' && M === 'GET') {
-    if (!toi) return json({ nguoi: null });
+    if (!toi) return json({ nguoi: null, cach: cachBat(env) });
     const { results } = await env.DB.prepare('SELECT d.id, d.ten, t.vai FROM thanh_vien t JOIN dong_ho d ON d.id = t.dong_ho_id WHERE t.nguoi_id = ? ORDER BY t.vao').bind(toi.id).all();
-    return json({ nguoi: toi, dong_ho: results });
+    return json({ nguoi: toi, dong_ho: results, cach: cachBat(env), phong: !!env.PHONG });
   }
   if (!toi) return loi(401, 'Hãy đăng nhập.');
+  // phòng chung (docs/phong-chung.md): chỉ người đã đăng nhập; chuyển kết nối WebSocket sang Durable Object kèm mã và tên do máy chủ xác nhận
+  if (a === 'phong' && !id && M === 'GET') {
+    if (!env.PHONG) return loi(503, 'Phòng chung chưa được bật.');
+    if ((req.headers.get('Upgrade') || '').toLowerCase() !== 'websocket') return loi(426, 'Cần WebSocket.');
+    let cung = false; try { cung = new URL(req.headers.get('Origin') || '').host === new URL(req.url).host } catch { }   // chống trang khác mượn cookie mở kết nối
+    if (!cung) return loi(403, 'Yêu cầu không đến từ trang Song Song.');
+    return env.PHONG.get(env.PHONG.idFromName('chung')).fetch('https://phong/ws', { headers: { Upgrade: 'websocket', 'X-Id': toi.id, 'X-Ten': encodeURIComponent(tenGoi(toi.ten)) } });
+  }
   if (a === 'toi' && M === 'PUT') {
     let ten; try { ten = chu(body.ten, 60, true) } catch { return loi(400, 'Tên từ 1 đến 60 ký tự.') }
-    await env.DB.prepare('UPDATE nguoi_dung SET ten = ? WHERE id = ?').bind(ten, toi.id).run(); return json({ ten });
+    await env.DB.prepare('UPDATE nguoi_dung SET ten = ? WHERE id = ?').bind(ten, toi.id).run(); await dongPhong(env, toi.id); return json({ ten });
   }
 
   if (a === 'tham-gia' && M === 'POST') {
@@ -217,7 +256,7 @@ async function xuLy(env, req, duong, toi) {
 
 export async function onRequest({ request: req, env, params }) {
   try {
-    if (!env.DB || !env.ZALO_APP_ID || !env.ZALO_APP_SECRET) return loi(503, 'Máy chủ gia phả chưa được cấu hình.');
+    if (!env.DB || !env.TK_KHOA || !cachBat(env).length) return loi(503, 'Máy chủ gia phả chưa được cấu hình.');
     if (req.method !== 'GET') {   // chống giả mạo yêu cầu từ trang khác
       const o = req.headers.get('Origin');
       let cung = false; try { cung = !!o && new URL(o).host === new URL(req.url).host } catch { }

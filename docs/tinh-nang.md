@@ -32,6 +32,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 |---|---|
 | `01-man-cho.js` | Màn chờ có thanh phần trăm; máy có 3D thì chờ cảnh 3D sắp vào nạp xong (tối đa 60 giây), cảnh khác nạp ngầm |
 | `02-am-lich.js` | Lịch âm Việt Nam (thuật toán Hồ Ngọc Đức, UTC+7), biến toàn cục `LV` |
+| `02-09-phong-chung.js` | Phòng chung trên máy chủ Song Song (`window.ssPhong`): chỉ người đã đăng nhập Google; cùng cách gọi với phòng của claude.ai để `03`, `04-01` vẽ người khác. Máy chủ: `phong/` (Durable Object), `docs/phong-chung.md` |
 | `03-nhac-nen.js` | Nhạc nền tự soạn bằng Web Audio theo lối (đàn tranh / organ) |
 | `04-00-du-lieu-canh.js` | Dữ liệu 7 cảnh (`window.SS_CANH`): lưới đi được, tỉ lệ, điểm bấm theo toạ độ ảnh camera iso (ảnh 2D đã bỏ, chỉ còn 3D). Sửa cảnh là sửa file này |
 | `04-01-the-gioi-nui.js` | Thế giới núi: chân núi → lên núi → chính điện, nhân vật, di chuyển |
@@ -43,13 +44,13 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `07-04-cua-hang-ngoi-nha.js` | Cửa hàng, ví nén, quà đã nhận, điều khiển ngôi nhà |
 | `07-05-hieu-ung-ban-do.js` | Hiệu ứng hồ sơ, bản đồ mộ phần thật |
 | `07-06-gioi-thieu.js` | Dải gradient, minh họa isometric trang giới thiệu |
-| `07-07-dang-ky.js` | Đăng ký / đăng nhập (bản trình diễn) |
+| `07-07-dang-ky.js` | Đăng ký / đăng nhập (bản trình diễn). Nút "Đăng nhập bằng Google" ở đầu khung (chỉ hiện khi máy chủ bật Google, `/api/toi` → `cach`): Google xong máy chủ chuyển về `/?dang-nhap=ok#ca-nhan`, trang vào luôn tài khoản trên máy bằng tên Google |
 | `07-08-thien-gioi.js` | Nền thiên giới: biển mây, hạc bay, cánh hoa |
 | `07-09-vong-ky-uc.js` | Vòng ký ức ảnh/video quay quanh tâm |
 | `07-10-den-troi-menu.js` | Đèn trời sau lời mời, menu điện thoại |
 | `07-11-am-thanh.js` | Âm thanh thanh tịnh (Web Audio) |
 | `07-12-trang-ca-nhan.js` | Ảnh chân dung, trang cá nhân: gia phả, làng dòng họ, ví nén. Gia phả kiểu Việt: bố + mẹ (`parent`, `mother`), nhiều vợ/chồng (`spouse` là người đầu, `sp2` là người thứ), đời tự tính, chi/ngành, con thứ, con nuôi, tên húy/tự/thụy hiệu, ngày sinh/mất (`ns`, `nm`, `nmAl` = âm lịch), ngày giỗ âm lịch tự tính (`ssGio(d,m)` cho lịch vạn niên), nơi an táng; sửa thông tin từng người. Cây lớn: tìm tên không cần dấu, phóng to/thu nhỏ/vừa khung, kéo chuột để di chuyển, thu gọn/mở từng chi (nút dưới mỗi khối, ghi số người đang ẩn). Cây vẽ bằng SVG theo kiểu cây mọc lên: tổ tiên ở gốc dưới cùng (thân, rễ), con cháu toả lên trên các cành cong có lá, tán lá mờ phía sau. Mỗi người là một quả tròn mang chữ đầu tên (ngọc: còn sống, đồng: đã khuất, đỏ: liệt sĩ), kèm nến lay lắt hoặc mầm cây, tên ghi dưới quả. Vợ chồng nối bằng hai vòng như logo; chọn một người thì cả dòng tổ tiên sáng vàng; người mới hiện ra nở dần từ gốc lên (chỉ người chưa vẽ lần trước, `daVe`). Tắt hết chuyển động khi máy bật giảm chuyển động |
-| `07-14-gia-pha-dong-ho.js` | Khung "Gia phả của cả dòng họ" trên tab Gia phả: nút "Đăng nhập bằng Zalo" (máy chủ lo, phiên trong cookie HttpOnly); lập dòng họ từ cây trên máy hoặc vào bằng mã mời; trưởng họ/người duyệt sửa là lưu thẳng lên máy chủ, thành viên sửa thành đề xuất chờ duyệt; danh sách đề xuất (tóm tắt thêm/sửa/xoá ai), mã mời, thành viên và vai. Tự ẩn khi không có máy chủ. Máy chủ: `functions/api`, `docs/gia-pha-dong-ho.md` |
+| `07-14-gia-pha-dong-ho.js` | Khung "Gia phả của cả dòng họ" trên tab Gia phả: nút "Đăng nhập bằng Google" (Zalo khi máy chủ bật; máy chủ lo, phiên trong cookie HttpOnly); lập dòng họ từ cây trên máy hoặc vào bằng mã mời; trưởng họ/người duyệt sửa là lưu thẳng lên máy chủ, thành viên sửa thành đề xuất chờ duyệt; danh sách đề xuất (tóm tắt thêm/sửa/xoá ai), mã mời, thành viên và vai. Tự ẩn khi không có máy chủ. Máy chủ: `functions/api`, `docs/gia-pha-dong-ho.md` |
 | `07-13-khoi-tao.js` | Khởi tạo, chuyển động toàn trang |
 | `08-icon-bien-hinh.js` | Icon biến hình (morphicons, tải từ jsdelivr) |
 | `09-trang-nguoi-than.js` | Trang Người thân |
