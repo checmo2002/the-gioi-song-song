@@ -12,8 +12,16 @@ DU_AN = 'song-song-thu'
 loi = []
 
 # ---------- Firebase giả ----------
-khoa, khoa_la = rsa.generate_private_key(public_exponent=65537, key_size=2048), rsa.generate_private_key(public_exponent=65537, key_size=2048)
-KID = 'thu-%d' % random.randint(1, 10**9)
+# khoá thử giữ cố định giữa các lần chạy (máy chủ chỉ tải lại khoá Firebase tối đa 5 phút một lần)
+import os, tempfile, hashlib
+from cryptography.hazmat.primitives import serialization
+TEP = os.path.join(tempfile.gettempdir(), 'ss-may-chu-khoa.pem')
+if os.path.exists(TEP): khoa = serialization.load_pem_private_key(open(TEP, 'rb').read(), None)
+else:
+    khoa = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    open(TEP, 'wb').write(khoa.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()))
+khoa_la = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+KID = 'thu-' + hashlib.sha256(str(khoa.public_key().public_numbers().n).encode()).hexdigest()[:12]
 b64u = lambda n: base64.urlsafe_b64encode(n.to_bytes((n.bit_length() + 7) // 8, 'big')).rstrip(b'=').decode()
 pub = khoa.public_key().public_numbers()
 JWKS = json.dumps({'keys': [{'kty': 'RSA', 'alg': 'RS256', 'use': 'sig', 'kid': KID, 'n': b64u(pub.n), 'e': b64u(pub.e)}]}).encode()
@@ -151,6 +159,34 @@ st, r = A.goi('POST', f'/api/dong-ho/{DH}/vai', {'nguoi_id': idB, 'vai': 'thanh-
 st, r = C.goi('POST', '/api/tham-gia', {'ma': MA2}); ky('mã của người bị hạ vai hết hiệu lực', r, st, 404)
 st, r = A.goi('POST', f'/api/dong-ho/{DH}/xoa-thanh-vien', {'nguoi_id': idB}); ky('A mời B ra khỏi dòng họ', r, st, 200)
 st, r = B.goi('GET', f'/api/dong-ho/{DH}'); ky('B đã ra không xem được nữa', r, st, 404)
+st, r = A.goi('POST', f'/api/dong-ho/{DH}/loi-moi', {}); MA3 = r.get('ma')
+st, r = B.goi('POST', '/api/tham-gia', {'ma': MA3}); ky('người bị mời ra không vào lại bằng mã mới', r, st, 404)
+
+# ---------- gắn tài khoản (tk): chỉ gắn với chính mình ----------
+st, r = A.goi('GET', f'/api/dong-ho/{DH}'); pb = r['phien_ban']; cay = r['cay']
+cay['members'][1]['tk'] = 'uid-nguoi-khac'; cay['members'][0]['tk'] = idA
+st, r = A.goi('PUT', f'/api/dong-ho/{DH}/cay', {'cay': cay, 'phien_ban': pb}); ky('A lưu cây có tk', r, st, 200)
+st, r = A.goi('GET', f'/api/dong-ho/{DH}'); ms = r['cay']['members']
+if ms[1].get('tk') is not None: loi.append('gắn được người trong cây với tài khoản người khác')
+if ms[0].get('tk') != idA: loi.append('không tự gắn được người trong cây với chính mình')
+
+# ---------- lịch sử, khôi phục sau khi cây bị xoá sạch ----------
+pb = r['phien_ban']
+st, r = A.goi('PUT', f'/api/dong-ho/{DH}/cay', {'cay': {'members': [], 'seq': 1}, 'phien_ban': pb}); ky('xoá sạch cây (để thử khôi phục)', r, st, 200)
+st, r = A.goi('GET', f'/api/dong-ho/{DH}/lich-su'); ky('trưởng họ xem các bản cũ', r, st, 200)
+ls = r.get('lich_su', [])
+if not ls or ls[0]['phien_ban'] != pb or not ls[0]['so_nguoi']: loi.append(f'lịch sử phải có bản {pb} trước khi xoá: {ls[:2]}')
+st, r = A.goi('POST', f'/api/dong-ho/{DH}/khoi-phuc', {'ve': pb, 'phien_ban': pb + 1}); ky('khôi phục bản cũ', r, st, 200)
+st, r = A.goi('GET', f'/api/dong-ho/{DH}')
+if len(r['cay']['members']) != len(ms): loi.append('khôi phục xong cây chưa về như cũ')
+st, r = C.goi('GET', f'/api/dong-ho/{DH}/lich-su'); ky('người ngoài không xem lịch sử', r, st, 404)
+
+# ---------- kid lạ không làm máy chủ lỗi ----------
+for kid in ('constructor', '__proto__', 'toString'):
+    t = jwt.encode({'aud': DU_AN, 'sub': 'x'}, khoa, algorithm='RS256', headers={'kid': kid})
+    st, r = Nguoi(t).goi('POST', '/api/dong-ho', {'ten': 'Họ X', 'cay': CAY}); ky(f'kid "{kid}" bị từ chối, không lỗi máy chủ', r, st, 401)
+st, r = A.goi('PUT', '/api/toi', {'ten': 'Trưởng\u200b họ\u2028 Phạm\ufeff'})
+if r.get('ten') != 'Trưởng họ Phạm': loi.append(f'chưa lọc ký tự rộng 0 / xuống dòng lạ: {r.get("ten")!r}')
 
 for x in loi: print('  ✗', x)
 assert not loi, 'KHÔNG ĐẠT'

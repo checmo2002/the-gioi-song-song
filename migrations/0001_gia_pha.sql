@@ -40,3 +40,17 @@ CREATE TABLE de_xuat (
   xu_ly_luc INTEGER
 );
 CREATE INDEX de_xuat_dong_ho ON de_xuat(dong_ho_id, trang_thai);
+CREATE TABLE chan (                -- người đã bị trưởng họ mời ra: không vào lại bằng mã mời
+  dong_ho_id TEXT NOT NULL REFERENCES dong_ho(id),
+  nguoi_id TEXT NOT NULL,
+  luc INTEGER NOT NULL,
+  PRIMARY KEY (dong_ho_id, nguoi_id)
+);
+CREATE TABLE lich_su (             -- bản cây cũ trước mỗi lần thay (giữ 30 bản), để trưởng họ khôi phục
+  dong_ho_id TEXT NOT NULL REFERENCES dong_ho(id),
+  phien_ban INTEGER NOT NULL,
+  cay TEXT NOT NULL,
+  luc INTEGER NOT NULL,
+  boi TEXT,
+  PRIMARY KEY (dong_ho_id, phien_ban)
+);
