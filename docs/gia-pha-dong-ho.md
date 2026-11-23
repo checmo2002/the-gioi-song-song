@@ -3,7 +3,7 @@
 Chủ dự án chốt ngày 23/11/2026:
 - Máy chủ chạy trên **Cloudflare**, trong tài khoản Cloudflare riêng của Song Song (dự án Pages `thegioisongsong`), dùng gói miễn phí. Phần xử lý là Pages Functions, dữ liệu nằm trong D1.
 - Khi người trong họ sửa gia phả, **trưởng họ duyệt**.
-- **Đăng nhập bằng Firebase Authentication của Google**, theo `docs/bao-mat.md`: không tự viết phần mật khẩu. Người dùng đăng nhập bằng email + mật khẩu (miễn phí). Firebase lo cả việc xác nhận email và quên mật khẩu.
+- **Đăng nhập bằng Zalo** (chốt lại cùng ngày, bỏ Firebase vì Firebase đòi thẻ thanh toán). Theo `docs/bao-mat.md`: không tự viết phần mật khẩu, Zalo giữ mật khẩu và lo việc quên mật khẩu, đăng nhập sai nhiều lần. Máy chủ chỉ nhận từ Zalo mã người dùng và tên hiển thị; không xin số điện thoại.
 
 ## Ai làm được gì
 
@@ -18,7 +18,6 @@ Chủ dự án chốt ngày 23/11/2026:
   - Gồm 10 ký tự, có hạn 14 ngày, dùng được nhiều lần.
   - Trưởng họ có thể thu hồi tất cả mã của dòng họ.
   - Khi một người bị hạ vai hoặc bị mời ra, các mã người đó đã tạo hết hiệu lực.
-- **Phải xác nhận email trước** khi lập dòng họ, vào dòng họ hay sửa gia phả. Việc này ngăn người khác dùng email không phải của mình.
 - **Người bị mời ra** không vào lại được, kể cả bằng mã mời mới (bảng `chan`). Đề xuất đang chờ của người đó bị bỏ.
 - **Lịch sử:** trước mỗi lần thay cây (sửa thẳng, duyệt, khôi phục), máy chủ lưu bản cũ, giữ 30 bản gần nhất (bảng `lich_su`). Trưởng họ xem và khôi phục được, phòng khi cây bị xoá nhầm hoặc bị phá.
 - Trường `tk` (người trong cây là tài khoản nào): mỗi người chỉ gắn được với chính tài khoản mình; `tk` của người khác máy chủ giữ nguyên như bản đang lưu.
@@ -28,7 +27,7 @@ Chủ dự án chốt ngày 23/11/2026:
 
 - Mỗi dòng họ lưu **một cây** dạng JSON, có cùng các trường với gia phả trên máy (xem `docs/tinh-nang.md`, phần `07-12`), và một `phien_ban` tăng dần sau mỗi lần sửa.
   - Những trường riêng của từng máy (`self`, nhà 3D) không được đưa lên.
-  - Người trong cây gắn với tài khoản qua trường `tk` (mã tài khoản Firebase).
+  - Người trong cây gắn với tài khoản qua trường `tk` (mã tài khoản trên máy chủ: `z` + mã người dùng Zalo).
 - Một đề xuất là **cả cây đề xuất**, kèm một dòng ghi chú. Đề xuất chỉ nhận khi được làm trên đúng phiên bản hiện tại.
 - Khi duyệt:
   - Nếu cây chưa đổi từ lúc đề xuất được gửi, cây đề xuất thay cây hiện tại.
@@ -37,20 +36,26 @@ Chủ dự án chốt ngày 23/11/2026:
 - Mỗi người gửi tối đa 30 đề xuất một ngày và có tối đa 20 đề xuất đang chờ.
 
 Các bảng D1 (`migrations/0001_gia_pha.sql`):
-- `nguoi_dung`: mã tài khoản Firebase và tên hiển thị. Không lưu email hay mật khẩu.
+- `nguoi_dung`: `z` + mã người dùng Zalo, và tên hiển thị. Không lưu số điện thoại, email hay mật khẩu.
+- `phien`: phiên đăng nhập. Chỉ lưu SHA-256 của mã phiên, hạn 30 ngày.
+- `zalo_cho`: lượt đăng nhập Zalo đang dở (SHA-256 của `state`, `code_verifier` của PKCE), hạn 10 phút, dùng một lần.
 - `dong_ho`: dòng họ, gồm cây và phiên bản.
 - `thanh_vien`: ai thuộc dòng họ nào, với vai gì.
 - `loi_moi`: mã mời. Chỉ lưu SHA-256 của mã, không lưu mã gốc.
 - `de_xuat`: các đề xuất và trạng thái của chúng.
+- `chan`: người đã bị mời ra.
+- `lich_su`: 30 bản cây cũ gần nhất.
 
 ## API (`functions/api/[[duong]].js`)
 
-Mọi yêu cầu cần đăng nhập đều gửi kèm `Authorization: Bearer <mã đăng nhập Firebase>`. Thân yêu cầu và trả lời đều là JSON. Khi lỗi, máy chủ trả `{loi: "câu tiếng Việt"}`.
+Đăng nhập xong, trình duyệt giữ cookie `ss_phien` (HttpOnly, Secure, SameSite=Lax, chỉ gửi cho `/api`), trang không đọc được mã này. Thân yêu cầu và trả lời đều là JSON. Khi lỗi, máy chủ trả `{loi: "câu tiếng Việt"}`.
 
 | Lệnh | Việc |
 |---|---|
-| `GET /api/cau-hinh` | Trả `{apiKey, projectId}` để trang gọi Firebase. Khoá web Firebase là khoá công khai; để ở biến môi trường cho repo không chứa khoá |
-| `GET /api/toi` | Tài khoản, cờ email đã xác nhận, các dòng họ đang tham gia |
+| `GET /api/zalo/bat-dau` | Bắt đầu đăng nhập: tạo `state` và PKCE, chuyển sang trang đăng nhập của Zalo |
+| `GET /api/zalo/ve` | Zalo chuyển về đây kèm `code`. Máy chủ đổi `code` lấy mã truy cập, hỏi Zalo tên người dùng, tạo phiên rồi chuyển về `/#ca-nhan` |
+| `POST /api/dang-xuat` | Xoá phiên |
+| `GET /api/toi` | Tài khoản (`null` nếu chưa đăng nhập), các dòng họ đang tham gia |
 | `PUT /api/toi` | Đổi tên hiển thị: `{ten}` |
 | `POST /api/dong-ho` | Lập dòng họ từ cây trên máy: `{ten, cay}` |
 | `GET /api/dong-ho/:id` | Cây, phiên bản, vai của mình |
@@ -70,14 +75,14 @@ Mọi yêu cầu cần đăng nhập đều gửi kèm `Authorization: Bearer <m
 
 ## Bảo mật
 
-- **Xác minh mã đăng nhập.** Máy chủ tự xác minh mã đăng nhập Firebase (JWT, thuật toán RS256):
-  - chữ ký đúng với khoá công khai Google công bố (khoá được lưu tạm, khi Google đổi khoá thì tải lại);
-  - `aud` và `iss` đúng dự án Firebase của mình;
-  - mã chưa hết hạn.
-  - Gặp `kid` lạ thì tải lại khoá, nhưng tối đa 5 phút một lần. Bảng khoá dùng `Map`, nên `kid` như `constructor` không làm hỏng máy chủ.
-  - Mã đăng nhập sống tối đa 1 giờ. Tài khoản bị khoá hoặc đổi mật khẩu thì mã cũ vẫn dùng được tới khi hết hạn; đây là giới hạn của cách xác minh không cần hỏi Google mỗi lần.
-- **Chống trang khác gửi yêu cầu thay người dùng.** Mã đăng nhập không tự gửi kèm như cookie, nên trang khác không mượn được. Ngoài ra, mọi lệnh ghi còn bắt buộc có `Origin` trùng tên miền của trang và `Content-Type: application/json`.
-- **Đăng nhập sai nhiều lần, quên mật khẩu, xác nhận email:** Firebase lo.
+- **Đăng nhập Zalo (OAuth v4 + PKCE):**
+  - `state` ngẫu nhiên vừa nằm trong cookie `ss_zalo` của chính trình duyệt đó, vừa lưu (dạng SHA-256) ở `zalo_cho`. Lúc Zalo chuyển về, hai bên phải khớp, nên kẻ khác không gài được lượt đăng nhập của họ vào máy người dùng.
+  - Mỗi lượt dùng một lần, hạn 10 phút. `code_verifier` không rời máy chủ.
+  - Khoá bí mật của ứng dụng Zalo (`ZALO_APP_SECRET`) chỉ nằm ở biến bí mật của Cloudflare, không ở repo, không ở trang.
+  - Mã truy cập Zalo chỉ dùng một lần để hỏi tên, không lưu.
+- **Phiên:** mã phiên 32 byte ngẫu nhiên, cookie HttpOnly (trang và mã độc chèn vào trang không đọc được). Cơ sở dữ liệu chỉ giữ SHA-256 của mã. Đăng xuất là xoá phiên ở máy chủ.
+- **Chống trang khác gửi yêu cầu thay người dùng:** cookie là SameSite=Lax, và mọi lệnh ghi còn bắt buộc có `Origin` trùng tên miền của trang và `Content-Type: application/json`.
+- **Đăng nhập sai nhiều lần, quên mật khẩu:** Zalo lo.
 - **Kiểm cây ở máy chủ trước khi lưu:**
   - tối đa 2.000 người và 1 MB;
   - chỉ giữ các trường đã biết, đúng kiểu, độ dài có giới hạn;
@@ -85,7 +90,7 @@ Mọi yêu cầu cần đăng nhập đều gửi kèm `Authorization: Bearer <m
   - quan hệ phải trỏ tới người có trong cây, không trỏ vào chính mình, không có vòng cha – con;
   - không nhận id `__proto__`, `constructor`, `prototype`.
 - **Hiển thị:** chữ người dùng nhập vẫn đi qua `esc()` khi đưa lên trang.
-- **Kiểm thử:** `tests/may-chu.py` dựng một "Firebase giả" (tự sinh khoá RSA, tự ký mã) và thử trên máy chủ thật chạy ở máy. Gồm mã giả, mã hết hạn, mã của dự án khác, `alg: none`, quyền của từng vai, cây xấu, giả mạo yêu cầu, thu hồi mã mời.
+- **Kiểm thử:** `tests/may-chu.py` dựng một "Zalo giả" (kiểm `secret_key`, `app_id` và PKCE như Zalo thật) và thử trên máy chủ thật chạy ở máy. Gồm: gài `state` của trình duyệt khác, sai `code_verifier`, dùng lại `state`, phiên giả, đăng xuất, quyền của từng vai, cây xấu, giả mạo yêu cầu, thu hồi mã mời, người bị mời ra vào lại.
 
 ## Chạy thử ở máy
 
@@ -105,48 +110,46 @@ database_name = "gia-pha-thu"
 database_id = "00000000-0000-0000-0000-000000000000"
 migrations_dir = "migrations"
 EOF
-printf 'FIREBASE_PROJECT_ID=song-song-thu\nFIREBASE_API_KEY=khoa-thu\nFIREBASE_JWKS=http://localhost:8790/jwks\n' > .dev.vars
+printf 'ZALO_APP_ID=app-thu\nZALO_APP_SECRET=bi-mat-thu\nZALO_OAUTH=http://localhost:8790\nZALO_GRAPH=http://localhost:8790\n' > .dev.vars
 npx wrangler d1 migrations apply gia-pha-thu --local
 npx wrangler pages dev --port 8788 &
-cd <repo> && python3 tests/may-chu.py           # cần python: pyjwt, cryptography
+cd <repo> && python3 tests/may-chu.py           # chỉ cần thư viện chuẩn của python
 ```
 
 ## Đưa lên mạng (làm một lần, cần chủ dự án)
 
-1. **Firebase**, việc chủ dự án làm (miễn phí):
-   - Tạo dự án Firebase.
-   - Bật đăng nhập Email/Password.
-   - Thêm `thegioisongsong.pages.dev` (và tên miền riêng khi có) vào Authorized domains.
-   - Trong Google Cloud Console, giới hạn khoá web chỉ dùng được từ tên miền đó.
+1. **Ứng dụng Zalo**, việc chủ dự án làm (miễn phí) ở developers.zalo.me:
+   - Tạo ứng dụng, lấy **App ID** và **khoá bí mật** (Secret Key).
+   - Bật "Đăng nhập", thêm địa chỉ gọi lại `https://thegioisongsong.pages.dev/api/zalo/ve` (thêm tên miền riêng khi có).
+   - Bản xem trước của PR có tên miền khác nên không đăng nhập Zalo được; thử đăng nhập trên `thegioisongsong.pages.dev`.
 2. **Hai cơ sở dữ liệu D1 riêng:**
    - `songsong-gia-pha` cho Production.
    - `songsong-gia-pha-thu` cho Preview, **chỉ chứa dữ liệu hư cấu**. Mọi nhánh, mọi PR đều có bản xem trước, nên không bao giờ gắn D1 thật cho Preview.
    - Chạy `migrations/0001_gia_pha.sql` trên cả hai.
 3. **Gắn vào dự án Pages**, ở Settings → Bindings / Variables:
    - biến `DB` trỏ tới D1 tương ứng với từng môi trường;
-   - `FIREBASE_PROJECT_ID` và `FIREBASE_API_KEY`.
+   - `ZALO_APP_ID` (biến thường) và `ZALO_APP_SECRET` (chọn **Encrypt**, là biến bí mật).
 
 Khi chưa gắn, `/api/*` trả lỗi 503 và khung "Gia phả của cả dòng họ" tự ẩn; phần còn lại của trang chạy như cũ.
 
 ## Giao diện (`js/07-14-gia-pha-dong-ho.js`)
 
-Khung "Gia phả của cả dòng họ" nằm trên cây, trong tab Gia phả của trang Gia đình. Khung tự ẩn khi `/api/cau-hinh` không trả lời được, ví dụ khi mở bằng `python3 -m http.server`.
+Khung "Gia phả của cả dòng họ" nằm trên cây, trong tab Gia phả của trang Gia đình. Khung tự ẩn khi `/api/toi` không trả lời được, ví dụ khi mở bằng `python3 -m http.server`.
 
-1. **Chưa đăng nhập:** khung đóng gọn. Mở ra thì có email, mật khẩu và ba nút Đăng nhập / Tạo tài khoản / Quên mật khẩu. Trang gọi thẳng REST của Firebase, không nạp thư viện ngoài.
-2. **Chưa xác nhận email:** báo đã gửi thư, kèm các nút "Tôi đã xác nhận", "Gửi lại thư", "Đăng xuất".
-3. **Chưa nối dòng họ:** danh sách dòng họ đang tham gia, ô lập dòng họ từ cây trên máy, ô vào dòng họ bằng mã mời. Nếu trên máy đã có gia phả, phải bấm hai lần để đồng ý thay bằng cây chung của họ.
-4. **Đã nối dòng họ:**
+1. **Chưa đăng nhập:** khung đóng gọn. Mở ra thì có nút xanh "Đăng nhập bằng Zalo" (một đường dẫn tới `/api/zalo/bat-dau`, không nạp thư viện ngoài). Nếu lượt đăng nhập lỗi hoặc quá 10 phút, khung báo lại.
+2. **Chưa nối dòng họ:** danh sách dòng họ đang tham gia, ô lập dòng họ từ cây trên máy, ô vào dòng họ bằng mã mời. Nếu trên máy đã có gia phả, phải bấm hai lần để đồng ý thay bằng cây chung của họ.
+3. **Đã nối dòng họ:**
    - Trưởng họ hoặc người duyệt sửa trên cây là lưu thẳng lên máy chủ. Nếu người khác vừa sửa trước, trang tải bản mới và báo lại.
    - Thành viên sửa thì thành bản nháp: hiện khung "Gửi đề xuất" kèm ghi chú, hoặc "Bỏ thay đổi".
    - Nút: đề xuất (tóm tắt thêm / sửa / xoá ai), tạo mã mời, thành viên (trưởng họ đổi vai ngay tại đây), tải lại, ngắt dòng họ khỏi máy này.
 
-Mã làm mới đăng nhập Firebase lưu ở `localStorage` (`ss-fb`), giống cách thư viện Firebase vẫn làm. Thông tin dòng họ đang nối lưu ở `ss-dong-ho`.
+Trang không giữ mã đăng nhập nào (phiên nằm trong cookie HttpOnly). Thông tin dòng họ đang nối lưu ở `ss-dong-ho`. Bấm "Thoát" của trang cũng đăng xuất khỏi máy chủ.
 
 ## Chưa làm
 
 - Người vào dòng họ chưa tự đánh dấu được "đây là tôi" trên cây chung (trường `tk`). Hiện chỉ người lập dòng họ được gắn sẵn.
-- Đăng nhập bằng tài khoản Google (đăng nhập qua cửa sổ của Google).
-- Đăng nhập bằng số điện thoại (mã OTP qua SMS, mỗi tin bị tính phí).
+- Cách đăng nhập khác ngoài Zalo (Google, số điện thoại).
+- Chạy máy chủ trên máy riêng của chủ dự án (wrangler + Cloudflare Tunnel): cần tên miền trước.
 - Ảnh và ký ức lưu trên máy chủ.
 - Thấy người khác đang trực tuyến.
 - Chính sách quyền riêng tư và điều khoản sử dụng: **cần chủ dự án duyệt trước khi mở cho người thật**.
