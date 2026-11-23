@@ -102,8 +102,7 @@
     if(p.a==='lay'){p.f+=dt*2.6;if(p.f>=5.99){p.a='chap';p.f=0}}}
    if(p.me&&pend&&dpx<=1.5&&!(p.path&&p.path.length)){var q=pend;pend=null;if(!hall.hidden)q()}   // đã rời thế giới trong lúc đi: bỏ việc đang chờ (#80)
    draw(p)});
-  if(st.map&&on())follow(false);
-  requestAnimationFrame(tick)}
+  if(st.map&&on())follow(false)}
  var pend=null;
  function upsert(id,pr,isMe){var p=av[id];if(!p){p=av[id]=mk(id,isMe);if(!isMe){p.x=+pr.x||.5;p.y=+pr.y||.9}}
   p.k=pr.k===1?1:0;p.tc=window.ssNVTC&&ssNVTC.doc(pr.tc)?pr.tc:'';   // kiểu nhân vật tự tạo (js/31), của người khác thì kiểm tra trước khi dùng
@@ -178,6 +177,6 @@ var seen={me:1},n=1,here=1;upsert('me',me,true);
  addEventListener('resize',function(){if(on()){clearSigns();layout()}});
  document.addEventListener('click',function(ev){var tg=ev.target.closest('.wl-toggle');if(!tg)return;ev.preventDefault();ev.stopPropagation();var l=tg.closest('.hall-list');l.classList.toggle('open');hall.classList.toggle('list-open',l.classList.contains('open'));tg.setAttribute('aria-expanded',l.classList.contains('open'))},true);
  window._wdbg=function(){return {me:me,av:av.me&&{x:av.me.x,y:av.me.y,tx:av.me.tx,ty:av.me.ty,a:av.me.a},st:st,scene:scene,O:O}};
- requestAnimationFrame(tick);setTimeout(refresh,60);
+ ssVong(tick,[hall]);setTimeout(refresh,60);   // dừng khi đại sảnh đóng hoặc tab ẩn
  if(window.claude&&claude.use)claude.use('room').then(function(r){if(!r)return;room=r;r.onPeers(function(){sync()},function(){room=null});send();setInterval(send,15000)}).catch(function(){});
 })();

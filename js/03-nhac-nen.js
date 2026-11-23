@@ -6,7 +6,7 @@
  // hiệu ứng (chuông, mõ, nến, bay lên): âm lượng chung 0..1 do bảng cài đặt (js/27) chỉnh; mỗi AudioContext đi qua một nút gain riêng
  window.ssSfx=function(){try{var v=parseFloat(localStorage.getItem('ss-sfx'));if(v>=0&&v<=1)return v}catch(e){}return 1};
  window.ssRa=function(ac){if(!ac._sfx){ac._sfx=ac.createGain();ac._sfx.connect(ac.destination)}ac._sfx.gain.value=ssSfx();return ac._sfx};
- function mk(){if(ctx)return;var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=new AC();
+ function mk(){if(ctx)return;var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=ssAm();
   master=ctx.createGain();master.gain.value=0;master.connect(ctx.destination);
   // vang: tiếng dội của chính điện / thánh đường
   var len=ctx.sampleRate*4.5,ir=ctx.createBuffer(2,len,ctx.sampleRate);

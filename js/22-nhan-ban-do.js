@@ -23,5 +23,5 @@
    if(!off&&hud.some(function(h){return hit(r,h,2)}))off=true;   // cả nhãn chính: nằm dưới thanh trên / nút thì ẩn, ra khỏi chỗ đó lại hiện
    if(!off&&placed.some(function(p){return hit(r,p,4)}))off=true;
    it.el.classList.toggle('wh-off',off);if(!off)placed.push(r)})}
- window.ssDeclutter=run;setInterval(function(){try{run()}catch(e){console.error('declutter',e)}},200);addEventListener('resize',function(){setTimeout(run,60)});
+ window.ssDeclutter=run;setInterval(function(){if(document.hidden)return;try{run()}catch(e){console.error('declutter',e)}},200);/* nhãn theo camera đi liền nên vẫn đo định kỳ; tab ẩn thì nghỉ */addEventListener('resize',function(){setTimeout(run,60)});
 })();

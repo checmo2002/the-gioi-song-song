@@ -30,6 +30,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 
 | File | Tính năng |
 |---|---|
+| `00-vong-ve.js` | Hàm dùng chung: vòng vẽ chỉ chạy khi nhìn thấy (`ssVong`), theo dõi thanh công cụ (`ssKhiDoi`), AudioContext chung (`ssAm`) |
 | `01-man-cho.js` | Màn chờ có thanh phần trăm; máy có 3D thì chờ cảnh 3D sắp vào nạp xong (tối đa 60 giây), cảnh khác nạp ngầm |
 | `02-am-lich.js` | Lịch âm Việt Nam (thuật toán Hồ Ngọc Đức, UTC+7), biến toàn cục `LV` |
 | `03-nhac-nen.js` | Nhạc nền tự soạn bằng Web Audio theo lối (đàn tranh / organ) |

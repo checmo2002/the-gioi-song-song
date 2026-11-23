@@ -28,5 +28,5 @@
  function addBtn(){var bar=document.querySelector('.hall .w-bar');if(!bar||bar.querySelector('.lmap-btn'))return;var b=document.createElement('button');b.type='button';b.className='lmap-btn';b.dataset.w='lmap';b.setAttribute('aria-label','Bản đồ làng');
   b.innerHTML=sv('<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>')+'<span>Bản đồ</span>';bar.insertBefore(b,bar.firstChild)}
  addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.lmap-btn');if(!b)return;e.stopPropagation();e.preventDefault();ssLangMap()},true);
- setInterval(addBtn,1500);addBtn();
+ ssKhiDoi(addBtn);
 })();

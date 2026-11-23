@@ -2,7 +2,7 @@
    (const/let/function) qua phạm vi toàn cục của trang, nên PHẢI nạp đúng thứ tự số. */
 /* ---------------- Ảnh chân dung do gia đình tải lên ---------------- */
 $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f.type.startsWith('image/'))return;const box=$('#lmPortrait');let im=box.querySelector('img');if(!im){im=document.createElement('img');im.alt='Chân dung do gia đình tải lên';box.insertBefore(im,box.querySelector('svg'))}
-  im.src=URL.createObjectURL(f);$('.lm-cap').textContent='Ảnh gia đình tải lên · chỉ lưu trong lần xem này';e.target.value=''});
+  if(im.src.startsWith('blob:'))URL.revokeObjectURL(im.src);im.src=URL.createObjectURL(f);/* trả bộ nhớ ảnh cũ khi thay ảnh */$('.lm-cap').textContent='Ảnh gia đình tải lên · chỉ lưu trong lần xem này';e.target.value=''});
 
 
 /* ---------------- Trang cá nhân: gia phả, làng dòng họ, nhà 3D, ví nén ---------------- */

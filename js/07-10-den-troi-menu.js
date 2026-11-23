@@ -11,10 +11,10 @@
     ctx.fillStyle=`rgba(255,250,220,${.9*fl})`;ctx.beginPath();ctx.ellipse(x,y+s*.55,s*.14,s*.2,0,0,7);ctx.fill()}
   function lgr(x,y,s,fl){const g=ctx.createLinearGradient(x,y-s,x,y+s);g.addColorStop(0,`rgba(255,150,70,${.55*fl})`);g.addColorStop(1,`rgba(255,215,150,${.95*fl})`);return g}
   if(reduce){setTimeout(()=>{size();L=Array.from({length:10},()=>mk(true));ctx.setTransform(dpr,0,0,dpr,0,0);L.forEach(l=>draw(l,0))},300);return}
-  let last=performance.now();(function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  let last=performance.now();ssVong(function(now){const dt=Math.min(.05,(now-last)/1000);last=now;
     if(vis&&W){if(!L.length)L=Array.from({length:W<600?9:16},()=>mk(true));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);const t=now/1000;
       L.forEach((l,i)=>{l.y-=l.v*dt;if(l.y<-30)L[i]=mk(false);const a=Math.min(1,(H-l.y)/80)*Math.min(1,(l.y+30)/90);ctx.globalAlpha=Math.max(0,a);draw(l,t)});ctx.globalAlpha=1}
-    requestAnimationFrame(loop)})(last);
+  },[cv]);
 })();
 
 
