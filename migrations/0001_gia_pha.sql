@@ -1,6 +1,6 @@
 -- Gia phả dòng họ trên máy chủ (docs/gia-pha-dong-ho.md)
 CREATE TABLE nguoi_dung (
-  id TEXT PRIMARY KEY,               -- 'z' + mã người dùng Zalo; mật khẩu do Zalo giữ, máy chủ không lưu số điện thoại hay email
+  id TEXT PRIMARY KEY,               -- 'g' + mã Google hoặc 'z' + mã Zalo; mật khẩu do họ giữ, máy chủ không lưu email hay số điện thoại
   ten TEXT NOT NULL,
   tao INTEGER NOT NULL
 );
@@ -59,8 +59,9 @@ CREATE TABLE phien (               -- phiên đăng nhập: chỉ lưu SHA-256 c
   nguoi_id TEXT NOT NULL REFERENCES nguoi_dung(id),
   het INTEGER NOT NULL
 );
-CREATE TABLE zalo_cho (            -- lượt đăng nhập Zalo đang dở (10 phút): SHA-256 của state, code_verifier của PKCE
+CREATE TABLE dn_cho (              -- lượt đăng nhập Google/Zalo đang dở (10 phút): SHA-256 của state, bên đăng nhập, code_verifier của PKCE
   state_bam TEXT PRIMARY KEY,
+  ben TEXT NOT NULL,
   cv TEXT NOT NULL,
   het INTEGER NOT NULL
 );
