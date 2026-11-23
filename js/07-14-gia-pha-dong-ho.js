@@ -8,8 +8,10 @@
   const luu=()=>{try{localStorage.setItem(KEY,JSON.stringify({dh,nhap}))}catch(e){}};
   // ---------- Firebase Authentication (REST) ----------
   let CH=null,FB=null;   // CH: {apiKey, projectId} từ máy chủ; FB: {rt mã làm mới, id mã đăng nhập, het, email}
-  try{FB=JSON.parse(localStorage.getItem('ss-fb')||'null')}catch(e){}
-  const luuFb=()=>{try{FB?localStorage.setItem('ss-fb',JSON.stringify(FB)):localStorage.removeItem('ss-fb')}catch(e){}};
+  // không chọn "ghi nhớ" khi đăng nhập trang: mã đăng nhập chỉ sống trong phiên trình duyệt này
+  const nho=()=>{try{return !(window.ssAuthPrefs&&ssAuthPrefs().remember===false)}catch(e){return true}};
+  try{FB=JSON.parse(sessionStorage.getItem('ss-fb')||localStorage.getItem('ss-fb')||'null')}catch(e){}
+  const luuFb=()=>{try{localStorage.removeItem('ss-fb');sessionStorage.removeItem('ss-fb');if(FB)(nho()?localStorage:sessionStorage).setItem('ss-fb',JSON.stringify(FB))}catch(e){}};
   const VIET={EMAIL_EXISTS:'Email này đã có tài khoản. Hãy đăng nhập.',INVALID_LOGIN_CREDENTIALS:'Sai email hoặc mật khẩu.',INVALID_PASSWORD:'Sai email hoặc mật khẩu.',EMAIL_NOT_FOUND:'Sai email hoặc mật khẩu.',
     INVALID_EMAIL:'Email chưa đúng.',MISSING_PASSWORD:'Hãy nhập mật khẩu.',USER_DISABLED:'Tài khoản này đã bị khoá.',TOO_MANY_ATTEMPTS_TRY_LATER:'Thử quá nhiều lần. Hãy đợi ít phút rồi thử lại.'};
   const viet=m=>VIET[(m||'').split(' ')[0]]||(/WEAK_PASSWORD/.test(m||'')?'Mật khẩu cần từ 6 ký tự.':'Chưa đăng nhập được. Hãy thử lại.');
@@ -58,20 +60,23 @@
       <label>Hoặc vào bằng mã mời<input name="ma" maxlength="10" autocomplete="off" placeholder="10 ký tự"></label></div>
       <p class="err" role="alert"></p><div class="me-act">${nut('lap','Lập dòng họ')}${nut('vao','Vào bằng mã','ghost')}</div></form>`}
     else{const dx=dh.vai!=='thanh-vien';
-      h=`<div class="dh-hd"><b>${esc(dh.ten)}</b><span>${VAI[dh.vai]} · bản ${dh.phien_ban} · ${esc(toi.ten)}</span></div>
+      h=`<div class="dh-hd"><b>${esc(dh.ten)}</b><span>${VAI[dh.vai]} · bản ${+dh.phien_ban||''} · ${esc(toi.ten)}</span></div>
       ${nhap?`<div class="dh-nhap"><p>Bạn đã sửa gia phả trên máy này. Thay đổi chỉ hiện với cả họ sau khi trưởng họ duyệt.</p><form class="me-form dh-form" novalidate>
         <label>Ghi chú cho trưởng họ<input name="gc" maxlength="200" placeholder="Ví dụ: thêm ngày giỗ ông nội"></label><p class="err" role="alert"></p>
         <div class="me-act">${nut('gui','Gửi đề xuất')}${nut('bo','Bỏ thay đổi','ghost')}</div></form></div>`:''}
-      <div class="me-quick">${dx?`<button data-dh="de-xuat">Đề xuất chờ duyệt</button><button data-dh="moi">Tạo mã mời</button>`:'<button data-dh="de-xuat">Đề xuất của tôi</button>'}
+      <div class="me-quick">${dx?`<button data-dh="de-xuat">Đề xuất chờ duyệt</button><button data-dh="moi">Tạo mã mời</button>${dh.vai==='truong'?'<button data-dh="lich-su">Bản cũ</button>':''}`:'<button data-dh="de-xuat">Đề xuất của tôi</button>'}
         <button data-dh="thanh-vien">Thành viên</button><button data-dh="tai">Tải lại</button><button data-dh="roi" class="del">Ngắt khỏi máy này</button></div><div class="dh-them"></div>`}
     box.innerHTML=h;if(dh&&mo)phan(mo)}
 
   async function phan(k){mo=k;const el=box.querySelector('.dh-them');if(!el)return;el.textContent='Đang tải…';
     if(k==='moi'){const r=await api('POST','dong-ho/'+dh.id+'/loi-moi',{});if(r.st!==201){el.textContent=r.d.loi||'Chưa tạo được mã.';return}
-      el.innerHTML=`<p class="dh-ma">Mã mời: <b>${esc(r.d.ma)}</b> · dùng được tới ${new Date(r.d.het).toLocaleDateString('vi-VN')}</p><p>Gửi mã này cho người trong họ. Họ mở trang Gia đình → Gia phả, đăng nhập máy chủ rồi nhập mã.</p>`;
+      el.innerHTML=`<p class="dh-ma">Mã mời: <b>${esc(r.d.ma)}</b> · dùng được tới ${new Date(r.d.het).toLocaleDateString('vi-VN')}</p><p>Gửi mã này cho người trong họ. Họ mở trang Gia đình → Gia phả, đăng nhập rồi nhập mã.</p><button type="button" class="btn ghost dh-nho" data-dh="thu-hoi">Thu hồi mọi mã mời</button>`;
       try{navigator.clipboard.writeText(r.d.ma).catch(()=>{})}catch(e){}return}
     if(k==='thanh-vien'){const r=await api('GET','dong-ho/'+dh.id+'/thanh-vien');if(r.st!==200){el.textContent=r.d.loi||'Chưa tải được.';return}
-      el.innerHTML='<ul class="dh-tv">'+r.d.thanh_vien.map(t=>`<li><span>${esc(t.ten)}</span>${dh.vai==='truong'&&t.nguoi_id!==toi.id?`<select data-vai="${esc(t.nguoi_id)}" aria-label="Vai của ${esc(t.ten)}">${Object.keys(VAI).map(v=>`<option value="${v}"${v===t.vai?' selected':''}>${VAI[v]}</option>`).join('')}</select>`:`<small>${VAI[t.vai]}</small>`}</li>`).join('')+'</ul>';return}
+      el.innerHTML='<ul class="dh-tv">'+r.d.thanh_vien.map(t=>`<li><span>${esc(t.ten)}</span>${dh.vai==='truong'&&t.nguoi_id!==toi.id?`<select data-vai="${esc(t.nguoi_id)}" aria-label="Vai của ${esc(t.ten)}">${Object.keys(VAI).map(v=>`<option value="${v}"${v===t.vai?' selected':''}>${VAI[v]}</option>`).join('')}</select>`:`<small>${VAI[t.vai]}</small>`}${dh.vai==='truong'&&t.nguoi_id!==toi.id?`<button type="button" class="btn ghost dh-nho" data-moi-ra="${esc(t.nguoi_id)}">Mời ra</button>`:''}</li>`).join('')+'</ul>';return}
+    if(k==='lich-su'){const r=await api('GET','dong-ho/'+dh.id+'/lich-su');if(r.st!==200){el.textContent=r.d.loi||'Chưa tải được.';return}
+      if(!r.d.lich_su.length){el.textContent='Chưa có bản cũ nào.';return}
+      el.innerHTML='<p>Mỗi lần gia phả thay đổi, bản trước đó được giữ lại (30 bản gần nhất). Khôi phục sẽ tạo một bản mới giống bản cũ, không xoá gì.</p><ul class="dh-tv">'+r.d.lich_su.map(l=>`<li><span>Bản ${+l.phien_ban} · ${new Date(l.luc).toLocaleString('vi-VN')} · ${+l.so_nguoi} người${l.boi?' · trước khi '+esc(l.boi)+' sửa':''}</span><button type="button" class="btn ghost dh-nho" data-ve="${+l.phien_ban}">Khôi phục</button></li>`).join('')+'</ul>';return}
     if(k==='de-xuat'){const r=await api('GET','dong-ho/'+dh.id+'/de-xuat');if(r.st!==200){el.textContent=r.d.loi||'Chưa tải được.';return}
       const l=r.d.de_xuat,cur={members:ME().members};if(!l.length){el.textContent=dh.vai==='thanh-vien'?'Bạn chưa gửi đề xuất nào.':'Không có đề xuất nào đang chờ.';return}
       const TT={cho:'Đang chờ duyệt',duyet:'Đã duyệt','tu-choi':'Bị từ chối'};
@@ -97,6 +102,10 @@
 
   box.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b||b.disabled)return;const k=b.dataset.dh,f=b.closest('form'),err=f&&f.querySelector('.err');
     if(b.dataset.mo){dh={id:b.dataset.mo,ten:b.querySelector('b').textContent};nhap=false;luu();await tai();return}
+    const chac=()=>{if(b.dataset.chac)return true;b.dataset.chac=1;b.textContent='Bấm lần nữa để chắc chắn';return false};
+    if(b.dataset.moiRa){if(!chac())return;const r=await api('POST','dong-ho/'+dh.id+'/xoa-thanh-vien',{nguoi_id:b.dataset.moiRa});toast(r.st===200?'Đã mời người này ra khỏi dòng họ.':(r.d.loi||'Chưa làm được.'));phan('thanh-vien');return}
+    if(b.dataset.ve){if(!chac())return;const r=await api('POST','dong-ho/'+dh.id+'/khoi-phuc',{ve:+b.dataset.ve,phien_ban:dh.phien_ban});toast(r.st===200?'Đã khôi phục bản '+b.dataset.ve+'.':(r.d.loi||'Chưa khôi phục được.'));mo='';await tai();return}
+    if(k==='thu-hoi'){if(!chac())return;const r=await api('DELETE','dong-ho/'+dh.id+'/loi-moi',{});toast(r.st===200?'Đã thu hồi mọi mã mời. Người đã vào vẫn ở lại.':(r.d.loi||'Chưa thu hồi được.'));mo='';ve();return}
     if(b.dataset.duyet||b.dataset.tuchoi){b.disabled=true;const id=b.dataset.duyet||b.dataset.tuchoi,r=await api('POST','dong-ho/'+dh.id+'/de-xuat/'+id+'/'+(b.dataset.duyet?'duyet':'tu-choi'),{});
       toast(r.st===200?(b.dataset.duyet?'Đã duyệt. Gia phả chung đã cập nhật.':'Đã từ chối đề xuất.'):(r.d.loi||'Chưa xử lý được.'));await tai();return}
     if(!k)return;if(f&&['dang-nhap','dang-ky','quen','lap','vao','gui'].includes(k)){e.preventDefault();err.textContent='';b.disabled=true;try{await vao(k,f,err)}finally{b.disabled=false}return}
@@ -114,6 +123,7 @@
     const r=await api('GET','toi');if(r.st!==200||!r.d||!('nguoi' in r.d)){box.hidden=true;return}
     box.hidden=false;toi=r.d.nguoi;ds=r.d.dong_ho||[];
     if(dh&&toi&&toi.xac_minh){const c=ds.find(d=>d.id===dh.id);if(c){dh.vai=c.vai;await tai();return}dh=null;luu()}ve()}
-  addEventListener('ss-auth-done',()=>{if(!box.hidden)ve()});   // vừa đăng ký trên trang: điền sẵn email
+  addEventListener('ss-auth-done',()=>{if(!box.hidden)ve()});
+  document.addEventListener('click',e=>{if(e.target.closest('[data-logout]')){FB=null;luuFb();toi=null;dh=null;nhap=false;mo='';try{localStorage.removeItem(KEY)}catch(_){}ve()}},true);   // bấm Thoát trên trang: thoát luôn máy chủ gia phả (máy dùng chung)   // vừa đăng ký trên trang: điền sẵn email
   batDau();
 })();
