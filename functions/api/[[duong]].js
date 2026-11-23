@@ -10,7 +10,7 @@ const sha = async s => b64(await crypto.subtle.digest('SHA-256', enc.encode(s)))
 // mã đọc được (bỏ 0/o, 1/l/i), lấy mẫu loại bỏ để không lệch xác suất
 function ma(n) { const A = 'abcdefghjkmnpqrstuvwxyz23456789'; let s = ''; while (s.length < n) for (const x of crypto.getRandomValues(new Uint8Array(n))) if (x < 248 && s.length < n) s += A[x % 31]; return s }
 // ---------- kiểm dữ liệu tại ranh giới tin cậy ----------
-const LA = /[\u0000-\u001f\u007f-\u009f\u200e\u200f\u202a-\u202e\u2066-\u2069]/g;   // ký tự điều khiển, đảo chiều chữ: dùng để giả tên
+const LA = /[\u0000-\u001f\u007f-\u009f\u061c\u200b-\u200f\u2028-\u202e\u2060-\u2069\ufeff]/g;   // ký tự điều khiển, đảo chiều chữ: dùng để giả tên
 const chu = (v, max, can) => { if (v == null || v === '') { if (can) throw 0; return null } if (typeof v !== 'string') throw 0; v = v.replace(LA, '').trim(); if (!v && can) throw 0; if (v.length > max) throw 0; return v || null };
 const so = (v, a, b) => { if (v == null || v === '') return null; if (!Number.isInteger(v) || v < a || v > b) throw 0; return v };
 const co = v => v === true;
@@ -36,12 +36,13 @@ export function kiemCay(c) {
 }
 // ---------- xác minh mã đăng nhập Firebase (JWT RS256) ----------
 const JWKS = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
-let KHOA = null, KHOA_HET = 0;
+let KHOA = null, KHOA_HET = 0, KHOA_TAI = 0;
 async function khoa(env, moi) {
-  if (KHOA && !moi && Date.now() < KHOA_HET) return KHOA;
+  if (KHOA && Date.now() < KHOA_HET && (!moi || Date.now() - KHOA_TAI < 3e5)) return KHOA;   // kid lạ: tải lại khoá tối đa 5 phút một lần
+  KHOA_TAI = Date.now();
   const r = await fetch(env.FIREBASE_JWKS || JWKS); if (!r.ok) throw new Error('khong tai duoc khoa Firebase');
-  const j = await r.json(), tuoi = /max-age=(\d+)/.exec(r.headers.get('Cache-Control') || ''), k = {};
-  for (const x of j.keys || []) if (x.kid && x.kty === 'RSA') k[x.kid] = await crypto.subtle.importKey('jwk', { kty: 'RSA', n: x.n, e: x.e, alg: 'RS256', ext: true }, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+  const j = await r.json(), tuoi = /max-age=(\d+)/.exec(r.headers.get('Cache-Control') || ''), k = new Map();
+  for (const x of j.keys || []) if (x.kid && x.kty === 'RSA') k.set(x.kid, await crypto.subtle.importKey('jwk', { kty: 'RSA', n: x.n, e: x.e, alg: 'RS256', ext: true }, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']));
   KHOA = k; KHOA_HET = Date.now() + Math.min(+(tuoi && tuoi[1]) || 3600, 86400) * 1e3; return k;
 }
 const b64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - s.length % 4) % 4)), c => c.charCodeAt(0));
@@ -49,7 +50,7 @@ async function ai(env, req) {
   const m = /^Bearer ([\w-]+)\.([\w-]+)\.([\w-]+)$/.exec(req.headers.get('Authorization') || ''); if (!m) return null;
   let H, P; try { H = JSON.parse(new TextDecoder().decode(b64u(m[1]))); P = JSON.parse(new TextDecoder().decode(b64u(m[2]))) } catch { return null }
   if (H.alg !== 'RS256' || typeof H.kid !== 'string') return null;
-  let K = (await khoa(env))[H.kid]; if (!K) K = (await khoa(env, true))[H.kid]; if (!K) return null;   // Google xoay khoá: tải lại một lần
+  let K = (await khoa(env)).get(H.kid); if (!K) K = (await khoa(env, true)).get(H.kid); if (!K) return null;   // Google xoay khoá: tải lại một lần
   if (!await crypto.subtle.verify('RSASSA-PKCS1-v1_5', K, b64u(m[3]), enc.encode(m[1] + '.' + m[2]))) return null;
   const now = Date.now() / 1000, pj = env.FIREBASE_PROJECT_ID;
   if (!pj || P.aud !== pj || P.iss !== 'https://securetoken.google.com/' + pj || !(P.exp > now) || !(P.iat <= now + 60) || !(P.auth_time <= now + 60)) return null;
@@ -57,6 +58,11 @@ async function ai(env, req) {
   return { id: P.sub, xac_minh: P.email_verified === true, ten_goc: (typeof P.name === 'string' && P.name) || (typeof P.email === 'string' ? P.email.split('@')[0] : 'Bạn') };
 }
 // tài khoản mới: ghi tên lần đầu thấy
+// trường tk (người trong cây là tài khoản nào): chỉ được gắn với chính mình, tk của người khác giữ nguyên như bản đang lưu
+function giuTk(cay, cu, minh) { const C = new Map((cu ? cu.members : []).map(m => [m.id, m.tk])); for (const m of cay.members) if (m.tk !== (C.get(m.id) || null) && m.tk !== minh) m.tk = C.get(m.id) || null; return cay }
+// lưu bản cũ trước khi thay cây, giữ 30 bản gần nhất để trưởng họ khôi phục
+const luuCu = (env, id, toi) => [env.DB.prepare('INSERT OR IGNORE INTO lich_su (dong_ho_id, phien_ban, cay, luc, boi) SELECT id, phien_ban, cay, ?, ? FROM dong_ho WHERE id = ?').bind(Date.now(), toi.id, id),
+  env.DB.prepare('DELETE FROM lich_su WHERE dong_ho_id = ? AND phien_ban <= (SELECT MAX(phien_ban) - 30 FROM lich_su WHERE dong_ho_id = ?)').bind(id, id)];
 const ghiNguoi = (env, t) => env.DB.prepare('INSERT OR IGNORE INTO nguoi_dung (id, ten, tao) VALUES (?, ?, ?)').bind(t.id, String(t.ten_goc).replace(LA, '').trim().slice(0, 60) || 'Bạn', Date.now()).run();
 const vaiCua = (env, dh, nguoi) => env.DB.prepare('SELECT vai FROM thanh_vien WHERE dong_ho_id = ? AND nguoi_id = ?').bind(dh, nguoi).first('vai');
 
@@ -90,14 +96,14 @@ async function xuLy(env, req, duong, toi) {
   if (a === 'tham-gia' && M === 'POST') {
     const m = String(body.ma || '').trim().toLowerCase(); if (!/^[a-z0-9]{10}$/.test(m)) return loi(400, 'Mã mời gồm 10 ký tự.');
     const r = await env.DB.prepare('SELECT l.dong_ho_id, d.ten FROM loi_moi l JOIN dong_ho d ON d.id = l.dong_ho_id WHERE l.ma_bam = ? AND l.het > ?').bind(await sha(m), Date.now()).first();
-    if (!r) return loi(404, 'Mã mời không đúng hoặc đã hết hạn.');
+    if (!r || await env.DB.prepare('SELECT 1 FROM chan WHERE dong_ho_id = ? AND nguoi_id = ?').bind(r.dong_ho_id, toi.id).first()) return loi(404, 'Mã mời không đúng hoặc đã hết hạn.');
     await env.DB.prepare("INSERT OR IGNORE INTO thanh_vien (dong_ho_id, nguoi_id, vai, vao) VALUES (?, ?, 'thanh-vien', ?)").bind(r.dong_ho_id, toi.id, Date.now()).run();
     return json({ dong_ho: { id: r.dong_ho_id, ten: r.ten } });
   }
   if (a !== 'dong-ho') return loi(404, 'Không có lệnh này.');
 
   if (!id && M === 'POST') {
-    let ten, cay; try { ten = chu(body.ten, 60, true); cay = kiemCay(body.cay) } catch { return loi(400, 'Tên dòng họ hoặc gia phả chưa hợp lệ.') }
+    let ten, cay; try { ten = chu(body.ten, 60, true); cay = giuTk(kiemCay(body.cay), null, toi.id) } catch { return loi(400, 'Tên dòng họ hoặc gia phả chưa hợp lệ.') }
     const dem = await env.DB.prepare("SELECT COUNT(*) n FROM thanh_vien WHERE nguoi_id = ? AND vai = 'truong'").bind(toi.id).first('n');
     if (dem >= 10) return loi(400, 'Mỗi tài khoản lập tối đa 10 dòng họ.');
     const dh = ma(12), now = Date.now();
@@ -115,13 +121,14 @@ async function xuLy(env, req, duong, toi) {
     if (!duyet) return loi(403, 'Chỉ trưởng họ hoặc người được giao duyệt mới sửa thẳng. Hãy gửi đề xuất.');
     let cay; try { cay = kiemCay(body.cay) } catch { return loi(400, 'Gia phả chưa hợp lệ.') }
     if (!Number.isInteger(body.phien_ban)) return loi(400, 'Thiếu phiên bản gia phả.');
-    const r = await env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(JSON.stringify(cay), id, body.phien_ban).run();
+    giuTk(cay, (await dongHoCua(env, id)).cay, toi.id);
+    const [, , r] = await env.DB.batch([...luuCu(env, id, toi), env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(JSON.stringify(cay), id, body.phien_ban)]);
     if (!r.meta.changes) { const d = await dongHoCua(env, id); return json({ loi: 'Gia phả vừa được người khác sửa. Hãy xem bản mới rồi sửa lại.', ...d }, 409) }
     return json({ phien_ban: body.phien_ban + 1 });
   }
   if (b === 'de-xuat' && !dx && M === 'POST') {
     let cay, gc; try { cay = kiemCay(body.cay); gc = chu(body.ghi_chu, 200) } catch { return loi(400, 'Gia phả chưa hợp lệ.') }
-    const pb = await env.DB.prepare('SELECT phien_ban FROM dong_ho WHERE id = ?').bind(id).first('phien_ban');
+    const hien = await dongHoCua(env, id), pb = hien.phien_ban; giuTk(cay, hien.cay, toi.id);
     if (body.phien_ban !== pb) return loi(409, 'Gia phả vừa được người khác sửa. Hãy tải lại rồi sửa trên bản mới.');
     const dem = await env.DB.prepare("SELECT SUM(trang_thai = 'cho') cho, SUM(tao > ?) ngay FROM de_xuat WHERE dong_ho_id = ? AND nguoi_id = ?").bind(Date.now() - NGAY, id, toi.id).first();
     if (dem.cho >= 20) return loi(429, 'Bạn đã có 20 đề xuất đang chờ duyệt.');
@@ -143,7 +150,7 @@ async function xuLy(env, req, duong, toi) {
     const now = Date.now(), xong = (tt, ld) => env.DB.prepare("UPDATE de_xuat SET trang_thai = ?, ly_do = ?, cay = '', xu_ly_boi = ?, xu_ly_luc = ? WHERE id = ? AND trang_thai = 'cho'").bind(tt, ld, toi.id, now, dx);
     if (c === 'tu-choi') { let ld; try { ld = chu(body.ly_do, 200) } catch { return loi(400, 'Lý do tối đa 200 ký tự.') } await xong('tu-choi', ld).run(); return json({ ok: true }) }
     if (!(await xong('duyet', null).run()).meta.changes) return loi(404, 'Đề xuất không còn chờ duyệt.');   // hai người bấm duyệt cùng lúc: chỉ một người được
-    const r = await env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(x.cay, id, x.phien_ban_goc).run();
+    const [, , r] = await env.DB.batch([...luuCu(env, id, toi), env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(x.cay, id, x.phien_ban_goc)]);
     if (!r.meta.changes) { await env.DB.prepare("UPDATE de_xuat SET trang_thai = 'tu-choi', ly_do = ? WHERE id = ?").bind('Gia phả đã đổi sau khi đề xuất được gửi. Cần gửi lại trên bản mới.', dx).run(); return loi(409, 'Gia phả đã đổi từ lúc đề xuất được gửi, nên đề xuất đã bị từ chối. Người gửi cần gửi lại.') }
     return json({ phien_ban: x.phien_ban_goc + 1 });
   }
@@ -152,6 +159,19 @@ async function xuLy(env, req, duong, toi) {
     const m = ma(10), het = Date.now() + MOI_HAN;
     await env.DB.prepare('INSERT INTO loi_moi (ma_bam, dong_ho_id, tao_boi, het) VALUES (?, ?, ?, ?)').bind(await sha(m), id, toi.id, het).run();
     return json({ ma: m, het }, 201);
+  }
+  if (b === 'lich-su' && M === 'GET') {
+    if (vai !== 'truong') return loi(403, 'Chỉ trưởng họ xem được các bản cũ.');
+    const { results } = await env.DB.prepare('SELECT l.phien_ban, l.luc, n.ten boi, l.cay FROM lich_su l LEFT JOIN nguoi_dung n ON n.id = l.boi WHERE l.dong_ho_id = ? ORDER BY l.phien_ban DESC LIMIT 30').bind(id).all();
+    return json({ lich_su: results.map(r => ({ phien_ban: r.phien_ban, luc: r.luc, boi: r.boi, so_nguoi: JSON.parse(r.cay).members.length })) });
+  }
+  if (b === 'khoi-phuc' && M === 'POST') {
+    if (vai !== 'truong') return loi(403, 'Chỉ trưởng họ khôi phục được bản cũ.');
+    if (!Number.isInteger(body.ve) || !Number.isInteger(body.phien_ban)) return loi(400, 'Thiếu phiên bản.');
+    const cu = await env.DB.prepare('SELECT cay FROM lich_su WHERE dong_ho_id = ? AND phien_ban = ?').bind(id, body.ve).first('cay');
+    if (!cu) return loi(404, 'Không còn bản này.');
+    const [, , r] = await env.DB.batch([...luuCu(env, id, toi), env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(cu, id, body.phien_ban)]);
+    return r.meta.changes ? json({ phien_ban: body.phien_ban + 1 }) : loi(409, 'Gia phả vừa được người khác sửa. Hãy tải lại rồi thử lại.');
   }
   if (b === 'loi-moi' && M === 'DELETE') {
     if (!duyet) return loi(403, 'Chỉ trưởng họ hoặc người được giao mới thu hồi mã mời.');
@@ -170,6 +190,9 @@ async function xuLy(env, req, duong, toi) {
       : env.DB.prepare('DELETE FROM thanh_vien WHERE dong_ho_id = ? AND nguoi_id = ?').bind(id, body.nguoi_id)).run();
     if (!r.meta.changes) return loi(404, 'Người này không ở trong dòng họ.');
     if (b === 'xoa-thanh-vien' || body.vai === 'thanh-vien') await env.DB.prepare('DELETE FROM loi_moi WHERE dong_ho_id = ? AND tao_boi = ?').bind(id, body.nguoi_id).run();   // mã người đó tạo hết hiệu lực
+    if (b === 'xoa-thanh-vien') await env.DB.batch([   // không vào lại bằng mã cũ; đề xuất đang chờ của người đó bỏ đi
+      env.DB.prepare('INSERT OR IGNORE INTO chan (dong_ho_id, nguoi_id, luc) VALUES (?, ?, ?)').bind(id, body.nguoi_id, Date.now()),
+      env.DB.prepare("UPDATE de_xuat SET trang_thai = 'tu-choi', ly_do = 'Người gửi đã rời dòng họ.', cay = '' WHERE dong_ho_id = ? AND nguoi_id = ? AND trang_thai = 'cho'").bind(id, body.nguoi_id)]);
     return json({ ok: true });
   }
   return loi(404, 'Không có lệnh này.');

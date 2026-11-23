@@ -28,6 +28,7 @@ Agent phụ trách: `.claude/agents/bao-mat.md`. Bài kiểm tra: `tests/bao-mat
 | Open-Meteo | Toạ độ thành phố người dùng chọn (không phải vị trí thật) | Không cần khoá |
 | Google Maps | Toạ độ mộ, chỉ khi người dùng bấm "Mở Google Maps" | Mở tab mới, có `noopener` |
 | `window.claude` | Tên hiển thị, vị trí nhân vật trong phòng chung | Chỉ có trên bản thử claude.ai |
+| Firebase Authentication (`identitytoolkit.googleapis.com`, `securetoken.googleapis.com`) | Email, mật khẩu (trong thân yêu cầu, không trên URL), mã làm mới đăng nhập | Chỉ khi người dùng đăng nhập gia phả dòng họ. Khoá web Firebase trên URL là khoá công khai. Khi đặt CSP: thêm hai miền này vào `connect-src` |
 
 ## Việc cần làm khi lên hosting và máy chủ (Đợt 2, 3)
 

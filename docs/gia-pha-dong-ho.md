@@ -19,6 +19,9 @@ Chủ dự án chốt ngày 23/11/2026:
   - Trưởng họ có thể thu hồi tất cả mã của dòng họ.
   - Khi một người bị hạ vai hoặc bị mời ra, các mã người đó đã tạo hết hiệu lực.
 - **Phải xác nhận email trước** khi lập dòng họ, vào dòng họ hay sửa gia phả. Việc này ngăn người khác dùng email không phải của mình.
+- **Người bị mời ra** không vào lại được, kể cả bằng mã mời mới (bảng `chan`). Đề xuất đang chờ của người đó bị bỏ.
+- **Lịch sử:** trước mỗi lần thay cây (sửa thẳng, duyệt, khôi phục), máy chủ lưu bản cũ, giữ 30 bản gần nhất (bảng `lich_su`). Trưởng họ xem và khôi phục được, phòng khi cây bị xoá nhầm hoặc bị phá.
+- Trường `tk` (người trong cây là tài khoản nào): mỗi người chỉ gắn được với chính tài khoản mình; `tk` của người khác máy chủ giữ nguyên như bản đang lưu.
 - Người không thuộc dòng họ không đọc được gì của dòng họ đó. Máy chủ trả 404, nên họ cũng không biết dòng họ đó có tồn tại hay không.
 
 ## Dữ liệu
@@ -62,6 +65,8 @@ Mọi yêu cầu cần đăng nhập đều gửi kèm `Authorization: Bearer <m
 | `GET /api/dong-ho/:id/thanh-vien` | Danh sách thành viên (không có email) |
 | `POST /api/dong-ho/:id/vai` | Giao vai: `{nguoi_id, vai}`. Chỉ `truong` |
 | `POST /api/dong-ho/:id/xoa-thanh-vien` | Mời một người ra khỏi dòng họ: `{nguoi_id}`. Chỉ `truong` |
+| `GET /api/dong-ho/:id/lich-su` | 30 bản cũ gần nhất (phiên bản, lúc, ai sửa, số người). Chỉ `truong` |
+| `POST /api/dong-ho/:id/khoi-phuc` | Khôi phục bản cũ: `{ve, phien_ban}`. Chỉ `truong` |
 
 ## Bảo mật
 
@@ -69,6 +74,8 @@ Mọi yêu cầu cần đăng nhập đều gửi kèm `Authorization: Bearer <m
   - chữ ký đúng với khoá công khai Google công bố (khoá được lưu tạm, khi Google đổi khoá thì tải lại);
   - `aud` và `iss` đúng dự án Firebase của mình;
   - mã chưa hết hạn.
+  - Gặp `kid` lạ thì tải lại khoá, nhưng tối đa 5 phút một lần. Bảng khoá dùng `Map`, nên `kid` như `constructor` không làm hỏng máy chủ.
+  - Mã đăng nhập sống tối đa 1 giờ. Tài khoản bị khoá hoặc đổi mật khẩu thì mã cũ vẫn dùng được tới khi hết hạn; đây là giới hạn của cách xác minh không cần hỏi Google mỗi lần.
 - **Chống trang khác gửi yêu cầu thay người dùng.** Mã đăng nhập không tự gửi kèm như cookie, nên trang khác không mượn được. Ngoài ra, mọi lệnh ghi còn bắt buộc có `Origin` trùng tên miền của trang và `Content-Type: application/json`.
 - **Đăng nhập sai nhiều lần, quên mật khẩu, xác nhận email:** Firebase lo.
 - **Kiểm cây ở máy chủ trước khi lưu:**
