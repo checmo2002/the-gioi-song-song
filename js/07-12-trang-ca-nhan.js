@@ -35,7 +35,7 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
   function syncRecipients(){$('#recipient').innerHTML=people.map(p=>`<option value="${p.id}">${esc(p.name)}${p.mine?' · gia đình':''}</option>`).join('')}
 
   // ---------- cây gia đình ----------
-  const NW=156,NH=62,SG=14,GX=26,GY=64;let sel=null,Z=1,TW=0,TH=0;const gon=new Set();   // gon: các khối đang thu gọn chi (theo id người đứng đầu khối)
+  const NW=180,NH=64,SG=26,GX=26,GY=68;let sel=null,Z=1,TW=0,TH=0;const gon=new Set();let daVe=null;   // daVe: id đã vẽ lần trước, người mới hiện ra mới chạy hiệu ứng   // gon: các khối đang thu gọn chi (theo id người đứng đầu khối)
   const hasPar=x=>!!(x.parent&&get(x.parent));
   // một khối = chủ hộ + các vợ/chồng chưa có bố mẹ trong cây (người có bố mẹ được xếp dưới bố mẹ mình)
   const unitOf=m=>{const h=headOf(m),b=h!==m&&!hasPar(h)?h:m;return [b,...spousesOf(b).filter(s=>s===m||!hasPar(s))]};
@@ -52,17 +52,24 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
     const an=new Set();gon.forEach(id=>{const h=get(id);if(h)under(unitOf(h)).forEach(k=>an.add(k))});   // con cháu của chi đang thu gọn: không vẽ
     ME.members.forEach(m=>{if(!placed.has(m.id)&&!an.has(m.id)){pos[m.id]={x,y:0};x+=NW+GX}});
     const L=64,W=Math.max(x-GX*2,NW)+L+20,H=(maxD+1)*(NH+GY)-GY+24;svg.setAttribute('viewBox',`-${L} -12 ${W} ${H}`);TW=W;TH=H;svg.style.width=W*Z+'px';svg.style.height=H*Z+'px';
-    let g='';for(let d=0;d<=maxD;d++)g+=`<text class="tg" x="-${L-4}" y="${d*(NH+GY)+NH/2+4}">Đời ${d+1}</text>`;
-    links.forEach(([u,k])=>{const ids=u.map(x=>x.id),a=pos[k.parent]||pos[ids[0]];let o=k.mother&&ids.includes(k.mother)?k.mother:u.length===2?ids.find(i=>i!==k.parent):k.parent!==ids[0]?ids[0]:null;const b=o&&o!==k.parent&&pos[o]?pos[o]:null;const x1=b&&u.length>2?b.x+NW/2:b?(a.x+b.x+NW)/2:a.x+NW/2,y1=a.y+NH,p=pos[k.id],x2=p.x+NW/2,y2=p.y,ym=y1+GY/2;g+=`<path class="tl" d="M${x1} ${y1}V${ym}H${x2}V${y2}"/>`});
-    pairs.forEach(u=>u.slice(1).forEach((b,i)=>{const p=pos[u[i].id],q=pos[b.id];g+=`<path class="ts" d="M${p.x+NW} ${p.y+NH/2}H${q.x}"/><circle class="tsd" cx="${(p.x+NW+q.x)/2}" cy="${p.y+NH/2}" r="4"/>`}));
-    ME.members.forEach(m=>{const p=pos[m.id];if(!p)return;const vt=[vaiVo(m),m.nuoi?'Con nuôi':''].filter(Boolean).join(' · ');const nm=m.name.length>19?m.name.slice(0,18)+'…':m.name;
-      g+=`<g class="tn${m.d?' dead':''}${m.self?' self':''}${sel===m.id?' on':''}" data-id="${m.id}" tabindex="0" role="button" aria-label="${esc(m.name)}, ${yrs(m)}" transform="translate(${p.x},${p.y})"><rect width="${NW}" height="${NH}" rx="8"/>
-        ${m.d?`<path class="ic" d="M14 40v-12h4v12zM16 27c-2-3 0-5 0-7 2 2 3 4 0 7z"/>`:`<circle class="ic" cx="16" cy="31" r="4"/>`}${m.ls?`<text class="star" x="${NW-14}" y="18">★</text>`:''}
-        <text class="n" x="28" y="27">${esc(nm)}</text><text class="y" x="28" y="45">${m.self?'Bạn · ':''}${vt?esc(vt)+' · ':''}${yrs(m)}</text></g>`});
+    const to=new Set();if(sel){const q=[get(sel)];while(q.length){const x=q.shift();if(!x||to.has(x.id))continue;to.add(x.id);const p=x.parent&&get(x.parent),ps=p?spousesOf(p):[];q.push(p,x.mother&&get(x.mother)||(ps.length===1?ps[0]:null))}}   // dòng tổ tiên của người đang chọn (mẹ: như bảng bên cạnh)
+    const moi=id=>daVe&&!daVe.has(id)||!daVe,tre=id=>`style="--d:${Math.round(pos[id].y/(NH+GY))}"`;
+    let g='';for(let d=0;d<=maxD;d++){const y=d*(NH+GY)+NH/2;g+=`<path class="tgl" d="M-${L-50} ${y}H${W-L-20}"/><text class="tg" x="-${L-4}" y="${y+4}">Đời ${d+1}</text>`}
+    links.forEach(([u,k])=>{const ids=u.map(x=>x.id),a=pos[k.parent]||pos[ids[0]];let o=k.mother&&ids.includes(k.mother)?k.mother:u.length===2?ids.find(i=>i!==k.parent):k.parent!==ids[0]?ids[0]:null;const b=o&&o!==k.parent&&pos[o]?pos[o]:null;const x1=b&&u.length>2?b.x+NW/2:b?(a.x+b.x+NW)/2:a.x+NW/2,y1=a.y+NH,p=pos[k.id],x2=p.x+NW/2,y2=p.y,ym=y1+GY/2,lx=(x1+x2)/2,lr=x2>x1+2?-35:x2<x1-2?215:-80;
+      g+=`<g class="tlg${to.has(k.id)&&to.size>1?' to':''}${moi(k.id)?' moi':''}" ${tre(k.id)}><path class="tl" pathLength="1" d="M${x1} ${y1}C${x1} ${ym+8} ${x2} ${ym-8} ${x2} ${y2}"/><g transform="translate(${lx} ${ym}) rotate(${lr})"><path class="la" d="M0 0c4-6 11-7 16-6c-2 6-10 8-16 6z"/></g></g>`});
+    pairs.forEach(u=>u.slice(1).forEach((b,i)=>{const p=pos[u[i].id],q=pos[b.id];const cx=(p.x+NW+q.x)/2,cy=p.y+NH/2;g+=`<path class="ts" d="M${p.x+NW} ${cy}H${q.x}"/><g class="tsd${moi(b.id)?' moi':''}" ${tre(b.id)}><circle cx="${cx-3}" cy="${cy}" r="5"/><circle cx="${cx+3}" cy="${cy}" r="5"/></g>`}));
+    ME.members.forEach(m=>{const p=pos[m.id];if(!p)return;const vt=[vaiVo(m),m.nuoi?'Con nuôi':''].filter(Boolean).join(' · ');const nm=m.name.length>18?m.name.slice(0,17)+'…':m.name;
+      const chu=(m.name.trim().split(/\s+/).pop()||'?')[0].toUpperCase();   // chữ đầu của tên gọi (chữ cuối họ tên)
+      g+=`<g class="tn${m.d?' dead':''}${m.ls?' ls':''}${m.self?' self':''}${sel===m.id?' on':''}${to.has(m.id)&&sel!==m.id?' to':''}${moi(m.id)?' moi':''}" ${tre(m.id)} data-id="${m.id}" tabindex="0" role="button" aria-label="${esc(m.name)}, ${yrs(m)}" transform="translate(${p.x},${p.y})"><g class="tb">
+        ${sel===m.id?`<rect class="hl" x="-3" y="-3" width="${NW+6}" height="${NH+6}" rx="12"/>`:''}<rect class="bg" width="${NW}" height="${NH}" rx="10"/>
+        <circle class="av" cx="28" cy="32" r="17"/><text class="avc" x="28" y="37">${esc(chu)}</text>
+        <g class="bd" transform="translate(41 45)"><circle r="9.5"/>${m.d?'<path class="nen" d="M-2.6 6.5V-.5h5.2v7z"/><path class="lua" d="M0-1.5c-3.2-2.6-1.8-5.4 0-8c1.8 2.6 3.2 5.4 0 8z"/>':'<path class="mam" d="M0 6V0M0 1.5c-1-3.5-4.5-4.5-6.5-3.5c1 3.5 4.5 4.5 6.5 3.5zM0-.5c1-3.5 4.5-4.5 6.5-3.5c-1 3.5-4.5 4.5-6.5 3.5z"/>'}</g>
+        ${m.ls?`<text class="star" x="${NW-14}" y="18">★</text>`:''}
+        <text class="n" x="54" y="28">${esc(nm)}</text><text class="y" x="54" y="46">${m.self?'Bạn · ':''}${vt?esc(vt)+' · ':''}${yrs(m)}</text></g></g>`});
     // nút thu gọn / mở chi dưới mỗi khối có con; đang gọn thì ghi số con cháu bị ẩn
     cols.forEach(u=>{const a=pos[u[0].id],z=pos[u[u.length-1].id],cx=(a.x+z.x+NW)/2,cy=a.y+NH+11,on=gon.has(u[0].id),n=on?desc(u):0,w=on?34:18;
       g+=`<g class="tc${on?' on':''}" data-col="${u[0].id}" tabindex="0" role="button" aria-label="${on?'Mở':'Thu gọn'} chi của ${esc(u[0].name)}${on?', '+n+' người':''}" transform="translate(${cx},${cy})"><rect x="${-w/2}" y="-9" width="${w}" height="18" rx="9"/><text y="4">${on?'+'+n:'−'}</text></g>`});
-    svg.innerHTML=g;$('#treeNames').innerHTML=ME.members.map(m=>`<option value="${esc(m.name)}">`).join('');$('#treeEmpty').hidden=ME.members.length>1;$('#meSample').hidden=ME.members.length>1}
+    svg.innerHTML=g;daVe=new Set(Object.keys(pos));$('#treeNames').innerHTML=ME.members.map(m=>`<option value="${esc(m.name)}">`).join('');$('#treeEmpty').hidden=ME.members.length>1;$('#meSample').hidden=ME.members.length>1}
   // mọi con cháu (kèm vợ/chồng của họ) dưới một khối
   function under(u){const out=new Set(),q=kidsOf(u);while(q.length){const k=q.shift();if(out.has(k.id))continue;unitOf(k).forEach(x=>out.add(x.id));q.push(...kidsOf(unitOf(k)))}return out}
   function desc(u){return [...under(u)].filter(id=>{const x=get(id);return x&&x.parent}).length}
@@ -109,7 +116,13 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
   // con của: có bố/mẹ nhiều vợ/chồng thì hỏi con của người nào
   function upMo(){const to=get($('#nfTo').value),ss=to?spousesOf(to):[],on=$('#nfRel').value==='child'&&ss.length>1;$('#nfMoL').hidden=!on;
     $('#nfMo').innerHTML=on?ss.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')+'<option value="">Không rõ</option>':''}
-  function side(mode,preset){const el=$('#treeSide');const m=sel&&get(sel);
+  // biểu tượng nét mảnh cho các nút bên cạnh cây (màu theo chữ của nút)
+  const IC=(d=>k=>`<svg class="ic-n" viewBox="0 0 16 16" aria-hidden="true"><path d="${d[k]}"/></svg>`)({
+    edit:'M3 13l1-3.5L10.5 3a1.4 1.4 0 012 2L6 11.5zM9.5 4l2.5 2.5',child:'M8 14V8M8 9C7 6 4 5 2 6c1 3 4 4 6 3zM8 7c1-3 4-4 6-3c-1 3-4 4-6 3z',
+    spouse:'M6 8m-3.5 0a3.5 3.5 0 107 0a3.5 3.5 0 10-7 0M10 8m-3.5 0a3.5 3.5 0 107 0a3.5 3.5 0 10-7 0',parent:'M8 13V4M4.5 7.5L8 4l3.5 3.5',
+    del:'M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5',house:'M2.5 7.5L8 3l5.5 4.5M4 6.5V13h8V6.5M6.8 13v-3h2.4v3',
+    profile:'M4 2.5h6l2 2V13.5H4zM6 7h4M6 9.5h4',incense:'M8 14V7M6.5 14h3M8 5.5c-1.5-1-1-2.5 0-3.5c1 1 1.5 2.5 0 3.5z'});
+  function side(mode,preset){const el=$('#treeSide');const m=sel&&get(sel);el.classList.remove('vao');void el.offsetWidth;el.classList.add('vao');
     if(mode==='add'||mode==='edit'||!m){const ed=mode==='edit'&&m;el.innerHTML=form(ed?m:null,!!m);
       if(!ed){const pr=preset||{};if(pr.rel)$('#nfRel').value=pr.rel;if(pr.to)$('#nfTo').value=pr.to;upMo();$('#nfRel').addEventListener('change',upMo);$('#nfTo').addEventListener('change',upMo)}
       const c=$('#nfCancel');c&&c.addEventListener('click',()=>side());
@@ -124,8 +137,8 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
         ${m.ns?row('Sinh',sinhTxt(m)):''}${m.d&&m.nm?row('Mất',matTxt(m)):''}${row('Ngày giỗ',gioTxt(m))}${row('An táng',m.an)}
         ${row(pn(par),par&&par.name)}${row(pn(mo),mo&&mo!==par&&mo.name)}${row(vaiVo(m)?'Vai':'',vaiVo(m))}${row('Vợ/Chồng',vo)}
         ${row('Con',kids.map(k=>k.name+(k.nuoi?' (con nuôi)':'')).join(', '))}${row('Chung nhà 3D',mates.map(k=>k.name).join(', '))}</dl>
-      ${m.d?`<div class="me-act"><button class="btn" data-go="house">Vào nhà 3D</button><button class="btn ghost" data-go="profile">Xem hồ sơ</button><button class="btn ghost" data-go="incense">Thắp hương</button></div>`:''}
-      <div class="me-quick"><button data-q="edit">Sửa thông tin</button><button data-q="child">+ Thêm con</button><button data-q="spouse">+ Vợ/Chồng</button>${par&&mo?'':'<button data-q="parent">+ Bố/Mẹ</button>'}${m.self?'':'<button data-q="del" class="del">Xoá khỏi gia phả</button>'}</div>`;
+      ${m.d?`<div class="me-act"><button class="btn" data-go="house">${IC('house')}Vào nhà 3D</button><button class="btn ghost" data-go="profile">${IC('profile')}Xem hồ sơ</button><button class="btn ghost" data-go="incense">${IC('incense')}Thắp hương</button></div>`:''}
+      <div class="me-quick"><button data-q="edit">${IC('edit')}Sửa thông tin</button><button data-q="child">${IC('child')}Thêm con</button><button data-q="spouse">${IC('spouse')}Vợ/Chồng</button>${par&&mo?'':`<button data-q="parent">${IC('parent')}Bố/Mẹ</button>`}${m.self?'':`<button data-q="del" class="del">${IC('del')}Xoá khỏi gia phả</button>`}</div>`;
     el.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>{const q=b.dataset.q;if(q==='del'){delMember(m.id);return}if(q==='edit'){side('edit');return}side('add',{rel:q,to:m.id})}));
     el.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{const go=b.dataset.go;if(go==='house')enterHouse(m.id);else if(go==='profile'){select(m.id,false);setView('app','ho-so',true)}else{select(m.id,false);lightIncense();refresh()}}))}
   function year(v){v=v.trim();if(!v)return null;const n=+v;return Number.isInteger(n)&&n>=1800&&n<=new Date().getFullYear()?n:NaN}

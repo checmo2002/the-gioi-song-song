@@ -33,19 +33,44 @@ body:not(.signed) #ca-nhan>.wrap:not(.gd-wrap),body:not(.signed) .gd-out{display
 .tree-empty{padding:0 18px 18px;color:var(--ink-soft);font-size:13.5px}
 .tree-empty[hidden]{display:none}
 #treeSvg .tg{font-size:11px;font-weight:600;letter-spacing:.06em;fill:#9A8C78;text-transform:uppercase}
-#treeSvg .tl{fill:none;stroke:#C9B48E;stroke-width:1.5}
+#treeSvg .tgl{stroke:#E6D9BF;stroke-width:1;stroke-dasharray:2 6}
+/* cành: đường cong nâu đồng, lá ngọc nhỏ giữa cành; dòng tổ tiên của người đang chọn sáng vàng */
+#treeSvg .tl{fill:none;stroke:#C9B48E;stroke-width:2;stroke-linecap:round;transition:stroke .3s,stroke-width .3s}
+#treeSvg .la{fill:#4F7A6A;opacity:.6;transform-box:fill-box;transform-origin:0 50%}
+#treeSvg .tlg.to .tl{stroke:#B8862F;stroke-width:3}#treeSvg .tlg.to .la{opacity:.9}
 #treeSvg .ts{stroke:#B8862F;stroke-width:1.5}
-#treeSvg .tsd{fill:#B8862F}
+#treeSvg .tsd{transform-box:fill-box;transform-origin:center}#treeSvg .tsd circle{fill:#FFFDF8;stroke:#B8862F;stroke-width:1.6}#treeSvg .tsd circle+circle{fill:rgba(184,134,47,.35)}
 #treeSvg .tn{cursor:pointer;outline:none}
-#treeSvg .tn rect{fill:#FFFDF8;stroke:rgba(43,36,28,.2);stroke-width:1;transition:stroke .2s,fill .2s}
-#treeSvg .tn.dead rect{fill:#F4E9D3;stroke:#C9A86A}
-#treeSvg .tn.self rect{stroke:#2B241C;stroke-width:1.8}
-#treeSvg .tn.on rect,#treeSvg .tn:focus-visible rect{stroke:#B8862F;stroke-width:2.4;fill:#FFF6E2}
-#treeSvg .tn:hover rect{stroke:#B8862F}
-#treeSvg .ic{fill:#B8862F}#treeSvg .tn:not(.dead) .ic{fill:#4F7A6A}
+#treeSvg .tb{transition:transform .25s ease}
+#treeSvg .tn .bg{fill:#FFFDF8;stroke:rgba(43,36,28,.18);stroke-width:1;transition:stroke .2s,fill .2s;filter:drop-shadow(0 2px 3px rgba(43,36,28,.08))}
+#treeSvg .tn.dead .bg{fill:#F6ECD8;stroke:#D5BC8C}
+#treeSvg .tn.self .bg{stroke:#2B241C;stroke-width:1.8}
+#treeSvg .tn.to .bg{stroke:#B8862F;stroke-width:1.6}
+#treeSvg .tn.on .bg,#treeSvg .tn:focus-visible .bg{stroke:#B8862F;stroke-width:2.4;fill:#FFF6E2}
+#treeSvg .tn:hover .tb{transform:translateY(-2px)}#treeSvg .tn:hover .bg{stroke:#B8862F;filter:drop-shadow(0 6px 8px rgba(43,36,28,.14))}
+#treeSvg .hl{fill:none;stroke:#B8862F;stroke-width:2;opacity:.5;transform-box:fill-box;transform-origin:center;animation:gp-tho 2.6s ease-in-out infinite}
+#treeSvg .av{fill:#4F7A6A}#treeSvg .tn.dead .av{fill:#9A6E22}#treeSvg .tn.ls .av{fill:#8B3A1E}
+#treeSvg .avc{font-size:15px;font-weight:600;fill:#FFFDF8;text-anchor:middle}
+#treeSvg .bd circle{fill:#FFFDF8;stroke:#E3D3B2}
+#treeSvg .bd .nen{fill:#B8862F}#treeSvg .bd .lua{fill:#E0892B;transform-box:fill-box;transform-origin:50% 100%;animation:gp-lua 1.8s ease-in-out infinite}
+#treeSvg .bd .mam{fill:#6E9A7F;stroke:#4F7A6A;stroke-width:.9;stroke-linecap:round;transform-box:fill-box;transform-origin:50% 100%;animation:gp-mam 4s ease-in-out infinite}
 #treeSvg .n{font-size:13.5px;font-weight:500;fill:#2B241C}
 #treeSvg .y{font-size:11.5px;fill:#7A6E5E}
 #treeSvg .star{font-size:12px;fill:#9A3B2B}
+/* người mới hiện ra: mọc lên theo từng đời, cành vẽ dần từ trên xuống */
+#treeSvg .tn.moi .tb{animation:gp-moc .55s cubic-bezier(.2,.8,.3,1.2) both;animation-delay:calc(var(--d,0)*.14s)}
+#treeSvg .tlg.moi .tl{stroke-dasharray:1;animation:gp-ve .6s ease-out both;animation-delay:calc(var(--d,0)*.14s - .1s)}
+#treeSvg .tlg.moi .la,#treeSvg .tsd.moi{animation:gp-la .4s ease-out both;animation-delay:calc(var(--d,0)*.14s + .35s)}
+@keyframes gp-moc{from{opacity:0;transform:translateY(10px) scale(.94)}}
+@keyframes gp-ve{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes gp-la{from{opacity:0;transform:scale(0)}}
+@keyframes gp-lua{0%,100%{transform:scale(1,1)}30%{transform:scale(.88,1.12)}60%{transform:scale(1.08,.92)}}
+@keyframes gp-mam{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+@keyframes gp-tho{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:.6;transform:scale(1.025,1.06)}}
+.ic-n{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:6px}
+.tree-side.vao>*{animation:gp-hien .35s ease-out both}.tree-side.vao>*:nth-child(2){animation-delay:.04s}.tree-side.vao>*:nth-child(n+3){animation-delay:.08s}
+@keyframes gp-hien{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){#treeSvg *,.tree-side.vao>*{animation:none!important;transition:none!important}#treeSvg .tn:hover .tb{transform:none}#treeSvg .tlg .tl{stroke-dasharray:none}}
 .tree-side{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px}
 .tree-side h3{font-size:24px;font-weight:300}
 .me-y{color:var(--ink-soft);font-size:14px}
