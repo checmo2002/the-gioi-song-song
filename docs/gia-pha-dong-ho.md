@@ -48,7 +48,7 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
 
 ## API (`functions/api/[[duong]].js`)
 
-Đăng nhập xong, trình duyệt giữ cookie `ss_phien` (HttpOnly, Secure, SameSite=Lax, chỉ gửi cho `/api`), trang không đọc được mã này. Thân yêu cầu và trả lời đều là JSON. Khi lỗi, máy chủ trả `{loi: "câu tiếng Việt"}`.
+Đăng nhập xong, trình duyệt giữ cookie `__Host-ss_phien` (HttpOnly, Secure, SameSite=Lax), trang không đọc được mã này. Thân yêu cầu và trả lời đều là JSON. Khi lỗi, máy chủ trả `{loi: "câu tiếng Việt"}`.
 
 | Lệnh | Việc |
 |---|---|
@@ -76,11 +76,12 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
 ## Bảo mật
 
 - **Đăng nhập Zalo (OAuth v4 + PKCE):**
-  - `state` ngẫu nhiên vừa nằm trong cookie `ss_zalo` của chính trình duyệt đó, vừa lưu (dạng SHA-256) ở `zalo_cho`. Lúc Zalo chuyển về, hai bên phải khớp, nên kẻ khác không gài được lượt đăng nhập của họ vào máy người dùng.
+  - `state` ngẫu nhiên vừa nằm trong cookie `__Host-ss_zalo` của chính trình duyệt đó, vừa lưu (dạng SHA-256) ở `zalo_cho`. Lúc Zalo chuyển về, hai bên phải khớp, nên kẻ khác không gài được lượt đăng nhập của họ vào máy người dùng.
   - Mỗi lượt dùng một lần, hạn 10 phút. `code_verifier` không rời máy chủ.
   - Khoá bí mật của ứng dụng Zalo (`ZALO_APP_SECRET`) chỉ nằm ở biến bí mật của Cloudflare, không ở repo, không ở trang.
   - Mã truy cập Zalo chỉ dùng một lần để hỏi tên, không lưu.
-- **Phiên:** mã phiên 32 byte ngẫu nhiên, cookie HttpOnly (trang và mã độc chèn vào trang không đọc được). Cơ sở dữ liệu chỉ giữ SHA-256 của mã. Đăng xuất là xoá phiên ở máy chủ.
+- **Phiên:** mã phiên 32 byte ngẫu nhiên, cookie HttpOnly (trang và mã độc chèn vào trang không đọc được).
+- **Tiền tố `__Host-`** cho cả hai cookie: `pages.dev` là hậu tố công cộng nên mọi bản xem trước `<nhánh>.thegioisongsong.pages.dev` là tên miền con của trang chính. Không có tiền tố này, mã trên một bản xem trước ném được cookie phiên/state của kẻ xấu vào trang chính (gài đăng nhập, cố định phiên). Cookie trùng tên lọt tới thì máy chủ bỏ cả hai. Cơ sở dữ liệu chỉ giữ SHA-256 của mã. Đăng xuất là xoá phiên ở máy chủ.
 - **Chống trang khác gửi yêu cầu thay người dùng:** cookie là SameSite=Lax, và mọi lệnh ghi còn bắt buộc có `Origin` trùng tên miền của trang và `Content-Type: application/json`.
 - **Đăng nhập sai nhiều lần, quên mật khẩu:** Zalo lo.
 - **Kiểm cây ở máy chủ trước khi lưu:**
@@ -90,7 +91,7 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
   - quan hệ phải trỏ tới người có trong cây, không trỏ vào chính mình, không có vòng cha – con;
   - không nhận id `__proto__`, `constructor`, `prototype`.
 - **Hiển thị:** chữ người dùng nhập vẫn đi qua `esc()` khi đưa lên trang.
-- **Kiểm thử:** `tests/may-chu.py` dựng một "Zalo giả" (kiểm `secret_key`, `app_id` và PKCE như Zalo thật) và thử trên máy chủ thật chạy ở máy. Gồm: gài `state` của trình duyệt khác, sai `code_verifier`, dùng lại `state`, phiên giả, đăng xuất, quyền của từng vai, cây xấu, giả mạo yêu cầu, thu hồi mã mời, người bị mời ra vào lại.
+- **Kiểm thử:** `tests/may-chu.py` dựng một "Zalo giả" (kiểm `secret_key`, `app_id` và PKCE như Zalo thật) và thử trên máy chủ thật chạy ở máy. Gồm: gài `state` của trình duyệt khác, cookie không có tiền tố `__Host-` hoặc trùng tên, sai `code_verifier`, dùng lại `state`, phiên giả, đăng xuất, quyền của từng vai, cây xấu, giả mạo yêu cầu, thu hồi mã mời, người bị mời ra vào lại.
 
 ## Chạy thử ở máy
 
@@ -128,7 +129,7 @@ cd <repo> && python3 tests/may-chu.py           # chỉ cần thư viện chuẩ
    - Chạy `migrations/0001_gia_pha.sql` trên cả hai.
 3. **Gắn vào dự án Pages**, ở Settings → Bindings / Variables:
    - biến `DB` trỏ tới D1 tương ứng với từng môi trường;
-   - `ZALO_APP_ID` (biến thường) và `ZALO_APP_SECRET` (chọn **Encrypt**, là biến bí mật).
+   - `ZALO_APP_ID` (biến thường) và `ZALO_APP_SECRET` (chọn **Encrypt**, là biến bí mật). **Chỉ đặt ở Production.** Mã của mọi nhánh chạy ở Preview, nên đặt khoá ở đó là nhánh nào cũng đọc được khoá. Preview không có khoá thì `/api` trả 503, khung tự ẩn.
 
 Khi chưa gắn, `/api/*` trả lỗi 503 và khung "Gia phả của cả dòng họ" tự ẩn; phần còn lại của trang chạy như cũ.
 

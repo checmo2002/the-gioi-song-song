@@ -38,10 +38,14 @@ export function kiemCay(c) {
 const PHIEN_HAN = 30 * NGAY, CHO_HAN = 10 * 6e4;
 const hex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('');
 const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const banh = (req, k) => { const m = new RegExp('(?:^|;\\s*)' + k + '=([0-9a-f]{64})').exec(req.headers.get('Cookie') || ''); return m && m[1] };
-const cookie = (k, v, han) => `${k}=${v}; HttpOnly; Secure; SameSite=Lax; Path=/api; Max-Age=${han}`;
+// __Host-: trình duyệt chỉ nhận cookie này từ đúng tên miền trang (không Domain, Path=/), nên bản xem trước <nhánh>.thegioisongsong.pages.dev
+// không ném được cookie trùng tên vào trang chính. Trùng tên vẫn lọt tới (trình duyệt lạ) thì bỏ cả hai.
+const banh = (req, k) => { const c = (req.headers.get('Cookie') || '').split(/;\s*/).filter(x => x.startsWith(k + '='));
+  return c.length === 1 && /^[0-9a-f]{64}$/.test(c[0].slice(k.length + 1)) ? c[0].slice(k.length + 1) : null };
+const cookie = (k, v, han) => `${k}=${v}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${han}`;
+const PHIEN = '__Host-ss_phien', ZCHO = '__Host-ss_zalo';
 async function ai(env, req) {
-  const t = banh(req, 'ss_phien'); if (!t) return null;
+  const t = banh(req, PHIEN); if (!t) return null;
   return env.DB.prepare('SELECT n.id, n.ten FROM phien p JOIN nguoi_dung n ON n.id = p.nguoi_id WHERE p.ma_bam = ? AND p.het > ?').bind(await sha(t), Date.now()).first();
 }
 const chuyen = (url, cks) => { const h = new Headers({ Location: url, 'Cache-Control': 'no-store' }); for (const c of cks) h.append('Set-Cookie', c); return new Response(null, { status: 302, headers: h }) };
@@ -52,26 +56,26 @@ async function zaloBatDau(env, req) {
     env.DB.prepare('INSERT INTO zalo_cho (state_bam, cv, het) VALUES (?, ?, ?)').bind(await sha(st), cv, Date.now() + CHO_HAN)]);
   const u = new URL(OAUTH(env) + '/v4/permission');
   u.search = new URLSearchParams({ app_id: env.ZALO_APP_ID, redirect_uri: goc + '/api/zalo/ve', code_challenge: cc, state: st });
-  return chuyen(u.href, [cookie('ss_zalo', st, CHO_HAN / 1000)]);
+  return chuyen(u.href, [cookie(ZCHO, st, CHO_HAN / 1000)]);
 }
 async function zaloVe(env, req) {
-  const u = new URL(req.url), st = u.searchParams.get('state') || '', code = u.searchParams.get('code') || '', bo = cookie('ss_zalo', '', 0);
+  const u = new URL(req.url), st = u.searchParams.get('state') || '', code = u.searchParams.get('code') || '', bo = cookie(ZCHO, '', 0);
   const hong = ly => chuyen(u.origin + '/?dang-nhap=' + ly + '#ca-nhan', [bo]);
   // state phải khớp cookie của chính trình duyệt này: chặn kẻ xấu gài người khác đăng nhập vào tài khoản của hắn
-  if (!/^[0-9a-f]{64}$/.test(st) || banh(req, 'ss_zalo') !== st || !code || code.length > 2000) return hong('loi');
+  if (!/^[0-9a-f]{64}$/.test(st) || banh(req, ZCHO) !== st || !code || code.length > 2000) return hong('loi');
   const r = await env.DB.prepare('DELETE FROM zalo_cho WHERE state_bam = ? AND het > ? RETURNING cv').bind(await sha(st), Date.now()).first();
   if (!r) return hong('het-han');
   const t = await fetch(OAUTH(env) + '/v4/access_token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', secret_key: env.ZALO_APP_SECRET },
     body: new URLSearchParams({ code, app_id: env.ZALO_APP_ID, grant_type: 'authorization_code', code_verifier: r.cv }) }).then(x => x.json()).catch(() => ({}));
   if (!t || typeof t.access_token !== 'string') return hong('loi');
   const me = await fetch(GRAPH(env) + '/v2.0/me?fields=id,name', { headers: { access_token: t.access_token } }).then(x => x.json()).catch(() => ({}));
-  if (!me || !/^\d{1,30}$/.test(String(me.id))) return hong('loi');
+  if (!me || typeof me.id !== 'string' || !/^\d{1,30}$/.test(me.id)) return hong('loi');
   const id = 'z' + me.id, tk = hex(32), now = Date.now();
   await env.DB.batch([
     env.DB.prepare('INSERT OR IGNORE INTO nguoi_dung (id, ten, tao) VALUES (?, ?, ?)').bind(id, String(me.name || '').replace(LA, '').trim().slice(0, 60) || 'Bạn', now),
     env.DB.prepare('INSERT INTO phien (ma_bam, nguoi_id, het) VALUES (?, ?, ?)').bind(await sha(tk), id, now + PHIEN_HAN),
     env.DB.prepare('DELETE FROM phien WHERE het < ?').bind(now)]);
-  return chuyen(u.origin + '/#ca-nhan', [cookie('ss_phien', tk, PHIEN_HAN / 1000), bo]);
+  return chuyen(u.origin + '/#ca-nhan', [cookie(PHIEN, tk, PHIEN_HAN / 1000), bo]);
 }
 
 // trường tk (người trong cây là tài khoản nào): chỉ được gắn với chính mình, tk của người khác giữ nguyên như bản đang lưu
@@ -92,8 +96,8 @@ async function xuLy(env, req, duong, toi) {
   if (a === 'zalo' && id === 'bat-dau' && M === 'GET') return zaloBatDau(env, req);
   if (a === 'zalo' && id === 've' && M === 'GET') return zaloVe(env, req);
   if (a === 'dang-xuat' && M === 'POST') {
-    const t = banh(req, 'ss_phien'); if (t) await env.DB.prepare('DELETE FROM phien WHERE ma_bam = ?').bind(await sha(t)).run();
-    return json({ ok: true }, 200, { 'Set-Cookie': cookie('ss_phien', '', 0) });
+    const t = banh(req, PHIEN); if (t) await env.DB.prepare('DELETE FROM phien WHERE ma_bam = ?').bind(await sha(t)).run();
+    return json({ ok: true }, 200, { 'Set-Cookie': cookie(PHIEN, '', 0) });
   }
   if (a === 'toi' && M === 'GET') {
     if (!toi) return json({ nguoi: null });

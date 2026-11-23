@@ -77,21 +77,33 @@ st, r = Nguoi().goi('GET', '/api/toi'); ky('chưa đăng nhập: /toi vẫn tr�
 if r.get('nguoi') is not None: loi.append('chưa đăng nhập mà /toi có người')
 A = zalo('Trưởng họ'); st, r = A.goi('GET', '/api/toi'); ky('đăng nhập Zalo thành công', r, st, 200)
 if not (r.get('nguoi') or {}).get('id', '').startswith('z'): loi.append(f'đăng nhập Zalo xong mà chưa có phiên: {r}')
-if 'ss_zalo=' in A.ck: loi.append('đăng nhập xong vẫn còn cookie ss_zalo')
+if '__Host-ss_zalo=' in A.ck: loi.append('đăng nhập xong vẫn còn cookie __Host-ss_zalo')
 B, C = zalo('Thành viên B'), zalo('Người ngoài C')
 gai = Nguoi(); gai.goi('GET', '/api/zalo/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(gai.vi_tri).query)
 nan = Nguoi(); st, r = nan.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': 'ma-bat-ky', 'state': q['state'][0]}))
-if 'ss_phien=' in nan.ck or 'dang-nhap=loi' not in nan.vi_tri: loi.append('trình duyệt khác dùng state của người khác vẫn đăng nhập được (gài đăng nhập)')
+if '__Host-ss_phien=' in nan.ck or 'dang-nhap=loi' not in nan.vi_tri: loi.append('trình duyệt khác dùng state của người khác vẫn đăng nhập được (gài đăng nhập)')
 else: print('  ✓ chặn gài đăng nhập bằng state của trình duyệt khác')
 D = zalo('Sai PKCE', sua=lambda n, st, code: (CHO[code].update(cc='sai'), (st, code))[1])
-if 'ss_phien=' in D.ck: loi.append('mã code không khớp PKCE mà vẫn đăng nhập được')
+if '__Host-ss_phien=' in D.ck: loi.append('mã code không khớp PKCE mà vẫn đăng nhập được')
 else: print('  ✓ chặn mã code không khớp PKCE')
 E = Nguoi(); E.goi('GET', '/api/zalo/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(E.vi_tri).query); ck = E.ck
 E.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': 'x', 'state': q['state'][0]})); E.ck = ck
 E.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': 'x', 'state': q['state'][0]}))
 if 'dang-nhap=het-han' not in E.vi_tri: loi.append(f'dùng lại state lần hai phải báo hết hạn: {E.vi_tri}')
 else: print('  ✓ state chỉ dùng được một lần')
-st, r = Nguoi('ss_phien=' + '0' * 64).goi('POST', '/api/dong-ho', {'ten': 'Họ X', 'cay': CAY}); ky('phiên giả bị từ chối', r, st, 401)
+st, r = Nguoi('__Host-ss_phien=' + '0' * 64).goi('POST', '/api/dong-ho', {'ten': 'Họ X', 'cay': CAY}); ky('phiên giả bị từ chối', r, st, 401)
+# cookie ném từ tên miền con (bản xem trước) không có tiền tố __Host-, hoặc trùng tên: phải bị bỏ qua
+gai = Nguoi(); gai.goi('GET', '/api/zalo/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(gai.vi_tri).query)
+code = 'ma-%d' % random.randint(1, 10**12); CHO[code] = {'cc': q['code_challenge'][0], 'zid': '1234567890123456', 'ten': 'Kẻ xấu'}
+nan = Nguoi('ss_zalo=' + q['state'][0]); nan.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': code, 'state': q['state'][0]}))
+if '__Host-ss_phien=' in nan.ck: loi.append('cookie ss_zalo ném từ tên miền con gài được đăng nhập')
+else: print('  ✓ bỏ qua cookie state không có tiền tố __Host-')
+tk = [x for x in B.ck.split('; ') if x.startswith('__Host-ss_phien=')][0].split('=', 1)[1]
+st, r = Nguoi('ss_phien=' + tk).goi('GET', '/api/toi')
+if r.get('nguoi'): loi.append('máy chủ nhận cookie phiên không có tiền tố __Host-')
+st, r = Nguoi(f'__Host-ss_phien={tk}; __Host-ss_phien={tk}').goi('GET', '/api/toi')
+if r.get('nguoi'): loi.append('cookie phiên trùng tên vẫn được nhận')
+else: print('  ✓ bỏ qua cookie phiên trùng tên')
 st, r = A.goi('PUT', '/api/toi', {'ten': 'Trưởng họ Phạm'}); ky('đổi tên hiển thị', r, st, 200)
 
 # ---------- giả mạo yêu cầu ----------
