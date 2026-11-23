@@ -59,6 +59,17 @@ body:not(.signed) #ca-nhan>.wrap:not(.gd-wrap),body:not(.signed) .gd-out{display
 .me-form .chk input{width:18px;height:18px;accent-color:#B8862F}
 .me-form .err{color:#9A3B2B;font-size:13px;min-height:1em}
 .me-form .btn{justify-content:center}
+.dh-box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13.5px}
+.dh-box summary{cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:3px}.dh-box summary::-webkit-details-marker{display:none}
+.dh-box summary span,.dh-hd span{color:var(--ink-soft);font-size:13px}.dh-box summary b,.dh-hd b{font-size:15px;font-weight:600;color:#8C6324}
+.dh-box details[open] summary{margin-bottom:12px}.dh-hd{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.dh-box .dh-form .me-act{display:flex;flex-wrap:wrap;gap:8px}.dh-box .btn.dh-nho{padding:3px 10px;font-size:12px;vertical-align:middle}
+.dh-ds{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.dh-dong{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;color:var(--ink)}
+.dh-dong:hover{border-color:#B8862F}.dh-dong small{color:var(--ink-soft);font-size:12px}
+.dh-nhap{background:#FFF6E2;border:1px dashed #C9A86A;border-radius:8px;padding:10px 12px;margin-bottom:10px}.dh-nhap p{margin:0 0 8px}
+.dh-them{margin-top:10px}.dh-them:empty{display:none}.dh-ma b{font-size:18px;letter-spacing:.12em;color:#8C6324}
+.dh-tv,.dh-dx{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}.dh-tv li,.dh-dx li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.dh-dx li{display:block}.dh-dx p{margin:4px 0 6px;color:var(--ink-soft)}.dh-dx .me-act{display:flex;gap:8px}.dh-tv select{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:var(--paper)}
 .me-form .gp-more{border:1px dashed var(--line);border-radius:8px;padding:9px 10px}
 .me-form .gp-more summary{cursor:pointer;font-size:13px;font-weight:600;color:#8C6324}
 .me-form .gp-more>*+*{margin-top:10px}

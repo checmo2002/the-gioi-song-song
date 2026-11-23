@@ -113,6 +113,7 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
     const tx=id=>$(id).value.trim()||null;return{name,g:$('#nfG').value,b,d,ls:$('#nfLs').checked&&!!d,ns,nm:d?nm:null,nmAl:!!(d&&nm&&al),huy:tx('#nfHuy'),tu:tx('#nfTu'),thuy:tx('#nfThuy'),chi:tx('#nfChi'),thu,nuoi:$('#nfNuoi').checked,an:tx('#nfAn')}}
   // thêm vợ/chồng: người đã có vợ/chồng thì người mới là vợ/chồng thứ
   function wed(a,b){if(!a.spouse)a.spouse=b.id;else if(a.spouse!==b.id&&!(a.sp2||[]).includes(b.id))a.sp2=(a.sp2||[]).concat(b.id);b.spouse=a.id}
+  const daDoi=()=>dispatchEvent(new Event('ss-gp-doi'));
   function addMember(){const err=$('#nfErr'),f=readForm(err);if(!f)return;
     const rel=$('#nfRel').value,to=get($('#nfTo').value);if(!to){err.textContent='Hãy chọn người để nối quan hệ.';return}
     const m=Object.assign({id:'u'+(ME.seq++),parent:null,spouse:null,houseOf:f.d&&$('#nfHouse').value||null},f);
@@ -120,13 +121,13 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
     else if(rel==='spouse')wed(to,m);
     else{const p=to.parent&&get(to.parent);if(p){wed(p,m);to.mother=m.id}else to.parent=m.id}   // đã có bố hoặc mẹ: người mới là vợ/chồng của người đó
     const wasClan=isClan();ME.members.push(m);reg(m);sel=m.id;refresh();side();toast(f.d?`Đã thêm ${f.name}. Nhà tưởng niệm trong làng đã sẵn sàng.`:`Đã thêm ${f.name} vào gia phả.`);
-    if(!wasClan&&isClan())setTimeout(()=>toast(`Đã lập dòng họ ${surname()}. Làng dòng họ đã mở.`),2800)}
+    if(!wasClan&&isClan())setTimeout(()=>toast(`Đã lập dòng họ ${surname()}. Làng dòng họ đã mở.`),2800);daDoi()}
   function saveEdit(m){const f=readForm($('#nfErr'));if(!f)return;Object.assign(m,f);if(!m.d)m.houseOf=null;
-    if(m.self&&ME.user){ME.user.name=m.name;window.ssSetUser&&ssSetUser(m.name)}reg(m);refresh();side();toast('Đã lưu thông tin '+m.name+'.')}
+    if(m.self&&ME.user){ME.user.name=m.name;window.ssSetUser&&ssSetUser(m.name)}reg(m);refresh();side();toast('Đã lưu thông tin '+m.name+'.');daDoi()}
   function delMember(id){const m=get(id);if(!m||m.self)return;
     ME.members.forEach(x=>{if(x.parent===id){x.parent=x.mother&&x.mother!==id?x.mother:(m.spouse||null);if(x.parent===x.mother)x.mother=null}if(x.mother===id)x.mother=null;
       if(x.sp2)x.sp2=x.sp2.filter(s=>s!==id);if(x.spouse===id)x.spouse=(x.sp2&&x.sp2.shift())||null;if(x.houseOf===id)x.houseOf=null});
-    ME.members=ME.members.filter(x=>x!==m);m.d=null;reg(m);sel=null;refresh();side();toast('Đã xoá '+m.name+' khỏi gia phả.')}
+    ME.members=ME.members.filter(x=>x!==m);m.d=null;reg(m);sel=null;refresh();side();toast('Đã xoá '+m.name+' khỏi gia phả.');daDoi()}
 
   // ---------- làng dòng họ 3D (cùng bộ dựng hình với làng chung) ----------
   let clan=null;
@@ -155,16 +156,16 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
   $('#meSample').addEventListener('click',()=>{const self=ME.members.find(m=>m.self);const sn=surname()||'Phạm';const id=()=>'u'+(ME.seq++);
     const a={id:id(),name:sn+' Văn Lễ',g:'m',b:1890,d:1951},b={id:id(),name:'Đinh Thị Tơ',g:'f',b:1894,d:1960},c={id:id(),name:sn+' Văn Cần',g:'m',b:1922,d:1990},w={id:id(),name:'Trần Thị Gái',g:'f',b:1925,d:2011},k={id:id(),name:sn+' Văn Khiêm',g:'m',b:1951,d:1972,ls:true},f={id:id(),name:sn+' Văn Khôi',g:'m',b:1948,d:2020};
     Object.assign(a,{chi:'Chi trưởng',huy:'Lễ',nm:'12/3',nmAl:true});Object.assign(c,{nm:'15/8',thu:1});Object.assign(k,{nm:'27/7',thu:2,an:'Nghĩa trang liệt sĩ quê nhà'});Object.assign(f,{thu:1});a.spouse=b.id;b.spouse=a.id;c.parent=a.id;c.spouse=w.id;w.spouse=c.id;w.houseOf=c.id;b.houseOf=a.id;k.parent=c.id;f.parent=c.id;self.parent=f.id;
-    [a,b,c,w,k,f].forEach(m=>{m.parent=m.parent||null;m.spouse=m.spouse||null;m.houseOf=m.houseOf||null;ME.members.push(m)});sel=self.id;refresh();side();toast('Đã thêm gia phả mẫu 4 đời. Làng dòng họ '+sn+' đã mở.')});
+    [a,b,c,w,k,f].forEach(m=>{m.parent=m.parent||null;m.spouse=m.spouse||null;m.houseOf=m.houseOf||null;ME.members.push(m)});sel=self.id;refresh();side();toast('Đã thêm gia phả mẫu 4 đời. Làng dòng họ '+sn+' đã mở.');daDoi()});
   $('#meInfo').addEventListener('submit',e=>{e.preventDefault();const n=$('#miName').value.trim();if(!n){toast('Hãy nhập họ và tên.');return}ME.user.name=n;ME.user.contact=$('#miContact').value.trim();ME.user.place=$('#miPlace').value.trim();const self=ME.members.find(m=>m.self);if(self)self.name=n;window.ssSetUser&&ssSetUser(n);refresh();toast('Đã lưu thông tin.')});
   function fillInfo(){$('#miName').value=ME.user.name;$('#miContact').value=ME.user.contact||'';$('#miPlace').value=ME.user.place||''}
-  function start(){document.body.classList.add('signed');const me=ME.members.find(m=>m.self);sel=me.id;refresh();fillInfo();if(ME.members.length>1)side();else side('add',{rel:'parent',to:me.id});tab('tree')}
+  function start(){document.body.classList.add('signed');const me=ME.members.find(m=>m.self);sel=me?me.id:null;refresh();fillInfo();if(ME.members.length>1||!me)side();else side('add',{rel:'parent',to:me.id});tab('tree')}
   window.ssGio=(d,mo)=>dead().filter(x=>{const g=gio(x);return g&&g.d===d&&g.m===mo}).map(x=>'Giỗ '+x.name);   // lịch vạn niên (02) hiện ngày giỗ
   window.ssMe={tree:function(){return ME},homeOf:function(id){return homeOf(id)},goods:function(){return goods},balance:function(){return balance},
     signup(name,contact){ME.user={name,contact,place:'',since:new Date().toLocaleDateString('vi-VN',{month:'2-digit',year:'numeric'})};ME.seq=2;ME.members=[{id:'u1',name,g:'m',b:null,d:null,self:true,parent:null,spouse:null}];
       people.filter(p=>p.mine).forEach(p=>{people.splice(people.indexOf(p),1);delete byId[p.id]});start()},
     login(contact){if(!ME.user&&!restore()){this.signup('Bạn',contact);return ME.user.name}start();return ME.user.name},
-    logout(){document.body.classList.remove('signed')},save,refresh,
+    logout(){document.body.classList.remove('signed')},save,refresh,ve(){if(sel&&!get(sel))sel=null;refresh();side()},
     resume(){if(restore()){start();return ME.user.name}return null}};
   // shortcut: dữ liệu gia phả chỉ lưu trên trình duyệt này (localStorage); cần máy chủ và tài khoản thật khi làm sản phẩm
   // tự kiểm tra bố cục cây: con luôn nằm thấp hơn cha mẹ một đời
