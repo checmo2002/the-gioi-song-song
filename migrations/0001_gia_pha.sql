@@ -1,6 +1,6 @@
 -- Gia phả dòng họ trên máy chủ (docs/gia-pha-dong-ho.md)
 CREATE TABLE nguoi_dung (
-  id TEXT PRIMARY KEY,               -- mã tài khoản Firebase (uid); đăng nhập, mật khẩu, email do Firebase giữ
+  id TEXT PRIMARY KEY,               -- 'z' + mã người dùng Zalo; mật khẩu do Zalo giữ, máy chủ không lưu số điện thoại hay email
   ten TEXT NOT NULL,
   tao INTEGER NOT NULL
 );
@@ -53,4 +53,14 @@ CREATE TABLE lich_su (             -- bản cây cũ trước mỗi lần thay (
   luc INTEGER NOT NULL,
   boi TEXT,
   PRIMARY KEY (dong_ho_id, phien_ban)
+);
+CREATE TABLE phien (               -- phiên đăng nhập: chỉ lưu SHA-256 của mã trong cookie ss_phien
+  ma_bam TEXT PRIMARY KEY,
+  nguoi_id TEXT NOT NULL REFERENCES nguoi_dung(id),
+  het INTEGER NOT NULL
+);
+CREATE TABLE zalo_cho (            -- lượt đăng nhập Zalo đang dở (10 phút): SHA-256 của state, code_verifier của PKCE
+  state_bam TEXT PRIMARY KEY,
+  cv TEXT NOT NULL,
+  het INTEGER NOT NULL
 );

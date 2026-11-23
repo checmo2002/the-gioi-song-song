@@ -1,5 +1,5 @@
-// Máy chủ gia phả dòng họ: Cloudflare Pages Functions + D1 (binding DB). Đăng nhập do Firebase Authentication lo (docs/bao-mat.md: không tự viết mật khẩu);
-// máy chủ chỉ xác minh mã đăng nhập (ID token) Firebase gửi kèm mỗi yêu cầu. Thiết kế: docs/gia-pha-dong-ho.md
+// Máy chủ gia phả dòng họ: Cloudflare Pages Functions + D1 (binding DB). Đăng nhập bằng Zalo (OAuth v4 + PKCE): Zalo giữ mật khẩu,
+// máy chủ chỉ cấp phiên (cookie HttpOnly) sau khi Zalo xác nhận người dùng (docs/bao-mat.md: không tự viết mật khẩu). Thiết kế: docs/gia-pha-dong-ho.md
 const NGAY = 864e5, MOI_HAN = 14 * NGAY, DX_NGAY = 30;
 const enc = new TextEncoder();
 
@@ -34,36 +34,55 @@ export function kiemCay(c) {
   if (JSON.stringify(out).length > 1e6) throw 0;
   return out;
 }
-// ---------- xác minh mã đăng nhập Firebase (JWT RS256) ----------
-const JWKS = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
-let KHOA = null, KHOA_HET = 0, KHOA_TAI = 0;
-async function khoa(env, moi) {
-  if (KHOA && Date.now() < KHOA_HET && (!moi || Date.now() - KHOA_TAI < 3e5)) return KHOA;   // kid lạ: tải lại khoá tối đa 5 phút một lần
-  KHOA_TAI = Date.now();
-  const r = await fetch(env.FIREBASE_JWKS || JWKS); if (!r.ok) throw new Error('khong tai duoc khoa Firebase');
-  const j = await r.json(), tuoi = /max-age=(\d+)/.exec(r.headers.get('Cache-Control') || ''), k = new Map();
-  for (const x of j.keys || []) if (x.kid && x.kty === 'RSA') k.set(x.kid, await crypto.subtle.importKey('jwk', { kty: 'RSA', n: x.n, e: x.e, alg: 'RS256', ext: true }, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']));
-  KHOA = k; KHOA_HET = Date.now() + Math.min(+(tuoi && tuoi[1]) || 3600, 86400) * 1e3; return k;
-}
-const b64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - s.length % 4) % 4)), c => c.charCodeAt(0));
+// ---------- đăng nhập bằng Zalo; phiên do máy chủ cấp ----------
+const PHIEN_HAN = 30 * NGAY, CHO_HAN = 10 * 6e4;
+const hex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('');
+const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+// __Host-: trình duyệt chỉ nhận cookie này từ đúng tên miền trang (không Domain, Path=/), nên bản xem trước <nhánh>.thegioisongsong.pages.dev
+// không ném được cookie trùng tên vào trang chính. Trùng tên vẫn lọt tới (trình duyệt lạ) thì bỏ cả hai.
+const banh = (req, k) => { const c = (req.headers.get('Cookie') || '').split(/;\s*/).filter(x => x.startsWith(k + '='));
+  return c.length === 1 && /^[0-9a-f]{64}$/.test(c[0].slice(k.length + 1)) ? c[0].slice(k.length + 1) : null };
+const cookie = (k, v, han) => `${k}=${v}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${han}`;
+const PHIEN = '__Host-ss_phien', ZCHO = '__Host-ss_zalo';
 async function ai(env, req) {
-  const m = /^Bearer ([\w-]+)\.([\w-]+)\.([\w-]+)$/.exec(req.headers.get('Authorization') || ''); if (!m) return null;
-  let H, P; try { H = JSON.parse(new TextDecoder().decode(b64u(m[1]))); P = JSON.parse(new TextDecoder().decode(b64u(m[2]))) } catch { return null }
-  if (H.alg !== 'RS256' || typeof H.kid !== 'string') return null;
-  let K = (await khoa(env)).get(H.kid); if (!K) K = (await khoa(env, true)).get(H.kid); if (!K) return null;   // Google xoay khoá: tải lại một lần
-  if (!await crypto.subtle.verify('RSASSA-PKCS1-v1_5', K, b64u(m[3]), enc.encode(m[1] + '.' + m[2]))) return null;
-  const now = Date.now() / 1000, pj = env.FIREBASE_PROJECT_ID;
-  if (!pj || P.aud !== pj || P.iss !== 'https://securetoken.google.com/' + pj || !(P.exp > now) || !(P.iat <= now + 60) || !(P.auth_time <= now + 60)) return null;
-  if (typeof P.sub !== 'string' || !P.sub || P.sub.length > 128) return null;
-  return { id: P.sub, xac_minh: P.email_verified === true, ten_goc: (typeof P.name === 'string' && P.name) || (typeof P.email === 'string' ? P.email.split('@')[0] : 'Bạn') };
+  const t = banh(req, PHIEN); if (!t) return null;
+  return env.DB.prepare('SELECT n.id, n.ten FROM phien p JOIN nguoi_dung n ON n.id = p.nguoi_id WHERE p.ma_bam = ? AND p.het > ?').bind(await sha(t), Date.now()).first();
 }
-// tài khoản mới: ghi tên lần đầu thấy
+const chuyen = (url, cks) => { const h = new Headers({ Location: url, 'Cache-Control': 'no-store' }); for (const c of cks) h.append('Set-Cookie', c); return new Response(null, { status: 302, headers: h }) };
+const OAUTH = env => env.ZALO_OAUTH || 'https://oauth.zaloapp.com', GRAPH = env => env.ZALO_GRAPH || 'https://graph.zalo.me';   // đổi được để thử với Zalo giả
+async function zaloBatDau(env, req) {
+  const st = hex(32), cv = hex(32), cc = b64url(await crypto.subtle.digest('SHA-256', enc.encode(cv))), goc = new URL(req.url).origin;
+  await env.DB.batch([env.DB.prepare('DELETE FROM zalo_cho WHERE het < ?').bind(Date.now()),
+    env.DB.prepare('INSERT INTO zalo_cho (state_bam, cv, het) VALUES (?, ?, ?)').bind(await sha(st), cv, Date.now() + CHO_HAN)]);
+  const u = new URL(OAUTH(env) + '/v4/permission');
+  u.search = new URLSearchParams({ app_id: env.ZALO_APP_ID, redirect_uri: goc + '/api/zalo/ve', code_challenge: cc, state: st });
+  return chuyen(u.href, [cookie(ZCHO, st, CHO_HAN / 1000)]);
+}
+async function zaloVe(env, req) {
+  const u = new URL(req.url), st = u.searchParams.get('state') || '', code = u.searchParams.get('code') || '', bo = cookie(ZCHO, '', 0);
+  const hong = ly => chuyen(u.origin + '/?dang-nhap=' + ly + '#ca-nhan', [bo]);
+  // state phải khớp cookie của chính trình duyệt này: chặn kẻ xấu gài người khác đăng nhập vào tài khoản của hắn
+  if (!/^[0-9a-f]{64}$/.test(st) || banh(req, ZCHO) !== st || !code || code.length > 2000) return hong('loi');
+  const r = await env.DB.prepare('DELETE FROM zalo_cho WHERE state_bam = ? AND het > ? RETURNING cv').bind(await sha(st), Date.now()).first();
+  if (!r) return hong('het-han');
+  const t = await fetch(OAUTH(env) + '/v4/access_token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', secret_key: env.ZALO_APP_SECRET },
+    body: new URLSearchParams({ code, app_id: env.ZALO_APP_ID, grant_type: 'authorization_code', code_verifier: r.cv }) }).then(x => x.json()).catch(() => ({}));
+  if (!t || typeof t.access_token !== 'string') return hong('loi');
+  const me = await fetch(GRAPH(env) + '/v2.0/me?fields=id,name', { headers: { access_token: t.access_token } }).then(x => x.json()).catch(() => ({}));
+  if (!me || typeof me.id !== 'string' || !/^\d{1,30}$/.test(me.id)) return hong('loi');
+  const id = 'z' + me.id, tk = hex(32), now = Date.now();
+  await env.DB.batch([
+    env.DB.prepare('INSERT OR IGNORE INTO nguoi_dung (id, ten, tao) VALUES (?, ?, ?)').bind(id, String(me.name || '').replace(LA, '').trim().slice(0, 60) || 'Bạn', now),
+    env.DB.prepare('INSERT INTO phien (ma_bam, nguoi_id, het) VALUES (?, ?, ?)').bind(await sha(tk), id, now + PHIEN_HAN),
+    env.DB.prepare('DELETE FROM phien WHERE het < ?').bind(now)]);
+  return chuyen(u.origin + '/#ca-nhan', [cookie(PHIEN, tk, PHIEN_HAN / 1000), bo]);
+}
+
 // trường tk (người trong cây là tài khoản nào): chỉ được gắn với chính mình, tk của người khác giữ nguyên như bản đang lưu
 function giuTk(cay, cu, minh) { const C = new Map((cu ? cu.members : []).map(m => [m.id, m.tk])); for (const m of cay.members) if (m.tk !== (C.get(m.id) || null) && m.tk !== minh) m.tk = C.get(m.id) || null; return cay }
 // lưu bản cũ trước khi thay cây, giữ 30 bản gần nhất để trưởng họ khôi phục
 const luuCu = (env, id, toi) => [env.DB.prepare('INSERT OR IGNORE INTO lich_su (dong_ho_id, phien_ban, cay, luc, boi) SELECT id, phien_ban, cay, ?, ? FROM dong_ho WHERE id = ?').bind(Date.now(), toi.id, id),
   env.DB.prepare('DELETE FROM lich_su WHERE dong_ho_id = ? AND phien_ban <= (SELECT MAX(phien_ban) - 30 FROM lich_su WHERE dong_ho_id = ?)').bind(id, id)];
-const ghiNguoi = (env, t) => env.DB.prepare('INSERT OR IGNORE INTO nguoi_dung (id, ten, tao) VALUES (?, ?, ?)').bind(t.id, String(t.ten_goc).replace(LA, '').trim().slice(0, 60) || 'Bạn', Date.now()).run();
 const vaiCua = (env, dh, nguoi) => env.DB.prepare('SELECT vai FROM thanh_vien WHERE dong_ho_id = ? AND nguoi_id = ?').bind(dh, nguoi).first('vai');
 
 // ---------- các lệnh ----------
@@ -74,24 +93,22 @@ async function xuLy(env, req, duong, toi) {
   let body = {};
   if (M !== 'GET') { if (+(req.headers.get('Content-Length') || 0) > 1.2e6) return loi(413, 'Dữ liệu quá lớn.'); const t = await req.text(); if (enc.encode(t).length > 1.2e6) return loi(413, 'Dữ liệu quá lớn.'); try { body = t ? JSON.parse(t) : {} } catch { return loi(400, 'Dữ liệu không đọc được.') } if (!body || typeof body !== 'object') return loi(400, 'Dữ liệu không đọc được.') }
 
-  if (a === 'cau-hinh' && M === 'GET') {   // khoá web Firebase là khoá công khai, để ở biến môi trường cho repo không chứa
-    if (!env.FIREBASE_API_KEY || !env.FIREBASE_PROJECT_ID) return loi(503, 'Chưa cấu hình đăng nhập.');
-    return json({ apiKey: env.FIREBASE_API_KEY, projectId: env.FIREBASE_PROJECT_ID });
+  if (a === 'zalo' && id === 'bat-dau' && M === 'GET') return zaloBatDau(env, req);
+  if (a === 'zalo' && id === 've' && M === 'GET') return zaloVe(env, req);
+  if (a === 'dang-xuat' && M === 'POST') {
+    const t = banh(req, PHIEN); if (t) await env.DB.prepare('DELETE FROM phien WHERE ma_bam = ?').bind(await sha(t)).run();
+    return json({ ok: true }, 200, { 'Set-Cookie': cookie(PHIEN, '', 0) });
   }
   if (a === 'toi' && M === 'GET') {
     if (!toi) return json({ nguoi: null });
-    await ghiNguoi(env, toi);
-    const n = await env.DB.prepare('SELECT id, ten FROM nguoi_dung WHERE id = ?').bind(toi.id).first();
     const { results } = await env.DB.prepare('SELECT d.id, d.ten, t.vai FROM thanh_vien t JOIN dong_ho d ON d.id = t.dong_ho_id WHERE t.nguoi_id = ? ORDER BY t.vao').bind(toi.id).all();
-    return json({ nguoi: { ...n, xac_minh: toi.xac_minh }, dong_ho: results });
+    return json({ nguoi: toi, dong_ho: results });
   }
   if (!toi) return loi(401, 'Hãy đăng nhập.');
   if (a === 'toi' && M === 'PUT') {
     let ten; try { ten = chu(body.ten, 60, true) } catch { return loi(400, 'Tên từ 1 đến 60 ký tự.') }
-    await ghiNguoi(env, toi); await env.DB.prepare('UPDATE nguoi_dung SET ten = ? WHERE id = ?').bind(ten, toi.id).run(); return json({ ten });
+    await env.DB.prepare('UPDATE nguoi_dung SET ten = ? WHERE id = ?').bind(ten, toi.id).run(); return json({ ten });
   }
-  if (!toi.xac_minh) return loi(403, 'Hãy bấm đường link xác nhận trong email trước, rồi thử lại.');   // không cho mạo danh email người khác
-  await ghiNguoi(env, toi);
 
   if (a === 'tham-gia' && M === 'POST') {
     const m = String(body.ma || '').trim().toLowerCase(); if (!/^[a-z0-9]{10}$/.test(m)) return loi(400, 'Mã mời gồm 10 ký tự.');
@@ -200,7 +217,7 @@ async function xuLy(env, req, duong, toi) {
 
 export async function onRequest({ request: req, env, params }) {
   try {
-    if (!env.DB) return loi(503, 'Máy chủ gia phả chưa được cấu hình.');
+    if (!env.DB || !env.ZALO_APP_ID || !env.ZALO_APP_SECRET) return loi(503, 'Máy chủ gia phả chưa được cấu hình.');
     if (req.method !== 'GET') {   // chống giả mạo yêu cầu từ trang khác
       const o = req.headers.get('Origin');
       let cung = false; try { cung = !!o && new URL(o).host === new URL(req.url).host } catch { }

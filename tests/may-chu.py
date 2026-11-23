@@ -1,60 +1,51 @@
-"""Kiểm máy chủ gia phả dòng họ (functions/api, docs/gia-pha-dong-ho.md): mã đăng nhập Firebase, quyền, cây xấu, giả mạo yêu cầu.
-Bài thử tự làm "Firebase giả": tự sinh khoá RSA, phát khoá công khai ở http://localhost:8790/jwks và tự ký mã đăng nhập.
+"""Kiểm máy chủ gia phả dòng họ (functions/api, docs/gia-pha-dong-ho.md): đăng nhập Zalo, phiên, quyền, cây xấu, giả mạo yêu cầu.
+Bài thử tự dựng "Zalo giả" ở http://localhost:8790 (đổi mã lấy token có kiểm PKCE, trả thông tin người dùng).
 Máy chủ thử phải chạy với biến môi trường (file .dev.vars cạnh wrangler.toml, xem docs/gia-pha-dong-ho.md mục "Chạy thử ở máy"):
-    FIREBASE_PROJECT_ID=song-song-thu   FIREBASE_API_KEY=khoa-thu   FIREBASE_JWKS=http://localhost:8790/jwks
+    ZALO_APP_ID=app-thu   ZALO_APP_SECRET=bi-mat-thu   ZALO_OAUTH=http://localhost:8790   ZALO_GRAPH=http://localhost:8790
 Chạy: python3 tests/may-chu.py [http://localhost:8788]"""
-import json, sys, time, random, threading, base64, urllib.request, urllib.error, http.server
-import jwt
-from cryptography.hazmat.primitives.asymmetric import rsa
+import json, sys, random, threading, base64, hashlib, http.server, urllib.request, urllib.error, urllib.parse
 
 GOC = (sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8788').rstrip('/')
-DU_AN = 'song-song-thu'
 loi = []
 
-# ---------- Firebase giả ----------
-# khoá thử giữ cố định giữa các lần chạy (máy chủ chỉ tải lại khoá Firebase tối đa 5 phút một lần)
-import os, tempfile, hashlib
-from cryptography.hazmat.primitives import serialization
-TEP = os.path.join(tempfile.gettempdir(), 'ss-may-chu-khoa.pem')
-if os.path.exists(TEP): khoa = serialization.load_pem_private_key(open(TEP, 'rb').read(), None)
-else:
-    khoa = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    open(TEP, 'wb').write(khoa.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()))
-khoa_la = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-KID = 'thu-' + hashlib.sha256(str(khoa.public_key().public_numbers().n).encode()).hexdigest()[:12]
-b64u = lambda n: base64.urlsafe_b64encode(n.to_bytes((n.bit_length() + 7) // 8, 'big')).rstrip(b'=').decode()
-pub = khoa.public_key().public_numbers()
-JWKS = json.dumps({'keys': [{'kty': 'RSA', 'alg': 'RS256', 'use': 'sig', 'kid': KID, 'n': b64u(pub.n), 'e': b64u(pub.e)}]}).encode()
-
-
-class Jwks(http.server.BaseHTTPRequestHandler):
-    def do_GET(s):
-        s.send_response(200); s.send_header('Content-Type', 'application/json'); s.send_header('Cache-Control', 'max-age=60'); s.end_headers(); s.wfile.write(JWKS)
+# ---------- Zalo giả ----------
+CHO = {}   # mã code -> {cc, zid, ten}
+class Zalo(http.server.BaseHTTPRequestHandler):
+    def tra(s, o, st=200):
+        b = json.dumps(o).encode(); s.send_response(st); s.send_header('Content-Type', 'application/json'); s.end_headers(); s.wfile.write(b)
+    def do_POST(s):   # /v4/access_token
+        f = urllib.parse.parse_qs(s.rfile.read(int(s.headers.get('Content-Length', 0))).decode())
+        g = lambda k: (f.get(k) or [''])[0]; c = CHO.pop(g('code'), None)
+        cc = base64.urlsafe_b64encode(hashlib.sha256(g('code_verifier').encode()).digest()).rstrip(b'=').decode()
+        if s.headers.get('secret_key') != 'bi-mat-thu' or g('app_id') != 'app-thu' or not c or c['cc'] != cc: return s.tra({'error': -14014, 'error_name': 'invalid'}, 400)
+        s.tra({'access_token': 'at-' + c['zid'], 'refresh_token': 'rt', 'expires_in': '3600'}); NGUOI['at-' + c['zid']] = c
+    def do_GET(s):    # /v2.0/me
+        c = NGUOI.get(s.headers.get('access_token'))
+        s.tra({'id': c['zid'], 'name': c['ten']} if c else {'error': 452, 'message': 'Access token is invalid'})
     def log_message(s, *a): pass
+NGUOI = {}
+threading.Thread(target=http.server.HTTPServer(('127.0.0.1', 8790), Zalo).serve_forever, daemon=True).start()
 
 
-threading.Thread(target=http.server.HTTPServer(('127.0.0.1', 8790), Jwks).serve_forever, daemon=True).start()
-
-
-def ma_dn(uid, ten, xac_minh=True, **sua):
-    now = int(time.time())
-    c = {'aud': DU_AN, 'iss': 'https://securetoken.google.com/' + DU_AN, 'sub': uid, 'iat': now, 'auth_time': now, 'exp': now + 3600,
-         'email': uid + '@vi-du.vn', 'email_verified': xac_minh, 'name': ten}
-    c.update(sua)
-    return jwt.encode(c, khoa, algorithm='RS256', headers={'kid': KID})
+class KhongTheo(urllib.request.HTTPRedirectHandler):
+    def redirect_request(s, *a): return None
+mo = urllib.request.build_opener(KhongTheo)
 
 
 class Nguoi:
-    def __init__(s, ma=None): s.ma = ma
+    def __init__(s, ck=''): s.ck = ck
 
     def goi(s, method, duong, body=None, origin=GOC, ctype='application/json'):
-        h = {}
-        if s.ma: h['Authorization'] = 'Bearer ' + s.ma
+        h = {'Cookie': s.ck}
         if origin: h['Origin'] = origin
         if body is not None: h['Content-Type'] = ctype
         req = urllib.request.Request(GOC + duong, method=method, headers=h, data=None if body is None else json.dumps(body).encode())
-        try: r = urllib.request.urlopen(req); st = r.status
+        try: r = mo.open(req); st = r.status
         except urllib.error.HTTPError as e: r = e; st = e.code
+        for v in r.headers.get_all('Set-Cookie') or []:
+            k, gt = v.split(';')[0].split('=', 1)
+            s.ck = '; '.join([x for x in s.ck.split('; ') if x and not x.startswith(k + '=')] + ([k + '=' + gt] if gt else []))
+        s.vi_tri = r.headers.get('Location') or ''
         t = r.read().decode()
         try: return st, (json.loads(t) if t else {})
         except ValueError: return st, {'tho': t[:120]}
@@ -65,26 +56,54 @@ def ky(ten, dk, st, du_kien):
     else: print(f'  ✓ {ten}')
 
 
-uid = lambda: 'uid%d' % random.randint(1, 10**12)
-A, B, C = Nguoi(ma_dn(uid(), 'Trưởng họ')), Nguoi(ma_dn(uid(), 'Thành viên B')), Nguoi(ma_dn(uid(), 'Người ngoài C'))
+def zalo(ten, n=None, sua=None):
+    """Đi trọn luồng đăng nhập Zalo; sua(n, state, code) để thử luồng hỏng."""
+    n = n or Nguoi(); n.goi('GET', '/api/zalo/bat-dau')
+    q = urllib.parse.parse_qs(urllib.parse.urlparse(n.vi_tri).query); g = lambda k: (q.get(k) or [''])[0]
+    if g('app_id') != 'app-thu' or not g('code_challenge') or not g('redirect_uri').endswith('/api/zalo/ve'): loi.append(f'URL sang Zalo thiếu tham số: {n.vi_tri[:120]}')
+    code = 'ma-%d' % random.randint(1, 10**12); CHO[code] = {'cc': g('code_challenge'), 'zid': str(random.randint(10**15, 10**16)), 'ten': ten}
+    st, code = (sua(n, g('state'), code) if sua else (g('state'), code))
+    n.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': code, 'state': st}))
+    return n
+
+
 CAY = {'members': [{'id': 'u1', 'name': 'Phạm Văn Lễ', 'g': 'm', 'b': 1890, 'd': 1951, 'nm': '12/3', 'nmAl': True, 'spouse': 'u2', 'self': True, 'houseOf': 'u2'},
                    {'id': 'u2', 'name': 'Đinh Thị Tơ', 'g': 'f', 'b': 1894, 'd': 1960, 'spouse': 'u1'},
                    {'id': 'u3', 'name': '<img src=x onerror=alert(1)>', 'g': 'm', 'b': 1922, 'parent': 'u1'}], 'seq': 4}
 sao = lambda c: json.loads(json.dumps(c))
 
-# ---------- mã đăng nhập ----------
-st, r = Nguoi().goi('GET', '/api/cau-hinh'); ky('cấu hình đăng nhập', r, st, 200)
-if r.get('projectId') != DU_AN: loi.append('cau-hinh phải trả projectId của máy chủ')
+# ---------- đăng nhập Zalo, phiên ----------
 st, r = Nguoi().goi('GET', '/api/toi'); ky('chưa đăng nhập: /toi vẫn trả', r, st, 200)
 if r.get('nguoi') is not None: loi.append('chưa đăng nhập mà /toi có người')
-for ten, ma in [('mã ký bằng khoá lạ', jwt.encode({'aud': DU_AN, 'iss': 'https://securetoken.google.com/' + DU_AN, 'sub': 'x', 'iat': int(time.time()), 'auth_time': int(time.time()), 'exp': int(time.time()) + 600}, khoa_la, algorithm='RS256', headers={'kid': KID})),
-                ('mã hết hạn', ma_dn('x', 'x', exp=int(time.time()) - 10)),
-                ('mã của dự án khác', ma_dn('x', 'x', aud='du-an-khac')),
-                ('mã sai nơi cấp', ma_dn('x', 'x', iss='https://securetoken.google.com/du-an-khac')),
-                ('mã không ký (alg none)', jwt.encode({'aud': DU_AN, 'sub': 'x'}, None, algorithm='none'))]:
-    st, r = Nguoi(ma).goi('POST', '/api/dong-ho', {'ten': 'Họ X', 'cay': CAY}); ky(ten + ' bị từ chối', r, st, 401)
-st, r = Nguoi(ma_dn(uid(), 'Chưa xác nhận', xac_minh=False)).goi('POST', '/api/dong-ho', {'ten': 'Họ X', 'cay': CAY}); ky('email chưa xác nhận không lập được dòng họ', r, st, 403)
-for n in (A, B, C): n.goi('GET', '/api/toi')
+A = zalo('Trưởng họ'); st, r = A.goi('GET', '/api/toi'); ky('đăng nhập Zalo thành công', r, st, 200)
+if not (r.get('nguoi') or {}).get('id', '').startswith('z'): loi.append(f'đăng nhập Zalo xong mà chưa có phiên: {r}')
+if '__Host-ss_zalo=' in A.ck: loi.append('đăng nhập xong vẫn còn cookie __Host-ss_zalo')
+B, C = zalo('Thành viên B'), zalo('Người ngoài C')
+gai = Nguoi(); gai.goi('GET', '/api/zalo/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(gai.vi_tri).query)
+nan = Nguoi(); st, r = nan.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': 'ma-bat-ky', 'state': q['state'][0]}))
+if '__Host-ss_phien=' in nan.ck or 'dang-nhap=loi' not in nan.vi_tri: loi.append('trình duyệt khác dùng state của người khác vẫn đăng nhập được (gài đăng nhập)')
+else: print('  ✓ chặn gài đăng nhập bằng state của trình duyệt khác')
+D = zalo('Sai PKCE', sua=lambda n, st, code: (CHO[code].update(cc='sai'), (st, code))[1])
+if '__Host-ss_phien=' in D.ck: loi.append('mã code không khớp PKCE mà vẫn đăng nhập được')
+else: print('  ✓ chặn mã code không khớp PKCE')
+E = Nguoi(); E.goi('GET', '/api/zalo/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(E.vi_tri).query); ck = E.ck
+E.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': 'x', 'state': q['state'][0]})); E.ck = ck
+E.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': 'x', 'state': q['state'][0]}))
+if 'dang-nhap=het-han' not in E.vi_tri: loi.append(f'dùng lại state lần hai phải báo hết hạn: {E.vi_tri}')
+else: print('  ✓ state chỉ dùng được một lần')
+st, r = Nguoi('__Host-ss_phien=' + '0' * 64).goi('POST', '/api/dong-ho', {'ten': 'Họ X', 'cay': CAY}); ky('phiên giả bị từ chối', r, st, 401)
+# cookie ném từ tên miền con (bản xem trước) không có tiền tố __Host-, hoặc trùng tên: phải bị bỏ qua
+gai = Nguoi(); gai.goi('GET', '/api/zalo/bat-dau'); q = urllib.parse.parse_qs(urllib.parse.urlparse(gai.vi_tri).query)
+code = 'ma-%d' % random.randint(1, 10**12); CHO[code] = {'cc': q['code_challenge'][0], 'zid': '1234567890123456', 'ten': 'Kẻ xấu'}
+nan = Nguoi('ss_zalo=' + q['state'][0]); nan.goi('GET', '/api/zalo/ve?' + urllib.parse.urlencode({'code': code, 'state': q['state'][0]}))
+if '__Host-ss_phien=' in nan.ck: loi.append('cookie ss_zalo ném từ tên miền con gài được đăng nhập')
+else: print('  ✓ bỏ qua cookie state không có tiền tố __Host-')
+tk = [x for x in B.ck.split('; ') if x.startswith('__Host-ss_phien=')][0].split('=', 1)[1]
+st, r = Nguoi('ss_phien=' + tk).goi('GET', '/api/toi')
+if r.get('nguoi'): loi.append('máy chủ nhận cookie phiên không có tiền tố __Host-')
+st, r = Nguoi(f'__Host-ss_phien={tk}; __Host-ss_phien={tk}').goi('GET', '/api/toi')
+if r.get('nguoi'): loi.append('cookie phiên trùng tên vẫn được nhận')
+else: print('  ✓ bỏ qua cookie phiên trùng tên')
 st, r = A.goi('PUT', '/api/toi', {'ten': 'Trưởng họ Phạm'}); ky('đổi tên hiển thị', r, st, 200)
 
 # ---------- giả mạo yêu cầu ----------
@@ -181,12 +200,14 @@ st, r = A.goi('GET', f'/api/dong-ho/{DH}')
 if len(r['cay']['members']) != len(ms): loi.append('khôi phục xong cây chưa về như cũ')
 st, r = C.goi('GET', f'/api/dong-ho/{DH}/lich-su'); ky('người ngoài không xem lịch sử', r, st, 404)
 
-# ---------- kid lạ không làm máy chủ lỗi ----------
-for kid in ('constructor', '__proto__', 'toString'):
-    t = jwt.encode({'aud': DU_AN, 'sub': 'x'}, khoa, algorithm='RS256', headers={'kid': kid})
-    st, r = Nguoi(t).goi('POST', '/api/dong-ho', {'ten': 'Họ X', 'cay': CAY}); ky(f'kid "{kid}" bị từ chối, không lỗi máy chủ', r, st, 401)
 st, r = A.goi('PUT', '/api/toi', {'ten': 'Trưởng\u200b họ\u2028 Phạm\ufeff'})
 if r.get('ten') != 'Trưởng họ Phạm': loi.append(f'chưa lọc ký tự rộng 0 / xuống dòng lạ: {r.get("ten")!r}')
+
+# ---------- đăng xuất ----------
+st, r = A.goi('POST', '/api/dang-xuat', {}); ky('đăng xuất', r, st, 200)
+st, r = A.goi('GET', '/api/toi')
+if r.get('nguoi') is not None: loi.append('đăng xuất rồi vẫn còn phiên')
+st, r = A.goi('GET', f'/api/dong-ho/{DH}'); ky('sau đăng xuất không xem được', r, st, 401)
 
 for x in loi: print('  ✗', x)
 assert not loi, 'KHÔNG ĐẠT'
