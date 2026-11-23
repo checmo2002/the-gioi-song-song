@@ -27,7 +27,7 @@ Chủ dự án chốt ngày 23/11/2026:
 
 - Mỗi dòng họ lưu **một cây** dạng JSON, có cùng các trường với gia phả trên máy (xem `docs/tinh-nang.md`, phần `07-12`), và một `phien_ban` tăng dần sau mỗi lần sửa.
   - Những trường riêng của từng máy (`self`, nhà 3D) không được đưa lên.
-  - Người trong cây gắn với tài khoản qua trường `tk` (mã tài khoản trên máy chủ: `g` + mã Google, hoặc `z` + mã Zalo).
+  - Người trong cây gắn với tài khoản qua trường `tk` (mã tài khoản trên máy chủ: `g` hoặc `z` + HMAC của mã Google/Zalo, xem phần Bảo mật).
 - Một đề xuất là **cả cây đề xuất**, kèm một dòng ghi chú. Đề xuất chỉ nhận khi được làm trên đúng phiên bản hiện tại.
 - Khi duyệt:
   - Nếu cây chưa đổi từ lúc đề xuất được gửi, cây đề xuất thay cây hiện tại.
@@ -36,7 +36,7 @@ Chủ dự án chốt ngày 23/11/2026:
 - Mỗi người gửi tối đa 30 đề xuất một ngày và có tối đa 20 đề xuất đang chờ.
 
 Các bảng D1 (`migrations/0001_gia_pha.sql`):
-- `nguoi_dung`: `g` + mã Google (hoặc `z` + mã Zalo), và tên hiển thị. Không lưu email, số điện thoại hay mật khẩu.
+- `nguoi_dung`: `g` (Google) hoặc `z` (Zalo) + HMAC-SHA256 của mã người dùng với khoá `TK_KHOA`, và tên hiển thị. Không lưu email, số điện thoại hay mật khẩu.
 - `phien`: phiên đăng nhập. Chỉ lưu SHA-256 của mã phiên, hạn 30 ngày.
 - `dn_cho`: lượt đăng nhập đang dở (SHA-256 của `state`, bên đăng nhập, `code_verifier` của PKCE), hạn 10 phút, dùng một lần.
 - `dong_ho`: dòng họ, gồm cây và phiên bản.
@@ -81,6 +81,8 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
   - Khoá bí mật (`GOOGLE_CLIENT_SECRET`, `ZALO_APP_SECRET`) chỉ nằm ở biến bí mật của Cloudflare, không ở repo, không ở trang.
   - Mã truy cập chỉ dùng một lần để hỏi mã và tên người dùng, không lưu.
   - Mã người dùng phải đúng dạng (Google: chữ/số tới 60 ký tự, Zalo: số) mới tạo tài khoản.
+  - **Không lưu, không trả ra mã Google/Zalo gốc.** Mã Google (`sub`) là mã tài khoản Google dùng chung mọi dịch vụ; ai trong dòng họ cũng thấy mã tài khoản (danh sách thành viên, trường `tk`), nên máy chủ dùng HMAC(`TK_KHOA`, `bên:mã`). **Không đổi `TK_KHOA` sau khi có người dùng**, vì mọi mã tài khoản sẽ đổi theo.
+  - Trường `tk` đã gắn với một người thì người khác không đè được, kể cả qua đề xuất được duyệt.
 - **Phiên:** mã phiên 32 byte ngẫu nhiên, cookie HttpOnly (trang và mã độc chèn vào trang không đọc được).
 - **Tiền tố `__Host-`** cho cả hai cookie: `pages.dev` là hậu tố công cộng nên mọi bản xem trước `<nhánh>.thegioisongsong.pages.dev` là tên miền con của trang chính. Không có tiền tố này, mã trên một bản xem trước ném được cookie phiên/state của kẻ xấu vào trang chính (gài đăng nhập, cố định phiên). Cookie trùng tên lọt tới thì máy chủ bỏ cả hai. Cơ sở dữ liệu chỉ giữ SHA-256 của mã. Đăng xuất là xoá phiên ở máy chủ.
 - **Chống trang khác gửi yêu cầu thay người dùng:** cookie là SameSite=Lax, và mọi lệnh ghi còn bắt buộc có `Origin` trùng tên miền của trang và `Content-Type: application/json`.
@@ -92,7 +94,7 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
   - quan hệ phải trỏ tới người có trong cây, không trỏ vào chính mình, không có vòng cha – con;
   - không nhận id `__proto__`, `constructor`, `prototype`.
 - **Hiển thị:** chữ người dùng nhập vẫn đi qua `esc()` khi đưa lên trang.
-- **Kiểm thử:** `tests/may-chu.py` dựng "Google giả" và "Zalo giả" (kiểm khoá bí mật, mã ứng dụng, `redirect_uri` và PKCE như thật) và thử trên máy chủ thật chạy ở máy. Gồm: dùng `state` của bên này cho bên kia, bên đăng nhập lạ, gài `state` của trình duyệt khác, cookie không có tiền tố `__Host-` hoặc trùng tên, sai `code_verifier`, dùng lại `state`, phiên giả, đăng xuất, quyền của từng vai, cây xấu, giả mạo yêu cầu, thu hồi mã mời, người bị mời ra vào lại.
+- **Kiểm thử:** `tests/may-chu.py` dựng "Google giả" và "Zalo giả" (kiểm khoá bí mật, mã ứng dụng, `redirect_uri` và PKCE như thật) và thử trên máy chủ thật chạy ở máy. Gồm: mã tài khoản không chứa `sub` của Google, không đè được `tk` của người khác, dùng `state` của bên này cho bên kia, bên đăng nhập lạ, gài `state` của trình duyệt khác, cookie không có tiền tố `__Host-` hoặc trùng tên, sai `code_verifier`, dùng lại `state`, phiên giả, đăng xuất, quyền của từng vai, cây xấu, giả mạo yêu cầu, thu hồi mã mời, người bị mời ra vào lại.
 
 ## Chạy thử ở máy
 
@@ -112,7 +114,7 @@ database_name = "gia-pha-thu"
 database_id = "00000000-0000-0000-0000-000000000000"
 migrations_dir = "migrations"
 EOF
-printf 'GOOGLE_CLIENT_ID=gg-thu\nGOOGLE_CLIENT_SECRET=gg-bi-mat\nGOOGLE_THU=http://localhost:8790\nZALO_APP_ID=app-thu\nZALO_APP_SECRET=bi-mat-thu\nZALO_OAUTH=http://localhost:8790\nZALO_GRAPH=http://localhost:8790\n' > .dev.vars
+printf 'TK_KHOA=khoa-thu\nGOOGLE_CLIENT_ID=gg-thu\nGOOGLE_CLIENT_SECRET=gg-bi-mat\nGOOGLE_THU=http://localhost:8790\nZALO_APP_ID=app-thu\nZALO_APP_SECRET=bi-mat-thu\nZALO_OAUTH=http://localhost:8790\nZALO_GRAPH=http://localhost:8790\n' > .dev.vars
 npx wrangler d1 migrations apply gia-pha-thu --local
 npx wrangler pages dev --port 8788 &
 cd <repo> && python3 tests/may-chu.py           # chỉ cần thư viện chuẩn của python
@@ -133,6 +135,7 @@ cd <repo> && python3 tests/may-chu.py           # chỉ cần thư viện chuẩ
    - Chạy `migrations/0001_gia_pha.sql` trên cả hai.
 3. **Gắn vào dự án Pages**, ở Settings → Bindings / Variables:
    - biến `DB` trỏ tới D1 tương ứng với từng môi trường;
+   - `TK_KHOA` (**Encrypt**): một chuỗi ngẫu nhiên dài (ví dụ `openssl rand -hex 32`), đặt một lần, **không bao giờ đổi**.
    - `GOOGLE_CLIENT_ID` (biến thường) và `GOOGLE_CLIENT_SECRET` (chọn **Encrypt**, là biến bí mật). Zalo khi cần: `ZALO_APP_ID`, `ZALO_APP_SECRET` (Encrypt). **Chỉ đặt ở Production.** Mã của mọi nhánh chạy ở Preview, nên đặt khoá ở đó là nhánh nào cũng đọc được khoá. Preview không có khoá thì `/api` trả 503, khung tự ẩn.
 
 Khi chưa gắn, `/api/*` trả lỗi 503 và khung "Gia phả của cả dòng họ" tự ẩn; phần còn lại của trang chạy như cũ.

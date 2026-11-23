@@ -1,7 +1,7 @@
 """Kiểm máy chủ gia phả dòng họ (functions/api, docs/gia-pha-dong-ho.md): đăng nhập Google/Zalo, phiên, quyền, cây xấu, giả mạo yêu cầu.
 Bài thử tự dựng "Google giả" và "Zalo giả" ở http://localhost:8790 (đổi mã lấy token có kiểm khoá bí mật và PKCE, trả thông tin người dùng).
 Máy chủ thử phải chạy với biến môi trường (file .dev.vars cạnh wrangler.toml, xem docs/gia-pha-dong-ho.md mục "Chạy thử ở máy"):
-    GOOGLE_CLIENT_ID=gg-thu   GOOGLE_CLIENT_SECRET=gg-bi-mat   GOOGLE_THU=http://localhost:8790
+    TK_KHOA=khoa-thu   GOOGLE_CLIENT_ID=gg-thu   GOOGLE_CLIENT_SECRET=gg-bi-mat   GOOGLE_THU=http://localhost:8790
     ZALO_APP_ID=app-thu   ZALO_APP_SECRET=bi-mat-thu   ZALO_OAUTH=http://localhost:8790   ZALO_GRAPH=http://localhost:8790
 Chạy: python3 tests/may-chu.py [http://localhost:8788]"""
 import json, sys, random, threading, base64, hashlib, http.server, urllib.request, urllib.error, urllib.parse
@@ -219,6 +219,24 @@ st, r = C.goi('GET', f'/api/dong-ho/{DH}/lich-su'); ky('người ngoài không x
 
 st, r = A.goi('PUT', '/api/toi', {'ten': 'Trưởng\u200b họ\u2028 Phạm\ufeff'})
 if r.get('ten') != 'Trưởng họ Phạm': loi.append(f'chưa lọc ký tự rộng 0 / xuống dòng lạ: {r.get("ten")!r}')
+
+# ---------- mã tài khoản Google/Zalo không lộ cho người khác (rà PR #107) ----------
+# sub của Google là mã tài khoản Google dùng chung mọi dịch vụ: lộ ra là tra được người đó ở chỗ khác
+SUB = '1%020d' % random.randint(0, 10**19)
+P = dn('Có sub', sua=lambda n, st, code: (CHO[code].update(zid=SUB), (st, code))[1])
+st, r = P.goi('GET', '/api/toi'); pid = (r.get('nguoi') or {}).get('id') or ''
+if not pid or SUB in pid: loi.append(f'mã tài khoản trên máy chủ chứa nguyên sub của Google, cả dòng họ thấy qua /thanh-vien và tk: {pid}')
+else: print('  ✓ mã tài khoản không chứa sub của Google')
+
+# ---------- tk đã gắn với người khác thì không đè được (rà PR #107) ----------
+H, K = dn('Trưởng họ H'), dn('Thành viên K')
+idH = H.goi('GET', '/api/toi')[1]['nguoi']['id']; idK = K.goi('GET', '/api/toi')[1]['nguoi']['id']
+st, r = H.goi('POST', '/api/dong-ho', {'ten': 'Họ Thử tk', 'cay': {'members': [{'id': 'u1', 'name': 'H', 'g': 'm', 'tk': idH}], 'seq': 2}}); DH9 = r.get('id')
+K.goi('POST', '/api/tham-gia', {'ma': H.goi('POST', f'/api/dong-ho/{DH9}/loi-moi', {})[1].get('ma')})
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/de-xuat', {'cay': {'members': [{'id': 'u1', 'name': 'H', 'g': 'm', 'tk': idK}], 'seq': 2}, 'phien_ban': 1})
+if st == 201: H.goi('POST', f'/api/dong-ho/{DH9}/de-xuat/{r["id"]}/duyet', {})
+if H.goi('GET', f'/api/dong-ho/{DH9}')[1]['cay']['members'][0].get('tk') != idH: loi.append('thành viên đè được tk của người khác bằng mã của mình (trưởng họ duyệt mà không thấy)')
+else: print('  ✓ không đè được tk đã gắn với người khác')
 
 # ---------- đăng xuất ----------
 st, r = A.goi('POST', '/api/dang-xuat', {}); ky('đăng xuất', r, st, 200)

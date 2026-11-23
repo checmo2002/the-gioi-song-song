@@ -86,7 +86,9 @@ async function ve(env, req, ben) {
   if (!r) return hong('het-han');
   const me = await BEN[ben].doi(env, u.origin + '/api/' + ben + '/ve', code, r.cv);
   if (!me || typeof me.id !== 'string' || !BEN[ben].id.test(me.id)) return hong('loi');
-  const id = BEN[ben].kt + me.id, tk = hex(32), now = Date.now();
+  // mã tài khoản = HMAC(TK_KHOA, bên:mã): mã Google (sub) dùng chung mọi dịch vụ, không để lộ cho người trong dòng họ. Không đổi TK_KHOA sau khi có người dùng
+  const k = await crypto.subtle.importKey('raw', enc.encode(env.TK_KHOA), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const id = BEN[ben].kt + b64url(await crypto.subtle.sign('HMAC', k, enc.encode(ben + ':' + me.id))), tk = hex(32), now = Date.now();
   await env.DB.batch([
     env.DB.prepare('INSERT OR IGNORE INTO nguoi_dung (id, ten, tao) VALUES (?, ?, ?)').bind(id, String(me.ten || '').replace(LA, '').trim().slice(0, 60) || 'Bạn', now),
     env.DB.prepare('INSERT INTO phien (ma_bam, nguoi_id, het) VALUES (?, ?, ?)').bind(await sha(tk), id, now + PHIEN_HAN),
@@ -95,7 +97,8 @@ async function ve(env, req, ben) {
 }
 
 // trường tk (người trong cây là tài khoản nào): chỉ được gắn với chính mình, tk của người khác giữ nguyên như bản đang lưu
-function giuTk(cay, cu, minh) { const C = new Map((cu ? cu.members : []).map(m => [m.id, m.tk])); for (const m of cay.members) if (m.tk !== (C.get(m.id) || null) && m.tk !== minh) m.tk = C.get(m.id) || null; return cay }
+function giuTk(cay, cu, minh) { const C = new Map((cu ? cu.members : []).map(m => [m.id, m.tk]));
+  for (const m of cay.members) { const c = C.get(m.id) || null; if (c && c !== minh) m.tk = c; else if (m.tk != null && m.tk !== minh) m.tk = c } return cay }   // người đã gắn với người khác: không ai đè được
 // lưu bản cũ trước khi thay cây, giữ 30 bản gần nhất để trưởng họ khôi phục
 const luuCu = (env, id, toi) => [env.DB.prepare('INSERT OR IGNORE INTO lich_su (dong_ho_id, phien_ban, cay, luc, boi) SELECT id, phien_ban, cay, ?, ? FROM dong_ho WHERE id = ?').bind(Date.now(), toi.id, id),
   env.DB.prepare('DELETE FROM lich_su WHERE dong_ho_id = ? AND phien_ban <= (SELECT MAX(phien_ban) - 30 FROM lich_su WHERE dong_ho_id = ?)').bind(id, id)];
@@ -232,7 +235,7 @@ async function xuLy(env, req, duong, toi) {
 
 export async function onRequest({ request: req, env, params }) {
   try {
-    if (!env.DB || !cachBat(env).length) return loi(503, 'Máy chủ gia phả chưa được cấu hình.');
+    if (!env.DB || !env.TK_KHOA || !cachBat(env).length) return loi(503, 'Máy chủ gia phả chưa được cấu hình.');
     if (req.method !== 'GET') {   // chống giả mạo yêu cầu từ trang khác
       const o = req.headers.get('Origin');
       let cung = false; try { cung = !!o && new URL(o).host === new URL(req.url).host } catch { }
