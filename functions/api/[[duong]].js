@@ -1,25 +1,20 @@
-// Máy chủ gia phả dòng họ: Cloudflare Pages Functions + D1 (binding DB). Thiết kế: docs/gia-pha-dong-ho.md
-const NGAY = 864e5, PHIEN_HAN = 30 * NGAY, MOI_HAN = 14 * NGAY, KHOA_LAN = 8, KHOA_THOI = 15 * 6e4;
+// Máy chủ gia phả dòng họ: Cloudflare Pages Functions + D1 (binding DB). Đăng nhập do Firebase Authentication lo (docs/bao-mat.md: không tự viết mật khẩu);
+// máy chủ chỉ xác minh mã đăng nhập (ID token) Firebase gửi kèm mỗi yêu cầu. Thiết kế: docs/gia-pha-dong-ho.md
+const NGAY = 864e5, MOI_HAN = 14 * NGAY, DX_NGAY = 30;
 const enc = new TextEncoder();
 
 const json = (o, st = 200, h = {}) => new Response(JSON.stringify(o), { status: st, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...h } });
 const loi = (st, chu) => json({ loi: chu }, st);
 const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
 const sha = async s => b64(await crypto.subtle.digest('SHA-256', enc.encode(s)));
-const hex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('');
 // mã đọc được (bỏ 0/o, 1/l/i), lấy mẫu loại bỏ để không lệch xác suất
 function ma(n) { const A = 'abcdefghjkmnpqrstuvwxyz23456789'; let s = ''; while (s.length < n) for (const x of crypto.getRandomValues(new Uint8Array(n))) if (x < 248 && s.length < n) s += A[x % 31]; return s }
-async function bamMk(mk, muoi) {
-  const k = await crypto.subtle.importKey('raw', enc.encode(mk), 'PBKDF2', false, ['deriveBits']);
-  return b64(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: enc.encode(muoi), iterations: 100000 }, k, 256));
-}
-function bang(a, b) { if (a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i); return d === 0 }
-
 // ---------- kiểm dữ liệu tại ranh giới tin cậy ----------
-const chu = (v, max, can) => { if (v == null || v === '') { if (can) throw 0; return null } if (typeof v !== 'string') throw 0; v = v.trim(); if (!v && can) throw 0; if (v.length > max) throw 0; return v || null };
+const LA = /[\u0000-\u001f\u007f-\u009f\u200e\u200f\u202a-\u202e\u2066-\u2069]/g;   // ký tự điều khiển, đảo chiều chữ: dùng để giả tên
+const chu = (v, max, can) => { if (v == null || v === '') { if (can) throw 0; return null } if (typeof v !== 'string') throw 0; v = v.replace(LA, '').trim(); if (!v && can) throw 0; if (v.length > max) throw 0; return v || null };
 const so = (v, a, b) => { if (v == null || v === '') return null; if (!Number.isInteger(v) || v < a || v > b) throw 0; return v };
 const co = v => v === true;
-const ID = /^[A-Za-z0-9_-]{1,24}$/, NGAY_THANG = /^([1-9]|[12]\d|3[01])\/([1-9]|1[0-2])$/;
+const ID = /^(?!(?:__proto__|constructor|prototype)$)[A-Za-z0-9_-]{1,24}$/, NGAY_THANG = /^([1-9]|[12]\d|3[01])\/([1-9]|1[0-2])$/;
 // Gia phả: chỉ giữ trường đã biết (docs/tinh-nang.md, phần 07-12); bỏ self, houseOf… là đồ riêng của từng máy
 export function kiemCay(c) {
   if (!c || typeof c !== 'object' || !Array.isArray(c.members) || c.members.length > 2000) throw 0;
@@ -32,69 +27,65 @@ export function kiemCay(c) {
       ns, nm, nmAl: co(m.nmAl), huy: chu(m.huy, 40), tu: chu(m.tu, 40), thuy: chu(m.thuy, 60), chi: chu(m.chi, 40),
       thu: so(m.thu, 1, 30), nuoi: co(m.nuoi), an: chu(m.an, 120), tk: chu(m.tk, 24) };
   });
-  for (const m of ms) for (const r of [m.parent, m.mother, m.spouse, ...m.sp2]) if (r != null && !ids.has(r)) throw 0;
+  for (const m of ms) for (const r of [m.parent, m.mother, m.spouse, ...m.sp2]) if (r != null && (!ids.has(r) || r === m.id)) throw 0;
+  const cha = new Map(ms.map(m => [m.id, m.parent]));   // không cho vòng cha – con
+  for (const m of ms) { let x = m.parent, n = 0; while (x) { if (x === m.id || ++n > 2000) throw 0; x = cha.get(x) } }
   const out = { members: ms, seq: so(c.seq, 1, 1e7) || ms.length + 1 };
   if (JSON.stringify(out).length > 1e6) throw 0;
   return out;
 }
-// số điện thoại: bỏ dấu cách, chấm, gạch; email: chỉ đổi chữ thường
-const lienHe = v => { v = String(v || '').trim().toLowerCase(); if (!v.includes('@')) v = v.replace(/[\s.-]/g, ''); return /^\+?\d{9,12}$/.test(v) || /^[^@\s]{1,64}@[^@\s]{1,190}\.[a-z]{2,}$/.test(v) ? v : null };
-
-// ---------- phiên đăng nhập ----------
-const cookie = (tok, han) => `ss_phien=${tok}; HttpOnly; Secure; SameSite=Lax; Path=/api; Max-Age=${han}`;
-async function ai(env, req) {
-  const m = /(?:^|;\s*)ss_phien=([0-9a-f]{64})/.exec(req.headers.get('Cookie') || ''); if (!m) return null;
-  return env.DB.prepare('SELECT n.id, n.ten FROM phien p JOIN nguoi_dung n ON n.id = p.nguoi_id WHERE p.ma_bam = ? AND p.het > ?').bind(await sha(m[1]), Date.now()).first();
+// ---------- xác minh mã đăng nhập Firebase (JWT RS256) ----------
+const JWKS = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
+let KHOA = null, KHOA_HET = 0;
+async function khoa(env, moi) {
+  if (KHOA && !moi && Date.now() < KHOA_HET) return KHOA;
+  const r = await fetch(env.FIREBASE_JWKS || JWKS); if (!r.ok) throw new Error('khong tai duoc khoa Firebase');
+  const j = await r.json(), tuoi = /max-age=(\d+)/.exec(r.headers.get('Cache-Control') || ''), k = {};
+  for (const x of j.keys || []) if (x.kid && x.kty === 'RSA') k[x.kid] = await crypto.subtle.importKey('jwk', { kty: 'RSA', n: x.n, e: x.e, alg: 'RS256', ext: true }, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+  KHOA = k; KHOA_HET = Date.now() + Math.min(+(tuoi && tuoi[1]) || 3600, 86400) * 1e3; return k;
 }
-async function moPhien(env, id) { const t = hex(32); await env.DB.prepare('INSERT INTO phien (ma_bam, nguoi_id, het) VALUES (?, ?, ?)').bind(await sha(t), id, Date.now() + PHIEN_HAN).run(); return cookie(t, PHIEN_HAN / 1000) }
+const b64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - s.length % 4) % 4)), c => c.charCodeAt(0));
+async function ai(env, req) {
+  const m = /^Bearer ([\w-]+)\.([\w-]+)\.([\w-]+)$/.exec(req.headers.get('Authorization') || ''); if (!m) return null;
+  let H, P; try { H = JSON.parse(new TextDecoder().decode(b64u(m[1]))); P = JSON.parse(new TextDecoder().decode(b64u(m[2]))) } catch { return null }
+  if (H.alg !== 'RS256' || typeof H.kid !== 'string') return null;
+  let K = (await khoa(env))[H.kid]; if (!K) K = (await khoa(env, true))[H.kid]; if (!K) return null;   // Google xoay khoá: tải lại một lần
+  if (!await crypto.subtle.verify('RSASSA-PKCS1-v1_5', K, b64u(m[3]), enc.encode(m[1] + '.' + m[2]))) return null;
+  const now = Date.now() / 1000, pj = env.FIREBASE_PROJECT_ID;
+  if (!pj || P.aud !== pj || P.iss !== 'https://securetoken.google.com/' + pj || !(P.exp > now) || !(P.iat <= now + 60) || !(P.auth_time <= now + 60)) return null;
+  if (typeof P.sub !== 'string' || !P.sub || P.sub.length > 128) return null;
+  return { id: P.sub, xac_minh: P.email_verified === true, ten_goc: (typeof P.name === 'string' && P.name) || (typeof P.email === 'string' ? P.email.split('@')[0] : 'Bạn') };
+}
+// tài khoản mới: ghi tên lần đầu thấy
+const ghiNguoi = (env, t) => env.DB.prepare('INSERT OR IGNORE INTO nguoi_dung (id, ten, tao) VALUES (?, ?, ?)').bind(t.id, String(t.ten_goc).replace(LA, '').trim().slice(0, 60) || 'Bạn', Date.now()).run();
 const vaiCua = (env, dh, nguoi) => env.DB.prepare('SELECT vai FROM thanh_vien WHERE dong_ho_id = ? AND nguoi_id = ?').bind(dh, nguoi).first('vai');
 
 // ---------- các lệnh ----------
-async function dangKy(env, b) {
-  const ten = (() => { try { return chu(b.ten, 60, true) } catch { return null } })(), lh = lienHe(b.lien_he), mk = b.mat_khau;
-  if (!ten) return loi(400, 'Hãy nhập họ và tên.'); if (!lh) return loi(400, 'Số điện thoại hoặc email chưa đúng.');
-  if (typeof mk !== 'string' || mk.length < 8 || mk.length > 128) return loi(400, 'Mật khẩu cần từ 8 ký tự.');
-  if (await env.DB.prepare('SELECT 1 FROM nguoi_dung WHERE lien_he = ?').bind(lh).first()) return loi(409, 'Số điện thoại hoặc email này đã có tài khoản. Hãy đăng nhập.');
-  const id = ma(12), muoi = hex(16);
-  await env.DB.prepare('INSERT INTO nguoi_dung (id, ten, lien_he, mk_bam, mk_muoi, tao) VALUES (?, ?, ?, ?, ?, ?)').bind(id, ten, lh, await bamMk(mk, muoi), muoi, Date.now()).run();
-  return json({ nguoi: { id, ten } }, 201, { 'Set-Cookie': await moPhien(env, id) });
-}
-async function dangNhap(env, b) {
-  const lh = lienHe(b.lien_he), mk = typeof b.mat_khau === 'string' ? b.mat_khau.slice(0, 128) : '', now = Date.now();
-  if (!lh) return loi(400, 'Số điện thoại hoặc email chưa đúng.');
-  const sai = await env.DB.prepare('SELECT lan, tu FROM dang_nhap_sai WHERE lien_he = ?').bind(lh).first();
-  if (sai && sai.lan >= KHOA_LAN && now - sai.tu < KHOA_THOI) return loi(429, 'Nhập sai quá nhiều lần. Hãy thử lại sau 15 phút.');
-  const n = await env.DB.prepare('SELECT id, ten, mk_bam, mk_muoi FROM nguoi_dung WHERE lien_he = ?').bind(lh).first();
-  const bam = await bamMk(mk, n ? n.mk_muoi : 'khong-co-tai-khoan');   // vẫn băm khi không có tài khoản: thời gian trả lời như nhau
-  if (!n || !bang(bam, n.mk_bam)) {
-    const moi = !sai || now - sai.tu >= KHOA_THOI;
-    await env.DB.prepare('INSERT INTO dang_nhap_sai (lien_he, lan, tu) VALUES (?, 1, ?) ON CONFLICT(lien_he) DO UPDATE SET lan = ?, tu = ?').bind(lh, now, moi ? 1 : sai.lan + 1, moi ? now : sai.tu).run();
-    return loi(401, 'Sai số điện thoại/email hoặc mật khẩu.');
-  }
-  await env.DB.batch([env.DB.prepare('DELETE FROM dang_nhap_sai WHERE lien_he = ?').bind(lh), env.DB.prepare('DELETE FROM phien WHERE het < ?').bind(now)]);
-  return json({ nguoi: { id: n.id, ten: n.ten } }, 200, { 'Set-Cookie': await moPhien(env, n.id) });
-}
-async function dangXuat(env, req) {
-  const m = /(?:^|;\s*)ss_phien=([0-9a-f]{64})/.exec(req.headers.get('Cookie') || '');
-  if (m) await env.DB.prepare('DELETE FROM phien WHERE ma_bam = ?').bind(await sha(m[1])).run();
-  return json({ ok: true }, 200, { 'Set-Cookie': cookie('', 0) });
-}
 async function dongHoCua(env, id) { const r = await env.DB.prepare('SELECT id, ten, cay, phien_ban FROM dong_ho WHERE id = ?').bind(id).first(); if (r) r.cay = JSON.parse(r.cay); return r }
 
 async function xuLy(env, req, duong, toi) {
   const [a, id, b, dx, c] = duong, M = req.method;
   let body = {};
-  if (M !== 'GET') { const t = await req.text(); if (t.length > 1.2e6) return loi(413, 'Dữ liệu quá lớn.'); try { body = t ? JSON.parse(t) : {} } catch { return loi(400, 'Dữ liệu không đọc được.') } if (!body || typeof body !== 'object') return loi(400, 'Dữ liệu không đọc được.') }
+  if (M !== 'GET') { if (+(req.headers.get('Content-Length') || 0) > 1.2e6) return loi(413, 'Dữ liệu quá lớn.'); const t = await req.text(); if (enc.encode(t).length > 1.2e6) return loi(413, 'Dữ liệu quá lớn.'); try { body = t ? JSON.parse(t) : {} } catch { return loi(400, 'Dữ liệu không đọc được.') } if (!body || typeof body !== 'object') return loi(400, 'Dữ liệu không đọc được.') }
 
-  if (a === 'dang-ky' && M === 'POST') return dangKy(env, body);
-  if (a === 'dang-nhap' && M === 'POST') return dangNhap(env, body);
-  if (a === 'dang-xuat' && M === 'POST') return dangXuat(env, req);
+  if (a === 'cau-hinh' && M === 'GET') {   // khoá web Firebase là khoá công khai, để ở biến môi trường cho repo không chứa
+    if (!env.FIREBASE_API_KEY || !env.FIREBASE_PROJECT_ID) return loi(503, 'Chưa cấu hình đăng nhập.');
+    return json({ apiKey: env.FIREBASE_API_KEY, projectId: env.FIREBASE_PROJECT_ID });
+  }
   if (a === 'toi' && M === 'GET') {
     if (!toi) return json({ nguoi: null });
+    await ghiNguoi(env, toi);
+    const n = await env.DB.prepare('SELECT id, ten FROM nguoi_dung WHERE id = ?').bind(toi.id).first();
     const { results } = await env.DB.prepare('SELECT d.id, d.ten, t.vai FROM thanh_vien t JOIN dong_ho d ON d.id = t.dong_ho_id WHERE t.nguoi_id = ? ORDER BY t.vao').bind(toi.id).all();
-    return json({ nguoi: toi, dong_ho: results });
+    return json({ nguoi: { ...n, xac_minh: toi.xac_minh }, dong_ho: results });
   }
   if (!toi) return loi(401, 'Hãy đăng nhập.');
+  if (a === 'toi' && M === 'PUT') {
+    let ten; try { ten = chu(body.ten, 60, true) } catch { return loi(400, 'Tên từ 1 đến 60 ký tự.') }
+    await ghiNguoi(env, toi); await env.DB.prepare('UPDATE nguoi_dung SET ten = ? WHERE id = ?').bind(ten, toi.id).run(); return json({ ten });
+  }
+  if (!toi.xac_minh) return loi(403, 'Hãy bấm đường link xác nhận trong email trước, rồi thử lại.');   // không cho mạo danh email người khác
+  await ghiNguoi(env, toi);
 
   if (a === 'tham-gia' && M === 'POST') {
     const m = String(body.ma || '').trim().toLowerCase(); if (!/^[a-z0-9]{10}$/.test(m)) return loi(400, 'Mã mời gồm 10 ký tự.');
@@ -123,15 +114,18 @@ async function xuLy(env, req, duong, toi) {
   if (b === 'cay' && M === 'PUT') {
     if (!duyet) return loi(403, 'Chỉ trưởng họ hoặc người được giao duyệt mới sửa thẳng. Hãy gửi đề xuất.');
     let cay; try { cay = kiemCay(body.cay) } catch { return loi(400, 'Gia phả chưa hợp lệ.') }
+    if (!Number.isInteger(body.phien_ban)) return loi(400, 'Thiếu phiên bản gia phả.');
     const r = await env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(JSON.stringify(cay), id, body.phien_ban).run();
     if (!r.meta.changes) { const d = await dongHoCua(env, id); return json({ loi: 'Gia phả vừa được người khác sửa. Hãy xem bản mới rồi sửa lại.', ...d }, 409) }
     return json({ phien_ban: body.phien_ban + 1 });
   }
   if (b === 'de-xuat' && !dx && M === 'POST') {
     let cay, gc; try { cay = kiemCay(body.cay); gc = chu(body.ghi_chu, 200) } catch { return loi(400, 'Gia phả chưa hợp lệ.') }
-    if (!Number.isInteger(body.phien_ban)) return loi(400, 'Thiếu phiên bản gia phả.');
-    const cho = await env.DB.prepare("SELECT COUNT(*) n FROM de_xuat WHERE dong_ho_id = ? AND nguoi_id = ? AND trang_thai = 'cho'").bind(id, toi.id).first('n');
-    if (cho >= 20) return loi(429, 'Bạn đã có 20 đề xuất đang chờ duyệt.');
+    const pb = await env.DB.prepare('SELECT phien_ban FROM dong_ho WHERE id = ?').bind(id).first('phien_ban');
+    if (body.phien_ban !== pb) return loi(409, 'Gia phả vừa được người khác sửa. Hãy tải lại rồi sửa trên bản mới.');
+    const dem = await env.DB.prepare("SELECT SUM(trang_thai = 'cho') cho, SUM(tao > ?) ngay FROM de_xuat WHERE dong_ho_id = ? AND nguoi_id = ?").bind(Date.now() - NGAY, id, toi.id).first();
+    if (dem.cho >= 20) return loi(429, 'Bạn đã có 20 đề xuất đang chờ duyệt.');
+    if (dem.ngay >= DX_NGAY) return loi(429, 'Mỗi ngày gửi tối đa ' + DX_NGAY + ' đề xuất.');
     const m = ma(12);
     await env.DB.prepare('INSERT INTO de_xuat (id, dong_ho_id, nguoi_id, cay, phien_ban_goc, ghi_chu, tao) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(m, id, toi.id, JSON.stringify(cay), body.phien_ban, gc, Date.now()).run();
     return json({ id: m }, 201);
@@ -146,11 +140,11 @@ async function xuLy(env, req, duong, toi) {
     if (!duyet) return loi(403, 'Chỉ trưởng họ hoặc người được giao mới duyệt được.');
     const x = await env.DB.prepare("SELECT cay, phien_ban_goc FROM de_xuat WHERE id = ? AND dong_ho_id = ? AND trang_thai = 'cho'").bind(dx, id).first();
     if (!x) return loi(404, 'Đề xuất không còn chờ duyệt.');
-    const now = Date.now(), xong = (tt, ld) => env.DB.prepare('UPDATE de_xuat SET trang_thai = ?, ly_do = ?, xu_ly_boi = ?, xu_ly_luc = ? WHERE id = ?').bind(tt, ld, toi.id, now, dx);
+    const now = Date.now(), xong = (tt, ld) => env.DB.prepare("UPDATE de_xuat SET trang_thai = ?, ly_do = ?, cay = '', xu_ly_boi = ?, xu_ly_luc = ? WHERE id = ? AND trang_thai = 'cho'").bind(tt, ld, toi.id, now, dx);
     if (c === 'tu-choi') { let ld; try { ld = chu(body.ly_do, 200) } catch { return loi(400, 'Lý do tối đa 200 ký tự.') } await xong('tu-choi', ld).run(); return json({ ok: true }) }
+    if (!(await xong('duyet', null).run()).meta.changes) return loi(404, 'Đề xuất không còn chờ duyệt.');   // hai người bấm duyệt cùng lúc: chỉ một người được
     const r = await env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(x.cay, id, x.phien_ban_goc).run();
-    if (!r.meta.changes) { await xong('tu-choi', 'Gia phả đã đổi sau khi đề xuất được gửi. Cần gửi lại trên bản mới.').run(); return loi(409, 'Gia phả đã đổi từ lúc đề xuất được gửi, nên đề xuất đã bị từ chối. Người gửi cần gửi lại.') }
-    await xong('duyet', null).run();
+    if (!r.meta.changes) { await env.DB.prepare("UPDATE de_xuat SET trang_thai = 'tu-choi', ly_do = ? WHERE id = ?").bind('Gia phả đã đổi sau khi đề xuất được gửi. Cần gửi lại trên bản mới.', dx).run(); return loi(409, 'Gia phả đã đổi từ lúc đề xuất được gửi, nên đề xuất đã bị từ chối. Người gửi cần gửi lại.') }
     return json({ phien_ban: x.phien_ban_goc + 1 });
   }
   if (b === 'loi-moi' && M === 'POST') {
@@ -159,16 +153,24 @@ async function xuLy(env, req, duong, toi) {
     await env.DB.prepare('INSERT INTO loi_moi (ma_bam, dong_ho_id, tao_boi, het) VALUES (?, ?, ?, ?)').bind(await sha(m), id, toi.id, het).run();
     return json({ ma: m, het }, 201);
   }
+  if (b === 'loi-moi' && M === 'DELETE') {
+    if (!duyet) return loi(403, 'Chỉ trưởng họ hoặc người được giao mới thu hồi mã mời.');
+    await env.DB.prepare('DELETE FROM loi_moi WHERE dong_ho_id = ?').bind(id).run(); return json({ ok: true });
+  }
   if (b === 'thanh-vien' && M === 'GET') {
     const { results } = await env.DB.prepare('SELECT n.id nguoi_id, n.ten, t.vai FROM thanh_vien t JOIN nguoi_dung n ON n.id = t.nguoi_id WHERE t.dong_ho_id = ? ORDER BY t.vao').bind(id).all();
     return json({ thanh_vien: results });
   }
-  if (b === 'vai' && M === 'POST') {
-    if (vai !== 'truong') return loi(403, 'Chỉ trưởng họ mới giao vai.');
-    if (!['truong', 'duyet', 'thanh-vien'].includes(body.vai) || typeof body.nguoi_id !== 'string') return loi(400, 'Vai không hợp lệ.');
+  if ((b === 'vai' || b === 'xoa-thanh-vien') && M === 'POST') {
+    if (vai !== 'truong') return loi(403, 'Chỉ trưởng họ mới giao vai hoặc mời người ra.');
+    if (typeof body.nguoi_id !== 'string' || (b === 'vai' && !['truong', 'duyet', 'thanh-vien'].includes(body.vai))) return loi(400, 'Vai không hợp lệ.');
     if (body.nguoi_id === toi.id) return loi(400, 'Không tự đổi vai của mình.');
-    const r = await env.DB.prepare('UPDATE thanh_vien SET vai = ? WHERE dong_ho_id = ? AND nguoi_id = ?').bind(body.vai, id, body.nguoi_id).run();
-    return r.meta.changes ? json({ ok: true }) : loi(404, 'Người này không ở trong dòng họ.');
+    if (body.nguoi_id === await env.DB.prepare('SELECT tao_boi FROM dong_ho WHERE id = ?').bind(id).first('tao_boi')) return loi(403, 'Không đổi vai người lập dòng họ.');
+    const r = await (b === 'vai' ? env.DB.prepare('UPDATE thanh_vien SET vai = ? WHERE dong_ho_id = ? AND nguoi_id = ?').bind(body.vai, id, body.nguoi_id)
+      : env.DB.prepare('DELETE FROM thanh_vien WHERE dong_ho_id = ? AND nguoi_id = ?').bind(id, body.nguoi_id)).run();
+    if (!r.meta.changes) return loi(404, 'Người này không ở trong dòng họ.');
+    if (b === 'xoa-thanh-vien' || body.vai === 'thanh-vien') await env.DB.prepare('DELETE FROM loi_moi WHERE dong_ho_id = ? AND tao_boi = ?').bind(id, body.nguoi_id).run();   // mã người đó tạo hết hiệu lực
+    return json({ ok: true });
   }
   return loi(404, 'Không có lệnh này.');
 }
@@ -178,7 +180,8 @@ export async function onRequest({ request: req, env, params }) {
     if (!env.DB) return loi(503, 'Máy chủ gia phả chưa được cấu hình.');
     if (req.method !== 'GET') {   // chống giả mạo yêu cầu từ trang khác
       const o = req.headers.get('Origin');
-      if (!o || new URL(o).host !== new URL(req.url).host) return loi(403, 'Yêu cầu không đến từ trang Song Song.');
+      let cung = false; try { cung = !!o && new URL(o).host === new URL(req.url).host } catch { }
+      if (!cung) return loi(403, 'Yêu cầu không đến từ trang Song Song.');
       if (!(req.headers.get('Content-Type') || '').startsWith('application/json')) return loi(415, 'Cần gửi dữ liệu JSON.');
     }
     const duong = [].concat(params.duong || []);

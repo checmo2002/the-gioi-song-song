@@ -1,21 +1,8 @@
 -- Gia phả dòng họ trên máy chủ (docs/gia-pha-dong-ho.md)
 CREATE TABLE nguoi_dung (
-  id TEXT PRIMARY KEY,
+  id TEXT PRIMARY KEY,               -- mã tài khoản Firebase (uid); đăng nhập, mật khẩu, email do Firebase giữ
   ten TEXT NOT NULL,
-  lien_he TEXT NOT NULL UNIQUE,      -- số điện thoại hoặc email, đã chuẩn hoá chữ thường
-  mk_bam TEXT NOT NULL,              -- PBKDF2-SHA256, base64
-  mk_muoi TEXT NOT NULL,
   tao INTEGER NOT NULL
-);
-CREATE TABLE phien (
-  ma_bam TEXT PRIMARY KEY,           -- SHA-256 của mã phiên trong cookie
-  nguoi_id TEXT NOT NULL REFERENCES nguoi_dung(id),
-  het INTEGER NOT NULL
-);
-CREATE TABLE dang_nhap_sai (
-  lien_he TEXT PRIMARY KEY,
-  lan INTEGER NOT NULL,
-  tu INTEGER NOT NULL                -- mốc bắt đầu đếm
 );
 CREATE TABLE dong_ho (
   id TEXT PRIMARY KEY,
@@ -43,7 +30,7 @@ CREATE TABLE de_xuat (
   id TEXT PRIMARY KEY,
   dong_ho_id TEXT NOT NULL REFERENCES dong_ho(id),
   nguoi_id TEXT NOT NULL REFERENCES nguoi_dung(id),
-  cay TEXT NOT NULL,
+  cay TEXT NOT NULL,                 -- cả cây đề xuất; xoá ('') khi đã duyệt hoặc từ chối
   phien_ban_goc INTEGER NOT NULL,
   ghi_chu TEXT,
   trang_thai TEXT NOT NULL DEFAULT 'cho' CHECK (trang_thai IN ('cho', 'duyet', 'tu-choi')),

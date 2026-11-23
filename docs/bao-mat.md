@@ -34,7 +34,7 @@ Agent phụ trách: `.claude/agents/bao-mat.md`. Bài kiểm tra: `tests/bao-mat
 - Đặt header ở hosting: `Content-Security-Policy` (chỉ cho script cùng nguồn), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, HSTS. Chưa đặt CSP trong `index.html` vì bản thử trên claude.ai tự chèn mã của nó.
 - Máy chủ: kiểm tra và lọc lại mọi dữ liệu ở phía máy chủ, không tin trình duyệt. Giới hạn độ dài tên, câu chuyện.
 - Ảnh tải lên: kiểm tra đúng là ảnh, xoá thông tin GPS trong ảnh (EXIF), giới hạn dung lượng.
-- Đăng nhập: không tự viết mật khẩu, dùng dịch vụ có sẵn (Supabase Auth hoặc tương đương). Giới hạn số lần thử.
+- Đăng nhập: không tự viết mật khẩu, dùng dịch vụ có sẵn (Supabase Auth hoặc tương đương). Giới hạn số lần thử. Gia phả dòng họ dùng Firebase Authentication, máy chủ chỉ xác minh mã đăng nhập: `docs/gia-pha-dong-ho.md`.
 - Quyền riêng tư hồ sơ (việc 13): bài thử phải chứng minh người ngoài không đọc được hồ sơ "chỉ gia đình".
 - Thanh toán: chỉ qua cổng thanh toán, trang không bao giờ thấy số thẻ.
 - Dữ liệu trong `localStorage` hiện để dạng chữ thường trên máy người dùng. Máy dùng chung thì người sau đọc được: khi có máy chủ, chỉ giữ phiên đăng nhập trên máy.
