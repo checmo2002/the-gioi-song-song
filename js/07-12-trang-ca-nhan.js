@@ -35,31 +35,54 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
   function syncRecipients(){$('#recipient').innerHTML=people.map(p=>`<option value="${p.id}">${esc(p.name)}${p.mine?' · gia đình':''}</option>`).join('')}
 
   // ---------- cây gia đình ----------
-  const NW=156,NH=62,SG=14,GX=26,GY=64;let sel=null;
+  const NW=156,NH=62,SG=14,GX=26,GY=64;let sel=null,Z=1,TW=0,TH=0;const gon=new Set();   // gon: các khối đang thu gọn chi (theo id người đứng đầu khối)
   const hasPar=x=>!!(x.parent&&get(x.parent));
   // một khối = chủ hộ + các vợ/chồng chưa có bố mẹ trong cây (người có bố mẹ được xếp dưới bố mẹ mình)
   const unitOf=m=>{const h=headOf(m),b=h!==m&&!hasPar(h)?h:m;return [b,...spousesOf(b).filter(s=>s===m||!hasPar(s))]};
   const kidsOf=u=>{const ids=u.map(x=>x.id);return ME.members.filter(c=>c.parent&&ids.includes(c.parent)).sort((a,b)=>(a.thu||99)-(b.thu||99)||(a.b||9999)-(b.b||9999))};
-  function width(u,seen){const own=u.length*NW+(u.length-1)*SG;const ks=kidsOf(u).filter(k=>!seen.has(k.id));ks.forEach(k=>seen.add(k.id));const kw=ks.reduce((a,k)=>a+width(unitOf(k),seen),0)+GX*Math.max(0,ks.length-1);return Math.max(own,kw)}
-  function drawTree(){const svg=$('#treeSvg');const pos={},links=[],pairs=[];let maxD=0;
+  const kidsVis=u=>gon.has(u[0].id)?[]:kidsOf(u);
+  function width(u,seen){const own=u.length*NW+(u.length-1)*SG;const ks=kidsVis(u).filter(k=>!seen.has(k.id));ks.forEach(k=>seen.add(k.id));const kw=ks.reduce((a,k)=>a+width(unitOf(k),seen),0)+GX*Math.max(0,ks.length-1);return Math.max(own,kw)}
+  function drawTree(){const svg=$('#treeSvg');const pos={},links=[],pairs=[],cols=[];let maxD=0;
     const roots=[];ME.members.forEach(m=>{if(hasPar(m))return;const h=headOf(m);if(roots.includes(h)||hasPar(h))return;if(spousesOf(h).some(s=>hasPar(s)||roots.includes(s)))return;roots.push(h)});
     const placed=new Set();
-    function place(u,x,depth){const w=width(u,new Set());u=u.filter(m=>!placed.has(m.id));if(!u.length)return;const own=u.length*NW+(u.length-1)*SG;const ox=x+(w-own)/2;u.forEach((m,i)=>{pos[m.id]={x:ox+i*(NW+SG),y:depth*(NH+GY)};placed.add(m.id)});if(u.length>1)pairs.push(u);maxD=Math.max(maxD,depth);
-      const ks=kidsOf(u).filter(k=>!placed.has(k.id));const widths=ks.map(k=>width(unitOf(k),new Set()));const kw=widths.reduce((a,b)=>a+b,0)+GX*Math.max(0,ks.length-1);let cx=x+(w-kw)/2;
+    function place(u,x,depth){const w=width(u,new Set());u=u.filter(m=>!placed.has(m.id));if(!u.length)return;const own=u.length*NW+(u.length-1)*SG;const ox=x+(w-own)/2;u.forEach((m,i)=>{pos[m.id]={x:ox+i*(NW+SG),y:depth*(NH+GY)};placed.add(m.id)});if(u.length>1)pairs.push(u);maxD=Math.max(maxD,depth);if(kidsOf(u).length)cols.push(u);
+      const ks=kidsVis(u).filter(k=>!placed.has(k.id));const widths=ks.map(k=>width(unitOf(k),new Set()));const kw=widths.reduce((a,b)=>a+b,0)+GX*Math.max(0,ks.length-1);let cx=x+(w-kw)/2;
       ks.forEach((k,i)=>{place(unitOf(k),cx,depth+1);links.push([u,k]);cx+=widths[i]+GX})}
     let x=0;roots.forEach(r=>{const u=unitOf(r);place(u,x,0);x+=width(u,new Set())+GX*2});
-    ME.members.forEach(m=>{if(!placed.has(m.id)){pos[m.id]={x,y:0};x+=NW+GX}});
-    const L=64,W=Math.max(x-GX*2,NW)+L+20,H=(maxD+1)*(NH+GY)-GY+24;svg.setAttribute('viewBox',`-${L} -12 ${W} ${H}`);svg.style.width=W+'px';svg.style.height=H+'px';
+    const an=new Set();gon.forEach(id=>{const h=get(id);if(h)under(unitOf(h)).forEach(k=>an.add(k))});   // con cháu của chi đang thu gọn: không vẽ
+    ME.members.forEach(m=>{if(!placed.has(m.id)&&!an.has(m.id)){pos[m.id]={x,y:0};x+=NW+GX}});
+    const L=64,W=Math.max(x-GX*2,NW)+L+20,H=(maxD+1)*(NH+GY)-GY+24;svg.setAttribute('viewBox',`-${L} -12 ${W} ${H}`);TW=W;TH=H;svg.style.width=W*Z+'px';svg.style.height=H*Z+'px';
     let g='';for(let d=0;d<=maxD;d++)g+=`<text class="tg" x="-${L-4}" y="${d*(NH+GY)+NH/2+4}">Đời ${d+1}</text>`;
     links.forEach(([u,k])=>{const ids=u.map(x=>x.id),a=pos[k.parent]||pos[ids[0]];let o=k.mother&&ids.includes(k.mother)?k.mother:u.length===2?ids.find(i=>i!==k.parent):k.parent!==ids[0]?ids[0]:null;const b=o&&o!==k.parent&&pos[o]?pos[o]:null;const x1=b&&u.length>2?b.x+NW/2:b?(a.x+b.x+NW)/2:a.x+NW/2,y1=a.y+NH,p=pos[k.id],x2=p.x+NW/2,y2=p.y,ym=y1+GY/2;g+=`<path class="tl" d="M${x1} ${y1}V${ym}H${x2}V${y2}"/>`});
     pairs.forEach(u=>u.slice(1).forEach((b,i)=>{const p=pos[u[i].id],q=pos[b.id];g+=`<path class="ts" d="M${p.x+NW} ${p.y+NH/2}H${q.x}"/><circle class="tsd" cx="${(p.x+NW+q.x)/2}" cy="${p.y+NH/2}" r="4"/>`}));
-    ME.members.forEach(m=>{const p=pos[m.id],vt=[vaiVo(m),m.nuoi?'Con nuôi':''].filter(Boolean).join(' · ');const nm=m.name.length>19?m.name.slice(0,18)+'…':m.name;
+    ME.members.forEach(m=>{const p=pos[m.id];if(!p)return;const vt=[vaiVo(m),m.nuoi?'Con nuôi':''].filter(Boolean).join(' · ');const nm=m.name.length>19?m.name.slice(0,18)+'…':m.name;
       g+=`<g class="tn${m.d?' dead':''}${m.self?' self':''}${sel===m.id?' on':''}" data-id="${m.id}" tabindex="0" role="button" aria-label="${esc(m.name)}, ${yrs(m)}" transform="translate(${p.x},${p.y})"><rect width="${NW}" height="${NH}" rx="8"/>
         ${m.d?`<path class="ic" d="M14 40v-12h4v12zM16 27c-2-3 0-5 0-7 2 2 3 4 0 7z"/>`:`<circle class="ic" cx="16" cy="31" r="4"/>`}${m.ls?`<text class="star" x="${NW-14}" y="18">★</text>`:''}
         <text class="n" x="28" y="27">${esc(nm)}</text><text class="y" x="28" y="45">${m.self?'Bạn · ':''}${vt?esc(vt)+' · ':''}${yrs(m)}</text></g>`});
-    svg.innerHTML=g;$('#treeEmpty').hidden=ME.members.length>1;$('#meSample').hidden=ME.members.length>1}
-  $('#treeSvg').addEventListener('click',e=>{const n=e.target.closest('.tn');if(n){sel=n.dataset.id;drawTree();side()}});
-  $('#treeSvg').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('.tn')){e.preventDefault();sel=e.target.closest('.tn').dataset.id;drawTree();side()}});
+    // nút thu gọn / mở chi dưới mỗi khối có con; đang gọn thì ghi số con cháu bị ẩn
+    cols.forEach(u=>{const a=pos[u[0].id],z=pos[u[u.length-1].id],cx=(a.x+z.x+NW)/2,cy=a.y+NH+11,on=gon.has(u[0].id),n=on?desc(u):0,w=on?34:18;
+      g+=`<g class="tc${on?' on':''}" data-col="${u[0].id}" tabindex="0" role="button" aria-label="${on?'Mở':'Thu gọn'} chi của ${esc(u[0].name)}${on?', '+n+' người':''}" transform="translate(${cx},${cy})"><rect x="${-w/2}" y="-9" width="${w}" height="18" rx="9"/><text y="4">${on?'+'+n:'−'}</text></g>`});
+    svg.innerHTML=g;$('#treeNames').innerHTML=ME.members.map(m=>`<option value="${esc(m.name)}">`).join('');$('#treeEmpty').hidden=ME.members.length>1;$('#meSample').hidden=ME.members.length>1}
+  // mọi con cháu (kèm vợ/chồng của họ) dưới một khối
+  function under(u){const out=new Set(),q=kidsOf(u);while(q.length){const k=q.shift();if(out.has(k.id))continue;unitOf(k).forEach(x=>out.add(x.id));q.push(...kidsOf(unitOf(k)))}return out}
+  function desc(u){return [...under(u)].filter(id=>{const x=get(id);return x&&x.parent}).length}
+  function gonToggle(id){gon.has(id)?gon.delete(id):gon.add(id);drawTree();const t=$(`#treeSvg [data-col="${id}"]`);t&&t.focus({preventScroll:true})}
+  $('#treeSvg').addEventListener('click',e=>{const c=e.target.closest('.tc');if(c){gonToggle(c.dataset.col);return}const n=e.target.closest('.tn');if(n){sel=n.dataset.id;drawTree();side()}});
+  $('#treeSvg').addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const c=e.target.closest('.tc'),n=e.target.closest('.tn');if(c){e.preventDefault();gonToggle(c.dataset.col)}else if(n){e.preventDefault();sel=n.dataset.id;drawTree();side()}});
+  // cây lớn: phóng to / thu nhỏ / vừa khung, kéo chuột để di chuyển, tìm tên
+  const stage=$('.tree-stage');
+  function zoom(k){const cw=stage.clientWidth-36,ch=stage.clientHeight-44,cx=(stage.scrollLeft+stage.clientWidth/2)/Z,cy=(stage.scrollTop+stage.clientHeight/2)/Z;
+    Z=Math.min(1.6,Math.max(.12,k?Z*(k>0?1.25:.8):Math.min(1,cw/TW,ch>100?ch/TH:1)));drawTree();stage.scrollLeft=cx*Z-stage.clientWidth/2;stage.scrollTop=cy*Z-stage.clientHeight/2}
+  $$('.tree-tools [data-z]').forEach(b=>b.addEventListener('click',()=>zoom(+b.dataset.z)));
+  let keo=null;stage.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button||e.target.closest('.tn,.tc'))return;keo=[e.clientX,e.clientY,stage.scrollLeft,stage.scrollTop];stage.classList.add('keo')});
+  addEventListener('pointermove',e=>{if(keo){stage.scrollLeft=keo[2]-(e.clientX-keo[0]);stage.scrollTop=keo[3]-(e.clientY-keo[1])}});
+  addEventListener('pointerup',()=>{keo=null;stage.classList.remove('keo')});
+  const bo=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').toLowerCase().trim();   // tìm không cần gõ dấu
+  function tim(){const v=bo($('#treeFind').value);if(!v)return;const m=ME.members.find(x=>bo(x.name)===v)||ME.members.find(x=>bo(x.name).includes(v));
+    if(!m){toast('Không thấy ai tên "'+$('#treeFind').value.trim()+'" trong gia phả.');return}
+    gon.clear();sel=m.id;drawTree();side();const n=$(`#treeSvg .tn[data-id="${m.id}"]`),r=n.getBoundingClientRect(),s=stage.getBoundingClientRect();
+    stage.scrollLeft+=r.left-s.left-s.width/2+r.width/2;stage.scrollTop+=r.top-s.top-s.height/2+r.height/2;n.focus({preventScroll:true})}
+  $('#treeFind').addEventListener('change',tim);$('#treeFind').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();tim()}});
 
   // ---------- bảng bên: chi tiết / thêm người ----------
   function opts(filter){return ME.members.filter(filter||(()=>true)).map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}

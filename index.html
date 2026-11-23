@@ -386,7 +386,7 @@
     <div class="tabs me-tabs" role="tablist" id="meTabs"><button role="tab" aria-selected="true" data-t="tree">Gia phả</button><button role="tab" aria-selected="false" data-t="village">Làng dòng họ</button><button role="tab" aria-selected="false" data-t="houses">Nhà tưởng niệm</button><button role="tab" aria-selected="false" data-t="info">Thông tin</button></div>
     <div data-mp="tree">
       <div class="me-tree">
-        <div class="tree-box"><div class="tree-bar"><span>Cây gia đình · bấm vào một người để xem, thêm con, vợ/chồng hoặc bố/mẹ</span><button class="btn ghost" id="meSample">Dùng gia phả mẫu</button></div>
+        <div class="tree-box"><div class="tree-bar"><span>Cây gia đình · bấm vào một người để xem, thêm con, vợ/chồng hoặc bố/mẹ</span><button class="btn ghost" id="meSample">Dùng gia phả mẫu</button><div class="tree-tools"><input id="treeFind" type="search" placeholder="Tìm tên trong gia phả" aria-label="Tìm tên trong gia phả" list="treeNames" autocomplete="off"><datalist id="treeNames"></datalist><button type="button" data-z="-1" aria-label="Thu nhỏ cây">−</button><button type="button" data-z="0" aria-label="Vừa khung">⤢</button><button type="button" data-z="1" aria-label="Phóng to cây">+</button></div></div>
           <div class="tree-stage"><svg id="treeSvg" role="group" aria-label="Cây gia đình"></svg></div>
           <p class="tree-empty" id="treeEmpty">Bắt đầu bằng việc thêm bố mẹ, ông bà hoặc người thân đã khuất. Thêm từ 2 người đã khuất sẽ lập thành dòng họ và mở làng dòng họ.</p></div>
         <aside class="tree-side" id="treeSide"></aside>
