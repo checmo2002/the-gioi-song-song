@@ -35,7 +35,8 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
   function syncRecipients(){$('#recipient').innerHTML=people.map(p=>`<option value="${p.id}">${esc(p.name)}${p.mine?' · gia đình':''}</option>`).join('')}
 
   // ---------- cây gia đình ----------
-  const NW=180,NH=64,SG=26,GX=26,GY=68;let sel=null,Z=1,TW=0,TH=0;const gon=new Set();let daVe=null;   // daVe: id đã vẽ lần trước, người mới hiện ra mới chạy hiệu ứng   // gon: các khối đang thu gọn chi (theo id người đứng đầu khối)
+  // cây mọc lên: tổ tiên ở gốc dưới cùng, con cháu toả lên trên các cành; mỗi người là một quả tròn, tên ghi dưới quả
+  const NW=128,SG=10,GX=16,R=24,RH=134,TOP=84;let sel=null,Z=1,TW=0,TH=0;const gon=new Set();let daVe=null;   // daVe: id đã vẽ lần trước, người mới hiện ra mới chạy hiệu ứng
   const hasPar=x=>!!(x.parent&&get(x.parent));
   // một khối = chủ hộ + các vợ/chồng chưa có bố mẹ trong cây (người có bố mẹ được xếp dưới bố mẹ mình)
   const unitOf=m=>{const h=headOf(m),b=h!==m&&!hasPar(h)?h:m;return [b,...spousesOf(b).filter(s=>s===m||!hasPar(s))]};
@@ -45,30 +46,42 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
   function drawTree(){const svg=$('#treeSvg');const pos={},links=[],pairs=[],cols=[];let maxD=0;
     const roots=[];ME.members.forEach(m=>{if(hasPar(m))return;const h=headOf(m);if(roots.includes(h)||hasPar(h))return;if(spousesOf(h).some(s=>hasPar(s)||roots.includes(s)))return;roots.push(h)});
     const placed=new Set();
-    function place(u,x,depth){const w=width(u,new Set());u=u.filter(m=>!placed.has(m.id));if(!u.length)return;const own=u.length*NW+(u.length-1)*SG;const ox=x+(w-own)/2;u.forEach((m,i)=>{pos[m.id]={x:ox+i*(NW+SG),y:depth*(NH+GY)};placed.add(m.id)});if(u.length>1)pairs.push(u);maxD=Math.max(maxD,depth);if(kidsOf(u).length)cols.push(u);
+    function place(u,x,depth){const w=width(u,new Set());u=u.filter(m=>!placed.has(m.id));if(!u.length)return;const own=u.length*NW+(u.length-1)*SG;const ox=x+(w-own)/2;u.forEach((m,i)=>{pos[m.id]={x:ox+i*(NW+SG),doi:depth};placed.add(m.id)});if(u.length>1)pairs.push(u);maxD=Math.max(maxD,depth);if(kidsOf(u).length)cols.push(u);
       const ks=kidsVis(u).filter(k=>!placed.has(k.id));const widths=ks.map(k=>width(unitOf(k),new Set()));const kw=widths.reduce((a,b)=>a+b,0)+GX*Math.max(0,ks.length-1);let cx=x+(w-kw)/2;
       ks.forEach((k,i)=>{place(unitOf(k),cx,depth+1);links.push([u,k]);cx+=widths[i]+GX})}
-    let x=0;roots.forEach(r=>{const u=unitOf(r);place(u,x,0);x+=width(u,new Set())+GX*2});
+    let x=0;const goc=[];roots.forEach(r=>{const u=unitOf(r);place(u,x,0);goc.push(u.filter(m=>pos[m.id]));x+=width(u,new Set())+GX*2});
     const an=new Set();gon.forEach(id=>{const h=get(id);if(h)under(unitOf(h)).forEach(k=>an.add(k))});   // con cháu của chi đang thu gọn: không vẽ
-    ME.members.forEach(m=>{if(!placed.has(m.id)&&!an.has(m.id)){pos[m.id]={x,y:0};x+=NW+GX}});
-    const L=64,W=Math.max(x-GX*2,NW)+L+20,H=(maxD+1)*(NH+GY)-GY+24;svg.setAttribute('viewBox',`-${L} -12 ${W} ${H}`);TW=W;TH=H;svg.style.width=W*Z+'px';svg.style.height=H*Z+'px';
+    ME.members.forEach(m=>{if(!placed.has(m.id)&&!an.has(m.id)){pos[m.id]={x,doi:0};x+=NW+GX}});
+    const cx=id=>pos[id].x+NW/2,cy=d=>TOP+(maxD-d)*RH+R,dat=cy(0)+R+58;   // dat: mặt đất dưới gốc
+    const L=64,W=Math.max(x-GX*2,NW)+L+20,H=dat+26;svg.setAttribute('viewBox',`-${L} 0 ${W} ${H}`);TW=W;TH=H;svg.style.width=W*Z+'px';svg.style.height=H*Z+'px';
     const to=new Set();if(sel){const q=[get(sel)];while(q.length){const x=q.shift();if(!x||to.has(x.id))continue;to.add(x.id);const p=x.parent&&get(x.parent),ps=p?spousesOf(p):[];q.push(p,x.mother&&get(x.mother)||(ps.length===1?ps[0]:null))}}   // dòng tổ tiên của người đang chọn (mẹ: như bảng bên cạnh)
-    const moi=id=>daVe&&!daVe.has(id)||!daVe,tre=id=>`style="--d:${Math.round(pos[id].y/(NH+GY))}"`;
-    let g='';for(let d=0;d<=maxD;d++){const y=d*(NH+GY)+NH/2;g+=`<path class="tgl" d="M-${L-50} ${y}H${W-L-20}"/><text class="tg" x="-${L-4}" y="${y+4}">Đời ${d+1}</text>`}
-    links.forEach(([u,k])=>{const ids=u.map(x=>x.id),a=pos[k.parent]||pos[ids[0]];let o=k.mother&&ids.includes(k.mother)?k.mother:u.length===2?ids.find(i=>i!==k.parent):k.parent!==ids[0]?ids[0]:null;const b=o&&o!==k.parent&&pos[o]?pos[o]:null;const x1=b&&u.length>2?b.x+NW/2:b?(a.x+b.x+NW)/2:a.x+NW/2,y1=a.y+NH,p=pos[k.id],x2=p.x+NW/2,y2=p.y,ym=y1+GY/2,lx=(x1+x2)/2,lr=x2>x1+2?-35:x2<x1-2?215:-80;
-      g+=`<g class="tlg${to.has(k.id)&&to.size>1?' to':''}${moi(k.id)?' moi':''}" ${tre(k.id)}><path class="tl" pathLength="1" d="M${x1} ${y1}C${x1} ${ym+8} ${x2} ${ym-8} ${x2} ${y2}"/><g transform="translate(${lx} ${ym}) rotate(${lr})"><path class="la" d="M0 0c4-6 11-7 16-6c-2 6-10 8-16 6z"/></g></g>`});
-    pairs.forEach(u=>u.slice(1).forEach((b,i)=>{const p=pos[u[i].id],q=pos[b.id];const cx=(p.x+NW+q.x)/2,cy=p.y+NH/2;g+=`<path class="ts" d="M${p.x+NW} ${cy}H${q.x}"/><g class="tsd${moi(b.id)?' moi':''}" ${tre(b.id)}><circle cx="${cx-3}" cy="${cy}" r="5"/><circle cx="${cx+3}" cy="${cy}" r="5"/></g>`}));
-    ME.members.forEach(m=>{const p=pos[m.id];if(!p)return;const vt=[vaiVo(m),m.nuoi?'Con nuôi':''].filter(Boolean).join(' · ');const nm=m.name.length>18?m.name.slice(0,17)+'…':m.name;
+    const moi=id=>!daVe||!daVe.has(id),tre=id=>`style="--d:${pos[id].doi}"`,giua=u=>(cx(u[0].id)+cx(u[Math.min(1,u.length-1)].id))/2;
+    // tán lá mờ phía sau các đời trên, thân và rễ dưới mỗi gốc
+    const tan=k=>Object.keys(pos).filter(id=>pos[id].doi>0).map(id=>`<circle cx="${cx(id)}" cy="${cy(pos[id].doi)-6}" r="${RH*k}"/>`).join('');   // tán: các vòng chồng lên nhau thành một khối mây lá, hai lớp cho mép mềm
+    let g=maxD?`<g class="tan t2">${tan(.8)}</g><g class="tan">${tan(.62)}</g>`:'';
+    goc.forEach(u=>{if(!u.length)return;const xr=giua(u),y0=u.length>1?cy(0):cy(0)+R,dy=dat-y0;
+      g+=`<g class="than${moi(u[0].id)?' moi':''}"><path d="M${xr-5} ${y0}C${xr-6} ${y0+dy*.5} ${xr-9} ${dat-14} ${xr-20} ${dat}H${xr+20}C${xr+9} ${dat-14} ${xr+6} ${y0+dy*.5} ${xr+5} ${y0}Z"/><path class="re" d="M${xr-12} ${dat-3}q-14 4-30 6M${xr+12} ${dat-3}q14 4 30 6M${xr-4} ${dat}q-4 6-10 10M${xr+4} ${dat}q4 6 10 10"/></g>`});
+    if(goc.length)g+=`<path class="dat" d="M-${L-30} ${dat+1}H${W-L-30}"/>`;
+    for(let d=0;d<=maxD;d++)g+=`<path class="tgl" d="M-${L-50} ${cy(d)}H${W-L-20}"/><text class="tg" x="-${L-4}" y="${cy(d)+4}">Đời ${d+1}</text>`;
+    // cành: từ quả (hoặc nút vợ chồng) của bố mẹ cong lên tới quả của con; cành gần gốc to hơn
+    links.forEach(([u,k])=>{const ids=u.map(x=>x.id),a=pos[k.parent]||pos[ids[0]];let o=k.mother&&ids.includes(k.mother)?k.mother:u.length===2?ids.find(i=>i!==k.parent):k.parent!==ids[0]?ids[0]:null;const b=o&&o!==k.parent&&pos[o]?pos[o]:null;
+      const x1=b&&u.length>2?b.x+NW/2:b?(a.x+b.x+NW)/2:a.x+NW/2,y1=b?cy(a.doi)-6:cy(a.doi)-R,p=pos[k.id],x2=cx(k.id),y2=cy(p.doi)+R,h=(y1-y2)*.5,lx=(x1+x2)/2,ly=(y1+y2)/2,lr=x2>x1+2?-55:x2<x1-2?-125:-35;
+      g+=`<g class="tlg${to.has(k.id)&&to.size>1?' to':''}${moi(k.id)?' moi':''}" ${tre(k.id)}><path class="tl" pathLength="1" style="stroke-width:${Math.max(2.2,7-a.doi*1.5).toFixed(1)}px" d="M${x1} ${y1}C${x1} ${y1-h} ${x2} ${y2+h} ${x2} ${y2}"/><g transform="translate(${lx} ${ly}) rotate(${lr})"><path class="la" d="M0 0c4-6 11-7 16-6c-2 6-10 8-16 6z"/></g></g>`});
+    pairs.forEach(u=>u.slice(1).forEach((b,i)=>{const y=cy(pos[b.id].doi),x0=cx(u[i].id)+R,x3=cx(b.id)-R,xm=(x0+x3)/2;g+=`<path class="ts" d="M${x0} ${y}H${x3}"/><g class="tsd${moi(b.id)?' moi':''}" ${tre(b.id)}><circle cx="${xm-3}" cy="${y}" r="5"/><circle cx="${xm+3}" cy="${y}" r="5"/></g>`}));
+    // nút thu gọn / mở chi phía trên mỗi khối có con; đang gọn thì ghi số con cháu bị ẩn
+    cols.forEach(u=>{const xu=giua(u),yu=cy(pos[u[0].id].doi)-(u.length>1?20:R+14),on=gon.has(u[0].id),n=on?desc(u):0,w=on?34:18;
+      g+=`<g class="tc${on?' on':''}" data-col="${u[0].id}" tabindex="0" role="button" aria-label="${on?'Mở':'Thu gọn'} chi của ${esc(u[0].name)}${on?', '+n+' người':''}" transform="translate(${xu},${yu})"><rect x="${-w/2}" y="-9" width="${w}" height="18" rx="9"/><text y="4">${on?'+'+n:'−'}</text></g>`});
+    const dong=t=>{if(t.length<=15)return[t];const w=t.split(' ');let best=null;for(let i=1;i<w.length;i++){const a=w.slice(0,i).join(' '),b=w.slice(i).join(' '),k=Math.max(a.length,b.length);if(!best||k<best[2])best=[a,b,k]}
+      return (best?[best[0],best[1]]:[t]).map(x=>x.length>17?x.slice(0,16)+'…':x)};   // tên dài: ngắt hai dòng ở chỗ cách giữa nhất
+    ME.members.forEach(m=>{const p=pos[m.id];if(!p)return;const vt=[vaiVo(m),m.nuoi?'Con nuôi':''].filter(Boolean).join(' · ');const nm=dong(m.name.trim());
       const chu=(m.name.trim().split(/\s+/).pop()||'?')[0].toUpperCase();   // chữ đầu của tên gọi (chữ cuối họ tên)
-      g+=`<g class="tn${m.d?' dead':''}${m.ls?' ls':''}${m.self?' self':''}${sel===m.id?' on':''}${to.has(m.id)&&sel!==m.id?' to':''}${moi(m.id)?' moi':''}" ${tre(m.id)} data-id="${m.id}" tabindex="0" role="button" aria-label="${esc(m.name)}, ${yrs(m)}" transform="translate(${p.x},${p.y})"><g class="tb">
-        ${sel===m.id?`<rect class="hl" x="-3" y="-3" width="${NW+6}" height="${NH+6}" rx="12"/>`:''}<rect class="bg" width="${NW}" height="${NH}" rx="10"/>
-        <circle class="av" cx="28" cy="32" r="17"/><text class="avc" x="28" y="37">${esc(chu)}</text>
-        <g class="bd" transform="translate(41 45)"><circle r="9.5"/>${m.d?'<path class="nen" d="M-2.6 6.5V-.5h5.2v7z"/><path class="lua" d="M0-1.5c-3.2-2.6-1.8-5.4 0-8c1.8 2.6 3.2 5.4 0 8z"/>':'<path class="mam" d="M0 6V0M0 1.5c-1-3.5-4.5-4.5-6.5-3.5c1 3.5 4.5 4.5 6.5 3.5zM0-.5c1-3.5 4.5-4.5 6.5-3.5c-1 3.5-4.5 4.5-6.5 3.5z"/>'}</g>
-        ${m.ls?`<text class="star" x="${NW-14}" y="18">★</text>`:''}
-        <text class="n" x="54" y="28">${esc(nm)}</text><text class="y" x="54" y="46">${m.self?'Bạn · ':''}${vt?esc(vt)+' · ':''}${yrs(m)}</text></g></g>`});
-    // nút thu gọn / mở chi dưới mỗi khối có con; đang gọn thì ghi số con cháu bị ẩn
-    cols.forEach(u=>{const a=pos[u[0].id],z=pos[u[u.length-1].id],cx=(a.x+z.x+NW)/2,cy=a.y+NH+11,on=gon.has(u[0].id),n=on?desc(u):0,w=on?34:18;
-      g+=`<g class="tc${on?' on':''}" data-col="${u[0].id}" tabindex="0" role="button" aria-label="${on?'Mở':'Thu gọn'} chi của ${esc(u[0].name)}${on?', '+n+' người':''}" transform="translate(${cx},${cy})"><rect x="${-w/2}" y="-9" width="${w}" height="18" rx="9"/><text y="4">${on?'+'+n:'−'}</text></g>`});
+      const yl=R+8,hl=14*nm.length+(vt||m.self?30:18);
+      g+=`<g class="tn${m.d?' dead':''}${m.ls?' ls':''}${m.self?' self':''}${sel===m.id?' on':''}${to.has(m.id)&&sel!==m.id?' to':''}${moi(m.id)?' moi':''}" ${tre(m.id)} data-id="${m.id}" tabindex="0" role="button" aria-label="${esc(m.name)}, ${yrs(m)}" transform="translate(${cx(m.id)},${cy(p.doi)})"><g class="tb">
+        ${sel===m.id?`<circle class="hl" r="${R+6}"/>`:''}<rect class="nhan" x="${-NW/2+8}" y="${yl}" width="${NW-16}" height="${hl}" rx="9"/>
+        <circle class="av" r="${R}"/><text class="avc" y="6">${esc(chu)}</text>
+        <g class="bd" transform="translate(${R*.74} ${R*.74})"><circle r="9.5"/>${m.d?'<path class="nen" d="M-2.6 6.5V-.5h5.2v7z"/><path class="lua" d="M0-1.5c-3.2-2.6-1.8-5.4 0-8c1.8 2.6 3.2 5.4 0 8z"/>':'<path class="mam" d="M0 6V0M0 1.5c-1-3.5-4.5-4.5-6.5-3.5c1 3.5 4.5 4.5 6.5 3.5zM0-.5c1-3.5 4.5-4.5 6.5-3.5c-1 3.5-4.5 4.5-6.5 3.5z"/>'}</g>
+        ${m.ls?`<text class="star" x="${R*.55}" y="${-R*.6}">★</text>`:''}
+        ${nm.map((t,i)=>`<text class="n" y="${yl+16+i*14}">${esc(t)}</text>`).join('')}<text class="y" y="${yl+16+nm.length*14}">${yrs(m)}</text>${vt||m.self?`<text class="y" y="${yl+28+nm.length*14}">${m.self?'Bạn':''}${m.self&&vt?' · ':''}${esc(vt)}</text>`:''}</g></g>`});
     svg.innerHTML=g;daVe=new Set(Object.keys(pos));$('#treeNames').innerHTML=ME.members.map(m=>`<option value="${esc(m.name)}">`).join('');$('#treeEmpty').hidden=ME.members.length>1;$('#meSample').hidden=ME.members.length>1}
   // mọi con cháu (kèm vợ/chồng của họ) dưới một khối
   function under(u){const out=new Set(),q=kidsOf(u);while(q.length){const k=q.shift();if(out.has(k.id))continue;unitOf(k).forEach(x=>out.add(x.id));q.push(...kidsOf(unitOf(k)))}return out}
