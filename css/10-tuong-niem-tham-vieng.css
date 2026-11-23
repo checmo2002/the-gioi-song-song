@@ -21,3 +21,10 @@
 .auth-form .btn{justify-content:center;margin-top:10px;padding:12px}
 .auth-alt{font-size:13px;color:#7A6E5E;text-align:center;margin-top:6px}
 .auth-alt button{background:none;border:0;color:#9A6E22;cursor:pointer;font-weight:500;text-decoration:underline;text-underline-offset:3px}
+
+/* nút Đăng nhập bằng Google: theo mẫu nút của Google (nền trắng, viền xám, chữ G nhiều màu) */
+.auth-gg{margin-bottom:16px}.auth-gg[hidden]{display:none}
+.btn-gg{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:46px;padding:10px 16px;border:1px solid #747775;border-radius:8px;background:#fff;color:#1F1F1F;font-size:15px;font-weight:500;text-decoration:none;transition:background .15s,box-shadow .15s}
+.btn-gg:hover{background:#F7F8F8;box-shadow:0 1px 3px rgba(60,64,67,.2)}.btn-gg:focus-visible{outline:2px solid #B8862F;outline-offset:2px}
+.btn-gg .gg-g{width:20px;height:20px;flex:none}
+.auth-or{display:flex;align-items:center;gap:10px;margin:16px 0 0;color:#9A8C78;font-size:12.5px}.auth-or::before,.auth-or::after{content:"";flex:1;height:1px;background:rgba(43,36,28,.12)}

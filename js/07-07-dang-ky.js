@@ -19,4 +19,13 @@
   $('#fSignup').addEventListener('submit',e=>{e.preventDefault();const n=$('#aName').value.trim();if(!n){$('#aName').focus();return}ssMe.signup(n,$('#aPhone').value.trim());savePrefs('a',$('#aPhone').value.trim());document.body.classList.add('signed');close();dispatchEvent(new Event('ss-auth-done'));setUser(n);setView('app','ca-nhan',true);setTimeout(()=>toast('Chào mừng '+n+'. Hãy bắt đầu lập gia phả.'),500)});
   $('#fLogin').addEventListener('submit',e=>{e.preventDefault();const n=ssMe.login($('#lUser').value.trim());savePrefs('l',$('#lUser').value.trim());document.body.classList.add('signed');close();dispatchEvent(new Event('ss-auth-done'));setUser(n);setView('app','ca-nhan',true);setTimeout(()=>toast('Chào mừng trở lại, '+n+'.'),500)});
   window.ssSetUser=setUser;
+  // Đăng nhập bằng Google (máy chủ gia phả, functions/api): nút chỉ hiện khi máy chủ bật Google.
+  // Vừa đăng nhập Google xong (?dang-nhap=ok) thì vào luôn tài khoản trên máy này bằng tên Google, không hỏi mật khẩu.
+  const vuaGoogle=/[?&]dang-nhap=ok\b/.test(location.search);
+  if(vuaGoogle)try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}
+  fetch('/api/toi').then(r=>r.ok?r.json():null).catch(()=>null).then(d=>{if(!d||!Array.isArray(d.cach)||!d.cach.includes('google'))return;$('#authGg').hidden=false;
+    const t=d.nguoi;if(!t||!vuaGoogle||document.body.classList.contains('signed'))return;
+    const n=ssMe.resume()||(ssMe.signup(t.ten,'Tài khoản Google'),t.ten);
+    try{localStorage.setItem('ss-auth',JSON.stringify({auto:true,remember:true,id:''}));localStorage.removeItem('ss-out');sessionStorage.setItem('ss-session','1')}catch(e){}
+    document.body.classList.add('signed');close();dispatchEvent(new Event('ss-auth-done'));setUser(n);setView('app','ca-nhan',true);setTimeout(()=>toast('Chào mừng '+n+'.'),500)});
 })();

@@ -93,7 +93,7 @@ async function ve(env, req, ben) {
     env.DB.prepare('INSERT OR IGNORE INTO nguoi_dung (id, ten, tao) VALUES (?, ?, ?)').bind(id, String(me.ten || '').replace(LA, '').trim().slice(0, 60) || 'Bạn', now),
     env.DB.prepare('INSERT INTO phien (ma_bam, nguoi_id, het) VALUES (?, ?, ?)').bind(await sha(tk), id, now + PHIEN_HAN),
     env.DB.prepare('DELETE FROM phien WHERE het < ?').bind(now)]);
-  return chuyen(u.origin + '/#ca-nhan', [cookie(PHIEN, tk, PHIEN_HAN / 1000), bo]);
+  return chuyen(u.origin + '/?dang-nhap=ok#ca-nhan', [cookie(PHIEN, tk, PHIEN_HAN / 1000), bo]);   // dang-nhap=ok: trang vào luôn tài khoản trên máy (js/07-07)
 }
 
 // trường tk (người trong cây là tài khoản nào): chỉ được gắn với chính mình, tk của người khác giữ nguyên như bản đang lưu
