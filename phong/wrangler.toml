@@ -1,0 +1,14 @@
+# Máy chủ phòng chung (docs/phong-chung.md). Cloudflare tự dựng lại khi main đổi (Workers Builds, thư mục gốc: phong).
+name = "songsong-phong"
+main = "index.js"
+compatibility_date = "2025-06-01"
+workers_dev = false          # không có đường vào công khai: chỉ dự án Pages thegioisongsong gọi qua binding PHONG
+preview_urls = false
+
+[[durable_objects.bindings]]
+name = "PHONG"
+class_name = "Phong"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Phong"]   # gói miễn phí chỉ có Durable Object dùng SQLite

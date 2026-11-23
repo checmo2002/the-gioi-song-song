@@ -120,9 +120,17 @@ async function xuLy(env, req, duong, toi) {
   if (a === 'toi' && M === 'GET') {
     if (!toi) return json({ nguoi: null, cach: cachBat(env) });
     const { results } = await env.DB.prepare('SELECT d.id, d.ten, t.vai FROM thanh_vien t JOIN dong_ho d ON d.id = t.dong_ho_id WHERE t.nguoi_id = ? ORDER BY t.vao').bind(toi.id).all();
-    return json({ nguoi: toi, dong_ho: results, cach: cachBat(env) });
+    return json({ nguoi: toi, dong_ho: results, cach: cachBat(env), phong: !!env.PHONG });
   }
   if (!toi) return loi(401, 'Hãy đăng nhập.');
+  // phòng chung (docs/phong-chung.md): chỉ người đã đăng nhập; chuyển kết nối WebSocket sang Durable Object kèm mã và tên do máy chủ xác nhận
+  if (a === 'phong' && !id && M === 'GET') {
+    if (!env.PHONG) return loi(503, 'Phòng chung chưa được bật.');
+    if ((req.headers.get('Upgrade') || '').toLowerCase() !== 'websocket') return loi(426, 'Cần WebSocket.');
+    let cung = false; try { cung = new URL(req.headers.get('Origin') || '').host === new URL(req.url).host } catch { }   // chống trang khác mượn cookie mở kết nối
+    if (!cung) return loi(403, 'Yêu cầu không đến từ trang Song Song.');
+    return env.PHONG.get(env.PHONG.idFromName('chung')).fetch('https://phong/ws', { headers: { Upgrade: 'websocket', 'X-Id': toi.id, 'X-Ten': encodeURIComponent(toi.ten) } });
+  }
   if (a === 'toi' && M === 'PUT') {
     let ten; try { ten = chu(body.ten, 60, true) } catch { return loi(400, 'Tên từ 1 đến 60 ký tự.') }
     await env.DB.prepare('UPDATE nguoi_dung SET ten = ? WHERE id = ?').bind(ten, toi.id).run(); return json({ ten });

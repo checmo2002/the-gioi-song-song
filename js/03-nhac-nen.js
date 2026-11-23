@@ -103,5 +103,6 @@
  new MutationObserver(function(){if(!hall.hidden)setTimeout(render,50);send()}).observe(hall,{attributes:true,attributeFilter:['hidden']});
  addEventListener('resize',function(){Object.keys(els).forEach(function(k){var el=els[k];el._p=null});render()});
  render();
- if(window.claude&&claude.use)claude.use('room').then(function(r){if(!r)return;room=r;r.onPeers(function(){render()},function(){room=null;render()});send()}).catch(function(){});
+ var vao=window.claude&&claude.use?claude.use('room'):window.ssPhong&&ssPhong();   // claude.ai: phòng của bản thử; trang thật: máy chủ Song Song (js/02-09)
+ if(vao)vao.then(function(r){if(!r)return;room=r;r.onPeers(function(){render()},function(){room=null;render()});send()}).catch(function(){});
 })();

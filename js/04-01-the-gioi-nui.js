@@ -179,5 +179,6 @@ var seen={me:1},n=1,here=1;upsert('me',me,true);
  document.addEventListener('click',function(ev){var tg=ev.target.closest('.wl-toggle');if(!tg)return;ev.preventDefault();ev.stopPropagation();var l=tg.closest('.hall-list');l.classList.toggle('open');hall.classList.toggle('list-open',l.classList.contains('open'));tg.setAttribute('aria-expanded',l.classList.contains('open'))},true);
  window._wdbg=function(){return {me:me,av:av.me&&{x:av.me.x,y:av.me.y,tx:av.me.tx,ty:av.me.ty,a:av.me.a},st:st,scene:scene,O:O}};
  requestAnimationFrame(tick);setTimeout(refresh,60);
- if(window.claude&&claude.use)claude.use('room').then(function(r){if(!r)return;room=r;r.onPeers(function(){sync()},function(){room=null});send();setInterval(send,15000)}).catch(function(){});
+ var vao=window.claude&&claude.use?claude.use('room'):window.ssPhong&&ssPhong();   // claude.ai: phòng của bản thử; trang thật: máy chủ Song Song (js/02-09)
+ if(vao)vao.then(function(r){if(!r)return;room=r;r.onPeers(function(){sync()},function(){room=null});send();setInterval(send,15000)}).catch(function(){});
 })();
