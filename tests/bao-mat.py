@@ -80,6 +80,35 @@ with sync_playwright() as p:
         loi += [f'{w}px lỗi JS: {e[:150]}' for e in js_loi]
     b.close()
 
+
+# ---------- 3. Phòng chung (docs/phong-chung.md): dữ liệu người khác gửi tới, dữ liệu mình gửi đi ----------
+# giả phòng (window.claude.use('room')) có người gửi biểu cảm lạ và tên chứa mã độc; bắt mọi trạng thái trang gửi vào phòng
+PHONG = '''window.__gui=[];window.claude={use:function(){var ps=[];['phat','cg'].forEach(function(f,i){['constructor','toString','__proto__'].forEach(function(e,j){
+  ps.push({peer:'xau'+i+j,kind:'viewer',isMe:false,sameTab:false,presence:{f:f,h:1,w:1,s:'sanh',x:.2+.2*j,y:.5,tx:.2+.2*j,ty:.5,e:e,c:-3,n:%s,li:9999999999999}})})});
+  return Promise.resolve({peers:function(){return ps},presence:function(p){__gui.push(JSON.stringify(p));return Promise.resolve()},onPeers:function(){}})}};''' % json.dumps('Khách ' + P)
+with sync_playwright() as p:
+    b = p.chromium.launch()
+    for w, h in [(1366, 820), (390, 844)]:
+        pg = b.new_page(viewport={'width': w, 'height': h})
+        goc = url.split('/', 3)[0] + '//' + url.split('/')[2]
+        pg.route('**/*', lambda r: r.continue_() if r.request.url.startswith(goc) else r.abort())
+        pg.add_init_script('try{localStorage.clear();localStorage.setItem("ss-me",' + json.dumps(json.dumps(ME)) + ')}catch(e){};' + PHONG)
+        pg.goto(url); pg.wait_for_function("!document.getElementById('loader')", timeout=300000); pg.wait_for_timeout(1500)
+        for vao in ("", "window.ssWorld&&ssWorld.set('sanh')"):
+            if vao: pg.evaluate(vao); pg.wait_for_timeout(800)
+            pg.evaluate("window.ssWorld&&ssWorld.sync&&ssWorld.sync()"); pg.wait_for_timeout(300)
+            r = pg.evaluate("""({xss:window.__xss||0,the:document.querySelectorAll('img[src="x"]').length,
+              rac:[].filter.call(document.querySelectorAll('.bub,.wa-bub'),function(e){return /native code|object Object/.test(e.textContent)}).length})""")
+            if r['xss'] or r['the']: loi.append(f'{w}px: mã độc từ phòng chung đã chạy')
+            if r['rac']: loi.append(f'{w}px: biểu cảm lạ (constructor/toString) từ phòng chung hiện thành chữ rác ({r["rac"]} chỗ)')
+        # làng riêng: khoá "ho:<băm tên + số điện thoại>" không được gửi vào phòng (dò ngược ra số điện thoại)
+        pg.evaluate("var g=document.getElementById('gate');g&&(g.hidden=true);document.getElementById('hall').hidden=false;window.ssWorld&&(ssWorld.refresh(),ssWorld.set('ho'))"); pg.wait_for_timeout(1500)
+        pg.evaluate("window.ssWorld&&ssWorld.send&&ssWorld.send()"); pg.wait_for_timeout(300)
+        lo = [x for x in pg.evaluate("__gui") if '"ho:' in x]
+        if lo: loi.append(f'{w}px: trạng thái gửi vào phòng chung chứa mã làng riêng (băm tên + số điện thoại): {lo[0][:80]}')
+        print(f'{w}x{h} phòng chung: đã thử tên độc, biểu cảm lạ, mã làng riêng')
+    b.close()
+
 for x in loi: print('  ✗', x)
 assert not loi, 'KHÔNG ĐẠT'
 print('ĐẠT')

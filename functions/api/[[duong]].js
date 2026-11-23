@@ -96,6 +96,16 @@ async function ve(env, req, ben) {
   return chuyen(u.origin + '/?dang-nhap=ok#ca-nhan', [cookie(PHIEN, tk, PHIEN_HAN / 1000), bo]);   // dang-nhap=ok: trang vào luôn tài khoản trên máy (js/07-07)
 }
 
+// phòng chung (docs/phong-chung.md): người lạ chỉ thấy tên gọi (chữ cuối), bỏ chữ tục và tên giả ban quản trị
+const XAU = new Set(['đụ', 'địt', 'đit', 'lồn', 'lon', 'cặc', 'cac', 'buồi', 'đĩ', 'đéo', 'deo', 'đm', 'dm', 'đcm', 'dcm', 'vl', 'vcl', 'clm', 'cc', 'loz', 'fuck', 'shit', 'bitch',
+  'admin', 'quantri', 'quảntrị', 'mod', 'moderator', 'songsong', 'bqt']);
+export function tenGoi(ten) {
+  const w = String(ten || '').normalize('NFC').replace(/[^\p{L}\p{N} ]/gu, ' ').trim().split(/\s+/), g = w.pop() || '', ca = w.concat(g).join('').toLowerCase();
+  if (!g || XAU.has(g.toLowerCase()) || /admin|quảntrị|quantri|songsong/.test(ca)) return 'Khách viếng';
+  return g.slice(0, 20);
+}
+const dongPhong = (env, id) => env.PHONG ? env.PHONG.get(env.PHONG.idFromName('chung')).fetch('https://phong/dong', { method: 'POST', headers: { 'X-Id': id } }).catch(() => { }) : null;
+
 // trường tk (người trong cây là tài khoản nào): chỉ được gắn với chính mình, tk của người khác giữ nguyên như bản đang lưu
 function giuTk(cay, cu, minh) { const C = new Map((cu ? cu.members : []).map(m => [m.id, m.tk]));
   for (const m of cay.members) { const c = C.get(m.id) || null; if (c && c !== minh) m.tk = c; else if (m.tk != null && m.tk !== minh) m.tk = c } return cay }   // người đã gắn với người khác: không ai đè được
@@ -115,6 +125,7 @@ async function xuLy(env, req, duong, toi) {
   if (Object.hasOwn(BEN, a) && BEN[a].bat(env) && M === 'GET' && !b) { if (id === 'bat-dau') return batDau(env, req, a); if (id === 've') return ve(env, req, a) }
   if (a === 'dang-xuat' && M === 'POST') {
     const t = banh(req, PHIEN); if (t) await env.DB.prepare('DELETE FROM phien WHERE ma_bam = ?').bind(await sha(t)).run();
+    if (toi) await dongPhong(env, toi.id);   // kết nối phòng chung đang mở cũng phải ra
     return json({ ok: true }, 200, { 'Set-Cookie': cookie(PHIEN, '', 0) });
   }
   if (a === 'toi' && M === 'GET') {
@@ -129,11 +140,11 @@ async function xuLy(env, req, duong, toi) {
     if ((req.headers.get('Upgrade') || '').toLowerCase() !== 'websocket') return loi(426, 'Cần WebSocket.');
     let cung = false; try { cung = new URL(req.headers.get('Origin') || '').host === new URL(req.url).host } catch { }   // chống trang khác mượn cookie mở kết nối
     if (!cung) return loi(403, 'Yêu cầu không đến từ trang Song Song.');
-    return env.PHONG.get(env.PHONG.idFromName('chung')).fetch('https://phong/ws', { headers: { Upgrade: 'websocket', 'X-Id': toi.id, 'X-Ten': encodeURIComponent(toi.ten) } });
+    return env.PHONG.get(env.PHONG.idFromName('chung')).fetch('https://phong/ws', { headers: { Upgrade: 'websocket', 'X-Id': toi.id, 'X-Ten': encodeURIComponent(tenGoi(toi.ten)) } });
   }
   if (a === 'toi' && M === 'PUT') {
     let ten; try { ten = chu(body.ten, 60, true) } catch { return loi(400, 'Tên từ 1 đến 60 ký tự.') }
-    await env.DB.prepare('UPDATE nguoi_dung SET ten = ? WHERE id = ?').bind(ten, toi.id).run(); return json({ ten });
+    await env.DB.prepare('UPDATE nguoi_dung SET ten = ? WHERE id = ?').bind(ten, toi.id).run(); await dongPhong(env, toi.id); return json({ ten });
   }
 
   if (a === 'tham-gia' && M === 'POST') {

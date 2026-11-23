@@ -14,8 +14,8 @@
     function noi(){if(het)return;var ok=false;
       try{ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/api/phong')}catch(e){return}
       ws.onmessage=function(e){var m;try{m=JSON.parse(e.data)}catch(_){return}if(!m)return;
-        if(m.t==='chao'){ok=true;hong=0;ds={};(m.ds||[]).forEach(function(x){if(x&&x.peer)ds[x.peer]=x.p});day()}
-        else if(m.t==='p'&&m.peer)ds[m.peer]=m.p;else if(m.t==='di')delete ds[m.peer];else return;bao()};
+        if(m.t==='chao'){ok=true;hong=0;ds={};(m.ds||[]).forEach(function(x){if(x&&x.peer)ds[x.peer]=x.p});if(!cuoi)cuoi={h:0};day()}   // máy chủ đóng kết nối im lặng sau 30 giây
+        else if(m.t==='p'&&m.peer)ds[m.peer]=m.p;else if(m.t==='di')delete ds[m.peer];else if(m.t==='het'){try{ws.close()}catch(_){}return}else return;bao()};
       ws.onclose=function(){ws=null;ds={};bao();if(het)return;if(!ok&&++hong>=3){thoi();return}   // ba lần không vào được (hết phiên, phòng đầy): thôi
         setTimeout(noi,Math.min(30000,1500*Math.pow(2,hong)))}}
     function thoi(){het=true;if(ws)try{ws.close()}catch(e){}ds={};hua=null;dong.forEach(function(f){try{f()}catch(e){}})}
