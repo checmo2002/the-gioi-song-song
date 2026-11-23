@@ -61,7 +61,9 @@ Chưa có hosting. Bản thử là một trang riêng tư trên claude.ai tên "
 `python3 tools/ban-thu.py` rồi đăng `dist/ban-thu/index.html` kèm `css/`, `js/`, `data/`, `img/` lên đúng artifact đó (giữ link cũ).
 Chủ dự án mở link này trên điện thoại thật để thử.
 
-Hosting thử (Cloudflare Pages, miễn phí): `songsong.bandolietsi.vn`, tự dựng lại mỗi lần `main` đổi, mỗi PR có link xem trước riêng.
+Hosting thử (Cloudflare Pages, miễn phí): `thegioisongsong.pages.dev`, trong tài khoản Cloudflare **riêng của Song Song** (tách khỏi Bản Đồ Liệt Sĩ từ 23/11/2026), dự án Pages `thegioisongsong`.
+Tự dựng lại mỗi lần `main` đổi, mỗi PR có link xem trước riêng. Tên miền riêng: chưa có, chủ dự án quyết sau.
+Trang cũ `songsong.bandolietsi.vn` (tài khoản Bản Đồ Liệt Sĩ) đã ngắt khỏi GitHub, không còn cập nhật.
 Cài đặt trang Pages: Build command `python3 tools/cloudflare.py`, Build output directory `dist/cloudflare`, nhánh `main`.
 Script chỉ đưa lên `index.html`, `css/`, `js/`, `data/`, `img/` và thêm `_headers` (cache, bảo mật). Thêm thư mục mới mà trang cần thì sửa danh sách `CAN` trong script.
 
