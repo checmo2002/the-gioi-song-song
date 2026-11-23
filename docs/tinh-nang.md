@@ -43,7 +43,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `07-04-cua-hang-ngoi-nha.js` | Cửa hàng, ví nén, quà đã nhận, điều khiển ngôi nhà |
 | `07-05-hieu-ung-ban-do.js` | Hiệu ứng hồ sơ, bản đồ mộ phần thật |
 | `07-06-gioi-thieu.js` | Dải gradient, minh họa isometric trang giới thiệu |
-| `07-07-dang-ky.js` | Đăng ký / đăng nhập (bản trình diễn) |
+| `07-07-dang-ky.js` | Đăng ký / đăng nhập (bản trình diễn). Nút "Đăng nhập bằng Google" ở đầu khung (chỉ hiện khi máy chủ bật Google, `/api/toi` → `cach`): Google xong máy chủ chuyển về `/?dang-nhap=ok#ca-nhan`, trang vào luôn tài khoản trên máy bằng tên Google |
 | `07-08-thien-gioi.js` | Nền thiên giới: biển mây, hạc bay, cánh hoa |
 | `07-09-vong-ky-uc.js` | Vòng ký ức ảnh/video quay quanh tâm |
 | `07-10-den-troi-menu.js` | Đèn trời sau lời mời, menu điện thoại |

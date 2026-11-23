@@ -37,7 +37,7 @@
       <div class="me-act dh-hang">${cach.map(k=>DN[k]?`<a class="btn dh-${k}" href="/api/${k}/bat-dau">${DN[k][0]}Đăng nhập bằng ${DN[k][1]}</a>`:'').join('')}</div>
       <p class="dh-chu">${/dang-nhap=het-han/.test(location.search)?'Lượt đăng nhập đã quá 10 phút. Hãy bấm lại. ':/dang-nhap=loi/.test(location.search)?'Chưa đăng nhập được. Hãy thử lại. ':''}${cach.map(k=>DN[k]&&DN[k][1]).filter(Boolean).join(' hoặc ')} xác nhận bạn là ai; Song Song không nhận mật khẩu của bạn, chỉ nhận tên hiển thị.</p></details>`}
     else if(!dh){const u=ME().user||{},ho=(u.name||'').trim().split(/\s+/)[0]||'';
-      h=`<div class="dh-hd"><b>Gia phả của cả dòng họ</b><span>Đã đăng nhập máy chủ: ${esc(toi.ten)} · ${nut('dang-xuat','Đăng xuất','ghost dh-nho')}</span></div>
+      h=`<div class="dh-hd"><b>Gia phả của cả dòng họ</b><span>Đã đăng nhập: ${esc(toi.ten)} · ${nut('dang-xuat','Đăng xuất','ghost dh-nho')}</span></div>
       ${ds.length?`<div class="dh-ds">${ds.map(d=>`<button type="button" class="dh-dong" data-mo="${esc(d.id)}"><b>${esc(d.ten)}</b><small>${VAI[d.vai]||''}</small></button>`).join('')}</div>`:''}
       <form class="me-form dh-form" novalidate><div class="row2"><label>Lập dòng họ từ gia phả này<input name="ten" maxlength="60" value="${esc(ho?'Họ '+ho:'')}" placeholder="Ví dụ: Họ Phạm làng Yên"></label>
       <label>Hoặc vào bằng mã mời<input name="ma" maxlength="10" autocomplete="off" placeholder="10 ký tự"></label></div>

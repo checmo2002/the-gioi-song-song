@@ -53,7 +53,7 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
 | Lệnh | Việc |
 |---|---|
 | `GET /api/google/bat-dau` | Bắt đầu đăng nhập: tạo `state` và PKCE, chuyển sang trang đăng nhập của Google. Zalo: `/api/zalo/bat-dau`, chỉ chạy khi có khoá Zalo |
-| `GET /api/google/ve` | Google chuyển về đây kèm `code`. Máy chủ đổi `code` lấy mã truy cập, hỏi Google mã và tên người dùng, tạo phiên rồi chuyển về `/#ca-nhan` |
+| `GET /api/google/ve` | Google chuyển về đây kèm `code`. Máy chủ đổi `code` lấy mã truy cập, hỏi Google mã và tên người dùng, tạo phiên rồi chuyển về `/?dang-nhap=ok#ca-nhan` (trang vào luôn tài khoản trên máy, `js/07-07`). |
 | `POST /api/dang-xuat` | Xoá phiên |
 | `GET /api/toi` | Tài khoản (`null` nếu chưa đăng nhập), các dòng họ đang tham gia, `cach`: các bên đăng nhập đang bật (trang chỉ hiện nút của các bên này) |
 | `PUT /api/toi` | Đổi tên hiển thị: `{ten}` |
