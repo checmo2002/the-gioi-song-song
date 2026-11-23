@@ -15,6 +15,8 @@ with sync_playwright() as p:
         pg.on('console', lambda m: m.type == 'error' and 'net::' not in m.text and errs.append(m.text))
         # mạng ngoài không bắt buộc cho kiểm tra
         pg.route('**/*', lambda r: r.abort() if not r.request.url.startswith(url.split('/', 3)[0] + '//' + url.split('/')[2]) else r.continue_())
+        # web tĩnh không có máy chủ gia phả (functions/api): trả lời như máy chủ chưa cấu hình, khung dòng họ tự ẩn
+        pg.route('**/api/**', lambda r: r.fulfill(status=200, content_type='application/json', body='{}'))
         pg.goto(url)
         pg.wait_for_timeout(4000)
         # mở thêm vài trang mục để nạp ảnh/nền chỉ dùng ở đó

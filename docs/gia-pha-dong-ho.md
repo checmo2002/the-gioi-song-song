@@ -121,8 +121,23 @@ cd <repo> && python3 tests/may-chu.py           # cần python: pyjwt, cryptogra
 
 Khi chưa gắn, `/api/*` trả lỗi 503 và khung "Gia phả của cả dòng họ" tự ẩn; phần còn lại của trang chạy như cũ.
 
+## Giao diện (`js/07-14-gia-pha-dong-ho.js`)
+
+Khung "Gia phả của cả dòng họ" nằm trên cây, trong tab Gia phả của trang Gia đình. Khung tự ẩn khi `/api/cau-hinh` không trả lời được, ví dụ khi mở bằng `python3 -m http.server`.
+
+1. **Chưa đăng nhập:** khung đóng gọn. Mở ra thì có email, mật khẩu và ba nút Đăng nhập / Tạo tài khoản / Quên mật khẩu. Trang gọi thẳng REST của Firebase, không nạp thư viện ngoài.
+2. **Chưa xác nhận email:** báo đã gửi thư, kèm các nút "Tôi đã xác nhận", "Gửi lại thư", "Đăng xuất".
+3. **Chưa nối dòng họ:** danh sách dòng họ đang tham gia, ô lập dòng họ từ cây trên máy, ô vào dòng họ bằng mã mời. Nếu trên máy đã có gia phả, phải bấm hai lần để đồng ý thay bằng cây chung của họ.
+4. **Đã nối dòng họ:**
+   - Trưởng họ hoặc người duyệt sửa trên cây là lưu thẳng lên máy chủ. Nếu người khác vừa sửa trước, trang tải bản mới và báo lại.
+   - Thành viên sửa thì thành bản nháp: hiện khung "Gửi đề xuất" kèm ghi chú, hoặc "Bỏ thay đổi".
+   - Nút: đề xuất (tóm tắt thêm / sửa / xoá ai), tạo mã mời, thành viên (trưởng họ đổi vai ngay tại đây), tải lại, ngắt dòng họ khỏi máy này.
+
+Mã làm mới đăng nhập Firebase lưu ở `localStorage` (`ss-fb`), giống cách thư viện Firebase vẫn làm. Thông tin dòng họ đang nối lưu ở `ss-dong-ho`.
+
 ## Chưa làm
 
+- Người vào dòng họ chưa tự đánh dấu được "đây là tôi" trên cây chung (trường `tk`). Hiện chỉ người lập dòng họ được gắn sẵn.
 - Đăng nhập bằng tài khoản Google (đăng nhập qua cửa sổ của Google).
 - Đăng nhập bằng số điện thoại (mã OTP qua SMS, mỗi tin bị tính phí).
 - Ảnh và ký ức lưu trên máy chủ.
