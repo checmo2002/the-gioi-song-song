@@ -49,6 +49,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `07-10-den-troi-menu.js` | Đèn trời sau lời mời, menu điện thoại |
 | `07-11-am-thanh.js` | Âm thanh thanh tịnh (Web Audio) |
 | `07-12-trang-ca-nhan.js` | Ảnh chân dung, trang cá nhân: gia phả, làng dòng họ, ví nén. Gia phả kiểu Việt: bố + mẹ (`parent`, `mother`), nhiều vợ/chồng (`spouse` là người đầu, `sp2` là người thứ), đời tự tính, chi/ngành, con thứ, con nuôi, tên húy/tự/thụy hiệu, ngày sinh/mất (`ns`, `nm`, `nmAl` = âm lịch), ngày giỗ âm lịch tự tính (`ssGio(d,m)` cho lịch vạn niên), nơi an táng; sửa thông tin từng người. Cây lớn: tìm tên không cần dấu, phóng to/thu nhỏ/vừa khung, kéo chuột để di chuyển, thu gọn/mở từng chi (nút dưới mỗi khối, ghi số người đang ẩn) |
+| `07-14-gia-pha-dong-ho.js` | Khung "Gia phả của cả dòng họ" trên tab Gia phả: đăng nhập Firebase (gọi REST, không nạp thư viện), xác nhận email, quên mật khẩu; lập dòng họ từ cây trên máy hoặc vào bằng mã mời; trưởng họ/người duyệt sửa là lưu thẳng lên máy chủ, thành viên sửa thành đề xuất chờ duyệt; danh sách đề xuất (tóm tắt thêm/sửa/xoá ai), mã mời, thành viên và vai. Tự ẩn khi không có máy chủ. Máy chủ: `functions/api`, `docs/gia-pha-dong-ho.md` |
 | `07-13-khoi-tao.js` | Khởi tạo, chuyển động toàn trang |
 | `08-icon-bien-hinh.js` | Icon biến hình (morphicons, tải từ jsdelivr) |
 | `09-trang-nguoi-than.js` | Trang Người thân |
