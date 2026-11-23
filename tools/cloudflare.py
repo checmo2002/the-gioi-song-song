@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dựng bản đưa lên Cloudflare Pages (songsong.bandolietsi.vn).
+"""Dựng bản đưa lên Cloudflare Pages (thegioisongsong.pages.dev).
 Cloudflare chạy lệnh này mỗi lần main đổi:  Build command: python3 tools/cloudflare.py   Build output directory: dist/cloudflare
 Chỉ chép các tệp trang cần (index.html, css, js, data, img); không đưa docs, tools, tests lên mạng. Thêm _headers (cache, bảo mật)."""
 import os, re, shutil, sys

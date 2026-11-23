@@ -1,7 +1,7 @@
 # Gia phả dòng họ trên máy chủ
 
 Chủ dự án chốt ngày 23/11/2026:
-- Máy chủ chạy trên **Cloudflare**, cùng tài khoản đang chạy `songsong.bandolietsi.vn`, dùng gói miễn phí. Phần xử lý là Pages Functions, dữ liệu nằm trong D1.
+- Máy chủ chạy trên **Cloudflare**, trong tài khoản Cloudflare riêng của Song Song (dự án Pages `thegioisongsong`), dùng gói miễn phí. Phần xử lý là Pages Functions, dữ liệu nằm trong D1.
 - Khi người trong họ sửa gia phả, **trưởng họ duyệt**.
 - **Đăng nhập bằng Firebase Authentication của Google**, theo `docs/bao-mat.md`: không tự viết phần mật khẩu. Người dùng đăng nhập bằng email + mật khẩu (miễn phí). Firebase lo cả việc xác nhận email và quên mật khẩu.
 
@@ -116,7 +116,7 @@ cd <repo> && python3 tests/may-chu.py           # cần python: pyjwt, cryptogra
 1. **Firebase**, việc chủ dự án làm (miễn phí):
    - Tạo dự án Firebase.
    - Bật đăng nhập Email/Password.
-   - Thêm `songsong.bandolietsi.vn` vào Authorized domains.
+   - Thêm `thegioisongsong.pages.dev` (và tên miền riêng khi có) vào Authorized domains.
    - Trong Google Cloud Console, giới hạn khoá web chỉ dùng được từ tên miền đó.
 2. **Hai cơ sở dữ liệu D1 riêng:**
    - `songsong-gia-pha` cho Production.
