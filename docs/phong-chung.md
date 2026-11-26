@@ -42,6 +42,21 @@ trang (js/02-09-phong-chung.js)
   - Dùng API ngủ (hibernation): lúc mọi người đứng yên, phòng không tính thời gian chạy.
   - Worker không có đường vào công khai (`workers_dev = false`, `preview_urls = false`). Chỉ dự án Pages gọi được, qua binding.
 
+## Ẩn và báo cáo người khác (24/11/2026, mục 8)
+
+- Bấm ô số người trực tuyến (`#hallOnline`) mở danh sách người trong phòng chung. Mỗi người có nút **Ẩn** / **Hiện lại** và **Báo cáo**. Báo cáo phải bấm hai lần.
+- Máy chủ gắn cho mỗi tài khoản một **mã ẩn danh cố định** `u` (16 ký tự đầu của SHA-256 của `"u:" + muối bí mật của phòng + mã tài khoản`; muối sinh ngẫu nhiên một lần, nằm trong bộ nhớ Durable Object, nên thành viên cùng dòng họ biết mã tài khoản của nhau cũng không tính ra `u`). Trang không tự đặt được mã này.
+  - Ẩn theo `u` nên vẫn đúng người khi họ vào lại.
+  - Danh sách ẩn lưu ở máy (`ss-an`, tối đa 200 người).
+  - `u` không phải mã tài khoản.
+- **Báo cáo** (`{t:'bao', u}`):
+  - Phòng ghi lại người báo, người bị báo, tên và thời điểm (`bl:*` trong bộ nhớ của Durable Object) để chủ dự án xem sau.
+  - Mỗi tài khoản báo tối đa 10 lần/ngày, không tự báo mình.
+  - Người bị **3 tài khoản khác nhau** báo trong 7 ngày thì bị **ẩn với mọi người 24 giờ**. Họ vẫn vào được nhưng không ai thấy. Ẩn xong bộ đếm về 0; báo thêm trong lúc đang bị ẩn chỉ được ghi lại, không gia hạn.
+  - Người báo cáo cũng tự ẩn người đó trên máy mình.
+- Mỗi giờ phòng tự dọn: bộ đếm các ngày trước, nhật ký báo cáo quá 90 ngày, lệnh cấm và lệnh ẩn đã hết hạn.
+- Chưa có: trang để chủ dự án xem và xử lý báo cáo. Hiện chỉ xem được bằng cách đọc bộ nhớ của Durable Object.
+
 ## Chi phí
 
 Gói miễn phí Workers: 100.000 lượt yêu cầu và 13.000 GB-giây mỗi ngày.
