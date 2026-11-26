@@ -45,6 +45,14 @@ Hai vòng tròn lồng nhau, phần giao nhau tô vàng `#B8862F`. Bản SVG có
 ### Nhân vật tự tạo
 `tools/blender/nv-tuy-chinh.py` dựng thân, mặt, tóc, áo, quần, giày rời, cùng bộ xương và động tác của ThanhNien (trọng số chép từ thân ThanhNien), ra `img/3d/nv/TuyChinh.json`. Vật liệu `da`, `toc`, `ao`, `ao2`, `quan` để web nhuộm màu. Thêm kiểu: thêm hàm dựng bộ phận trong script (tên vật thể = mã kiểu) và thêm lựa chọn vào `CHON` trong `js/31`.
 
+### NPC đời thường ghép từ bộ phận đất nặn
+`tools/blender/nv-npc-moi.py` lấy bộ phận của `TuyChinh.json` (thân, mặt, tóc, áo, quần), tô màu cố định, thêm chi tiết riêng, rồi xuất thẳng ra `img/3d/nv/<Tên>.json` (nén meshopt, cùng bộ xương 24 khớp và động tác Idle/Walk/Pray/Bow). Không tốn tiền như Meshy, mỗi mẫu khoảng 0,5 MB.
+- `TreEm` (bé trai, người 0,62, đầu to hơn), `CuOngTocBac` (tóc và râu bạc), `ThanhNienSoMi` (sơ mi trắng), `NguoiCamO` (áo bà ba, ô giấy đỏ trầm).
+- Người cầm ô: vai và tay phải khoá cố định ở tư thế cầm ô trong mọi động tác. Đừng cho mẫu này quỳ (`Kneel` mượn từ OngAoNau sẽ kéo tay ra khỏi cán ô) và chỉ đặt ở cảnh ngoài trời.
+- Thêm mẫu: thêm một mục vào `BO` trong script (danh sách bộ phận + màu sRGB). Chạy trong Blender đang mở thì đặt `ARGS` rồi `exec` file, không reset Blender.
+- Lưu ý bộ xương RigThanhNien: đuôi xương tay dài bất thường (hàng mét), nên IK của Blender và mọi phép tính theo độ dài xương đều sai. Script tự tính khuỷu tay bằng hình học.
+- Trang phục tu hành (sư, nữ tu, linh mục) và giáo dân trong lễ phục chưa làm: chờ chủ dự án duyệt.
+
 ## Lịch sử phong cách (đừng quay lại)
 
 Đã thử rồi bỏ: hoạt hình toon, Party Animals, phim AI, Naraka, Gaussian splat (quá giật trên điện thoại). Three.js 3D thời gian thực từng bị bỏ, nay chủ dự án chọn lại với nhân vật đất nặn (tháng 11/2026).
