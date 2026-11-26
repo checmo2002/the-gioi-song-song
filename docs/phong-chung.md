@@ -52,9 +52,9 @@ trang (js/02-09-phong-chung.js)
 - **Báo cáo** (`{t:'bao', u}`):
   - Phòng ghi lại người báo, người bị báo, tên và thời điểm (`bl:*` trong bộ nhớ của Durable Object) để chủ dự án xem sau.
   - Mỗi tài khoản báo tối đa 10 lần/ngày, không tự báo mình.
-  - Người bị **3 tài khoản khác nhau** báo trong 7 ngày thì bị **ẩn với mọi người 24 giờ**. Ẩn xong bộ đếm về 0; báo thêm trong lúc đang bị ẩn chỉ được ghi lại, không gia hạn.
-- Mỗi giờ phòng tự dọn: bộ đếm các ngày trước, nhật ký báo cáo quá 90 ngày, lệnh cấm và lệnh ẩn đã hết hạn. Họ vẫn vào được nhưng không ai thấy.
+  - Người bị **3 tài khoản khác nhau** báo trong 7 ngày thì bị **ẩn với mọi người 24 giờ**. Họ vẫn vào được nhưng không ai thấy. Ẩn xong bộ đếm về 0; báo thêm trong lúc đang bị ẩn chỉ được ghi lại, không gia hạn.
   - Người báo cáo cũng tự ẩn người đó trên máy mình.
+- Mỗi giờ phòng tự dọn: bộ đếm các ngày trước, nhật ký báo cáo quá 90 ngày, lệnh cấm và lệnh ẩn đã hết hạn.
 - Chưa có: trang để chủ dự án xem và xử lý báo cáo. Hiện chỉ xem được bằng cách đọc bộ nhớ của Durable Object.
 
 ## Chi phí

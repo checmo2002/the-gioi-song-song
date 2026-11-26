@@ -61,7 +61,7 @@ export class Phong extends DurableObject {
     const st = this.ctx.storage, xoa = [];
     for (const k of (await st.list({ prefix: 'bc:', end: 'bc:' + Math.floor(now / 864e5), limit: 1000 })).keys()) xoa.push(k);
     for (const k of (await st.list({ prefix: 'bl:', end: 'bl:' + (now - 90 * 864e5), limit: 1000 })).keys()) xoa.push(k);
-    for (const [k, v] of await st.list({ prefix: 'cam:', limit: 1000 })) if (v <= now) xoa.push(k);
+    for (const p of ['cam:', 'an:']) for (const [k, v] of await st.list({ prefix: p, limit: 1000 })) if (v <= now) xoa.push(k);
     for (const [k, v] of await st.list({ prefix: 'bao:', limit: 1000 })) if (Object.values(v).every(t => now - t > 7 * 864e5)) xoa.push(k);
     for (let i = 0; i < xoa.length; i += 128) await st.delete(xoa.slice(i, i + 128));
     await st.put('don', now);
