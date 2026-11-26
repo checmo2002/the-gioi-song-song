@@ -102,23 +102,10 @@ Mọi trường trong `du_lieu` là chữ do trình duyệt bất kỳ gửi lê
 - chỉ đưa dữ liệu vào trang bằng `textContent`, không dùng `innerHTML`;
 - khi xuất CSV (mở bằng Excel, Google Sheets): ô nào bắt đầu bằng `=`, `+`, `-`, `@` (kể cả sau dấu cách, tab) thì thêm dấu `'` ở đầu, để bảng tính không chạy nó như công thức.
 
-## Áp migration lên D1 thật
+## Tạo bảng trên D1 thật
 
-**Trưởng nhóm áp, agent không tự áp.** Cần làm trên cả hai cơ sở dữ liệu (xem `docs/gia-pha-dong-ho.md`, mục "Đưa lên mạng"):
-`songsong-gia-pha` (Production) và `songsong-gia-pha-thu` (Preview).
-
-Cách 1, trên bảng điều khiển: mở **Console** của từng D1, dán toàn bộ nội dung `migrations/0002_theo_doi.sql`, bấm **Execute**.
-
-Cách 2, bằng wrangler (đã đăng nhập tài khoản Cloudflare của Song Song, `wrangler.toml` có khối `[[d1_databases]]` với `migrations_dir = "migrations"`):
-
-```
-npx wrangler d1 migrations apply songsong-gia-pha --remote
-npx wrangler d1 migrations apply songsong-gia-pha-thu --remote
-```
-
-Nếu đã từng áp `0001` bằng Console (không qua wrangler), wrangler không biết và sẽ chạy lại `0001`, báo lỗi bảng đã có. Khi đó dùng Cách 1.
-
-Trước khi áp, trang vẫn chạy bình thường: máy chủ ghi lỗi `no such table` vào nhật ký của Cloudflare, trả 500 cho `/api/bao-loi`, người dùng không thấy gì.
+Không cần làm tay. Lần đầu `/api/bao-loi` gặp lỗi `no such table`, máy chủ tự chạy các lệnh `CREATE … IF NOT EXISTS` (giống `migrations/0002_theo_doi.sql`) rồi ghi lại. Việc này xảy ra riêng trên từng D1: `songsong-gia-pha` và `songsong-gia-pha-thu`.
+Áp `0002` bằng wrangler hay Console sau này cũng không lỗi, vì mọi lệnh đều có `IF NOT EXISTS`.
 
 ## Chạy thử ở máy
 

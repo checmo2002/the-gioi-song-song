@@ -21,6 +21,13 @@ export function dai(ip) {
   return g.slice(0, 4).map(h => (parseInt(h, 16) || 0).toString(16)).join(':') + '::/64';
 }
 
+// tạo bảng nếu chưa có (giống migrations/0002_theo_doi.sql): D1 thật chưa áp migration thì lần ghi đầu tự tạo, không cần vào bảng điều khiển
+const BANG = [
+  "CREATE TABLE IF NOT EXISTS theo_doi (id INTEGER PRIMARY KEY AUTOINCREMENT, luc INTEGER NOT NULL, loai TEXT NOT NULL CHECK (loai IN ('loi', 'toc-do')), may TEXT NOT NULL, du_lieu TEXT NOT NULL CHECK (json_valid(du_lieu)))",
+  'CREATE INDEX IF NOT EXISTS theo_doi_may ON theo_doi(may, luc)',
+  'CREATE INDEX IF NOT EXISTS theo_doi_luc ON theo_doi(luc)',
+  'CREATE TABLE IF NOT EXISTS theo_doi_ngay (ngay TEXT PRIMARY KEY, n INTEGER NOT NULL)'];
+
 // đọc thân yêu cầu, dừng ngay khi quá MAX byte (kể cả khi gửi không kèm Content-Length)
 async function doc(req) {
   if (!req.body) return '';
@@ -44,23 +51,28 @@ export async function onRequest({ request: req, env, waitUntil }) {
     const du = {};
     for (const k in ds) { const v = ds[k](o[k]); if (v !== undefined) du[k] = v }
     if (o.may === 'dt' || o.may === 'mt') du.may = o.may;
-    const now = Date.now(), ngay = new Date(now).toISOString().slice(0, 10);
-    const k = await crypto.subtle.importKey('raw', enc.encode(env.TK_KHOA), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-    const sig = await crypto.subtle.sign('HMAC', k, enc.encode('td:' + ngay + ':' + dai(req.headers.get('CF-Connecting-IP') || '')));
-    const may = [...new Uint8Array(sig, 0, 8)].map(x => x.toString(16).padStart(2, '0')).join('');
-    // may đổi mỗi ngày nên đếm theo may là đếm trong ngày. Máy đã đủ thì dừng trước, không ăn vào trần chung
-    if (await env.DB.prepare('SELECT COUNT(*) AS n FROM theo_doi WHERE may = ?').bind(may).first('n') >= TOI_DA) return xong(204);
-    // trần chung cả bảng mỗi ngày (kẻ xấu đổi nhiều IP không làm cạn hạn mức ghi D1 dùng chung với gia phả): bảng đếm, không đếm cả bảng
-    const dem = await env.DB.prepare('INSERT INTO theo_doi_ngay (ngay, n) VALUES (?, 1) ON CONFLICT(ngay) DO UPDATE SET n = n + 1 WHERE n < ?').bind(ngay, TRAN).run();
-    if (!dem.meta.changes) return xong(204);
-    // lại kiểm theo may trong cùng câu lệnh thêm, để hai yêu cầu cùng lúc của một máy không cùng lọt qua
-    await env.DB.prepare('INSERT INTO theo_doi (luc, loai, may, du_lieu) SELECT ?, ?, ?, ? WHERE (SELECT COUNT(*) FROM theo_doi WHERE may = ?) < ?')
-      .bind(now, o.t, may, JSON.stringify(du), may, TOI_DA).run();
-    if (Math.random() < 0.01) waitUntil(env.DB.batch([env.DB.prepare('DELETE FROM theo_doi WHERE luc < ?').bind(now - GIU),
-      env.DB.prepare('DELETE FROM theo_doi_ngay WHERE ngay < ?').bind(new Date(now - GIU).toISOString().slice(0, 10))]).catch(() => { }));
+    const ghi = () => luu(env, req, o, du, waitUntil);
+    try { await ghi() } catch (e) { if (!/no such table/i.test(String(e && e.message))) throw e; await env.DB.batch(BANG.map(q => env.DB.prepare(q))); await ghi() }
     return xong(204);
   } catch (e) {
     console.error(e);
     return xong(500);
   }
+}
+
+async function luu(env, req, o, du, waitUntil) {
+    const now = Date.now(), ngay = new Date(now).toISOString().slice(0, 10);
+    const k = await crypto.subtle.importKey('raw', enc.encode(env.TK_KHOA), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const sig = await crypto.subtle.sign('HMAC', k, enc.encode('td:' + ngay + ':' + dai(req.headers.get('CF-Connecting-IP') || '')));
+    const may = [...new Uint8Array(sig, 0, 8)].map(x => x.toString(16).padStart(2, '0')).join('');
+    // may đổi mỗi ngày nên đếm theo may là đếm trong ngày. Máy đã đủ thì dừng trước, không ăn vào trần chung
+    if (await env.DB.prepare('SELECT COUNT(*) AS n FROM theo_doi WHERE may = ?').bind(may).first('n') >= TOI_DA) return;
+    // trần chung cả bảng mỗi ngày (kẻ xấu đổi nhiều IP không làm cạn hạn mức ghi D1 dùng chung với gia phả): bảng đếm, không đếm cả bảng
+    const dem = await env.DB.prepare('INSERT INTO theo_doi_ngay (ngay, n) VALUES (?, 1) ON CONFLICT(ngay) DO UPDATE SET n = n + 1 WHERE n < ?').bind(ngay, TRAN).run();
+    if (!dem.meta.changes) return;
+    // lại kiểm theo may trong cùng câu lệnh thêm, để hai yêu cầu cùng lúc của một máy không cùng lọt qua
+    await env.DB.prepare('INSERT INTO theo_doi (luc, loai, may, du_lieu) SELECT ?, ?, ?, ? WHERE (SELECT COUNT(*) FROM theo_doi WHERE may = ?) < ?')
+      .bind(now, o.t, may, JSON.stringify(du), may, TOI_DA).run();
+    if (Math.random() < 0.01) waitUntil(env.DB.batch([env.DB.prepare('DELETE FROM theo_doi WHERE luc < ?').bind(now - GIU),
+      env.DB.prepare('DELETE FROM theo_doi_ngay WHERE ngay < ?').bind(new Date(now - GIU).toISOString().slice(0, 10))]).catch(() => { }));
 }
