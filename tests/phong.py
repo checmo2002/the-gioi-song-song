@@ -127,6 +127,7 @@ async def main():
     ky('máy chủ gắn mã ẩn danh u (không lấy u trang gửi lên)', len(u) == 16 and u != 'giamao0000000000')
     id_d = json.loads(goi(D, '/api/toi').read())['nguoi']['id']
     ky('u không phải mã tài khoản', u not in id_d)
+    ky('biết mã tài khoản (cùng dòng họ) cũng không tính ra u (rà PR #114)', u != hashlib.sha256(('u:' + id_d).encode()).hexdigest()[:16])
     await wd.close(); wd = await ket(D); await nhan(wd, 'chao'); await wd.send(json.dumps({'p': {'x': .5}}))
     m = await nhan(wb, 'p')
     while m['p'].get('n') != 'Báo': m = await nhan(wb, 'p')

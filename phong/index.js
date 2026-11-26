@@ -37,8 +37,11 @@ export class Phong extends DurableObject {
     const [kh, may] = Object.values(new WebSocketPair());
     const peer = [...crypto.getRandomValues(new Uint8Array(9))].map(x => x.toString(16).padStart(2, '0')).join('');   // mã ngẫu nhiên mỗi kết nối, không lộ mã tài khoản
     this.ctx.acceptWebSocket(may);   // ngủ được (hibernation): đứng yên không tính thời gian chạy
-    const u = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('u:' + id)))].slice(0, 8).map(x => x.toString(16).padStart(2, '0')).join('');
-    const an = await this.ctx.storage.get('an:' + id) || 0;   // đang bị ẩn vì nhiều người báo cáo: vẫn vào được nhưng không ai thấy
+    // muối bí mật của phòng: không có nó thì người biết mã tài khoản (thành viên cùng dòng họ) cũng không tính ra u
+    if (!this.muoi) { this.muoi = await this.ctx.storage.get('muoi'); if (!this.muoi) { this.muoi = crypto.randomUUID(); await this.ctx.storage.put('muoi', this.muoi) } }
+    const u = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('u:' + this.muoi + ':' + id)))].slice(0, 8).map(x => x.toString(16).padStart(2, '0')).join('');
+    let an = await this.ctx.storage.get('an:' + id) || 0;   // đang bị ẩn vì nhiều người báo cáo: vẫn vào được nhưng không ai thấy
+    if (an && an <= Date.now()) { an = 0; await this.ctx.storage.delete('an:' + id) }
     may.serializeAttachment({ peer, id, ten, u, an, p: null, t0: Date.now(), n: 0, vao: Date.now() });
     may.send(JSON.stringify({ t: 'chao', toi: peer, ds: ds.map(w => w.deserializeAttachment()).filter(a => a && a.p && !(a.an > Date.now())).map(a => ({ peer: a.peer, p: a.p })) }));
     return new Response(null, { status: 101, webSocket: kh });
@@ -51,6 +54,17 @@ export class Phong extends DurableObject {
     this.dong(a => !a.p && now - a.vao > CHO_P, 4001, 'Không hoạt động');
     this.dong(a => now - a.vao > TUOI, 4000, 'Nối lại');
     if (this.ctx.getWebSockets().length) await this.ctx.storage.setAlarm(now + CHO_P);
+    if (now - (await this.ctx.storage.get('don') || 0) > 3600e3) await this.don(now);
+  }
+  // mỗi giờ một lần: xoá bộ đếm báo cáo các ngày trước, nhật ký báo cáo quá 90 ngày, lệnh cấm đã hết, bộ đếm quá 7 ngày
+  async don(now) {
+    const st = this.ctx.storage, xoa = [];
+    for (const k of (await st.list({ prefix: 'bc:', end: 'bc:' + Math.floor(now / 864e5), limit: 1000 })).keys()) xoa.push(k);
+    for (const k of (await st.list({ prefix: 'bl:', end: 'bl:' + (now - 90 * 864e5), limit: 1000 })).keys()) xoa.push(k);
+    for (const [k, v] of await st.list({ prefix: 'cam:', limit: 1000 })) if (v <= now) xoa.push(k);
+    for (const [k, v] of await st.list({ prefix: 'bao:', limit: 1000 })) if (Object.values(v).every(t => now - t > 7 * 864e5)) xoa.push(k);
+    for (let i = 0; i < xoa.length; i += 128) await st.delete(xoa.slice(i, i + 128));
+    await st.put('don', now);
   }
   async webSocketMessage(ws, tin) {
     const a = ws.deserializeAttachment(); if (!a) return ws.close(1008, 'Hỏng');
@@ -66,15 +80,19 @@ export class Phong extends DurableObject {
   // báo cáo người khác: ghi lại (để chủ dự án xem), đủ BAO_DU tài khoản khác nhau trong 7 ngày thì ẩn người đó với mọi người AN_LAU
   async baoCao(a, u, now) {
     if (typeof u !== 'string' || !CHU_U.test(u) || u === a.u) return;
+    const ngay = Math.floor(now / 864e5); if (a.bd !== ngay) { a.bd = ngay; a.bn = 0 }
+    if (a.bn >= BAO_NGAY) return;   // hết lượt trong ngày: bỏ luôn, không đọc bộ nhớ
     const dich = this.ctx.getWebSockets().map(w => w.deserializeAttachment()).find(x => x && x.u === u); if (!dich) return;
-    const kn = 'bc:' + a.id + ':' + Math.floor(now / 864e5), dem = (await this.ctx.storage.get(kn) || 0) + 1; if (dem > BAO_NGAY) return;
+    const kn = 'bc:' + ngay + ':' + a.id, dem = (await this.ctx.storage.get(kn) || 0) + 1; a.bn = dem;
+    for (const w of this.ctx.getWebSockets()) { const x = w.deserializeAttachment(); if (x && x.id === a.id) { x.bd = ngay; x.bn = dem; w.serializeAttachment(x) } }
+    if (dem > BAO_NGAY) return;
+    const bl = { ['bl:' + now + ':' + a.u]: { luc: now, ai: a.u, ve: dich.u, ten: dich.ten } };
+    if (dich.an > now) return this.ctx.storage.put({ [kn]: dem, ...bl });   // đang bị ẩn: chỉ ghi lại, không đếm, không gia hạn
     const kb = 'bao:' + dich.id, b = await this.ctx.storage.get(kb) || {}; for (const k in b) if (now - b[k] > 7 * 864e5) delete b[k];
-    b[a.id] = now;
-    await this.ctx.storage.put({ [kn]: dem, [kb]: b, ['bl:' + now + ':' + a.u]: { luc: now, ai: a.u, ve: dich.u, ten: dich.ten, so: Object.keys(b).length } });
-    if (Object.keys(b).length >= BAO_DU) {
-      const den = now + AN_LAU; await this.ctx.storage.put('an:' + dich.id, den);
-      for (const w of this.ctx.getWebSockets()) { const x = w.deserializeAttachment(); if (x && x.id === dich.id) { x.an = den; w.serializeAttachment(x); this.gui(w, { t: 'di', peer: x.peer }) } }
-    }
+    b[a.id] = now; bl['bl:' + now + ':' + a.u].so = Object.keys(b).length;
+    if (Object.keys(b).length < BAO_DU) return this.ctx.storage.put({ [kn]: dem, [kb]: b, ...bl });
+    const den = now + AN_LAU; await this.ctx.storage.put({ [kn]: dem, ...bl, ['an:' + dich.id]: den }); await this.ctx.storage.delete(kb);   // ẩn xong thì đếm lại từ đầu
+    for (const w of this.ctx.getWebSockets()) { const x = w.deserializeAttachment(); if (x && x.id === dich.id) { x.an = den; w.serializeAttachment(x); this.gui(w, { t: 'di', peer: x.peer }) } }
   }
   async webSocketClose(ws, code) { const a = ws.deserializeAttachment(); if (a) this.gui(ws, { t: 'di', peer: a.peer }); try { ws.close(code === 1005 ? 1000 : code) } catch { } }
   async webSocketError(ws) { return this.webSocketClose(ws) }
