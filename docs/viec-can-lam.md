@@ -28,7 +28,7 @@ Trưởng nhóm chuyển mỗi mục thành một GitHub Issue trước khi giao
 ## Đợt 4 — Đồ hoạ, video, nhân vật AI (thêm đội 3D, video, nhân vật AI)
 
 15. Render lại các không gian còn lệch phong cách isometric theo `docs/do-hoa.md`.
-15b. **Camera xoay vòng** (chủ dự án muốn có): mỗi cảnh hiện là một ảnh render một góc, nên muốn xoay phải render thêm góc nhìn (ví dụ 4 góc × 7 cảnh) kèm lưới đi được cho từng góc. Làm cùng đợt render lại.
+15b. ~~**Camera xoay vòng**~~ — xong: các cảnh đã là 3D thật (three.js) nên không cần render thêm góc. Kéo chuột (trái, phải, Alt + trái), phím Q / E, hai ngón trên điện thoại; bánh xe và chụm ngón để phóng to / thu nhỏ; nút "Về góc mặc định" hoặc phím R. Chưa có đi bằng phím hay cần điều khiển, nên chưa cần đi theo hướng camera.
 16. Hoàn thiện đại sảnh chân núi và lối lên đỉnh núi thờ.
 17. Video giới thiệu và hoạt cảnh mở cửa hai lối.
 17b. Hình riêng cho NPC (sư thầy áo nâu, Phật tử áo lam, giáo dân, cụ già, trẻ em): hiện NPC dùng chung hình nhân vật người chơi. Render sprite mới theo `docs/do-hoa.md`.

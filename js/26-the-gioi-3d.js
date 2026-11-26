@@ -136,6 +136,7 @@ function khoi(){
   const cam=new THREE.PerspectiveCamera(35,1,1,400);   // near 1 m (camera luôn cách đích ≥ 7 m): bộ đệm sâu mịn hơn 10 lần, các mảnh phẳng cách nhau vài mm không còn sọc nhấp nháy
   const dk=new OrbitControls(cam,r.domElement);dk.enableDamping=!GIAM;dk.dampingFactor=.08;dk.rotateSpeed=.7;dk.enableZoom=false;dk.enablePan=false;
   dk.minPolarAngle=15*Math.PI/180;dk.maxPolarAngle=68*Math.PI/180;
+  dk.mouseButtons.RIGHT=THREE.MOUSE.ROTATE;dk.touches.TWO=THREE.TOUCH.DOLLY_ROTATE;   // chuột phải (Alt + chuột trái vẫn là chuột trái) và hai ngón cũng xoay; phóng to thu nhỏ do js/16
   const ori=()=>hall.clientWidth/Math.max(1,hall.clientHeight)<.9?'v':'h';
   const xa=()=>{const g=dang?CANH[dang].xa:CANH[DAU].xa;return THREE.MathUtils.clamp(g/(window.ssZoomK?ssZoomK(ori()):1),7,g*2)};   // tới 2 lần (nút thu nhỏ hết cỡ, js/16 MIN .5); nút góc nhìn, cuộn chuột, chụm ngón (js/16-goc-nhin.js) đổi khoảng cách camera
   let cw=-1,ch=-1;   // cảnh nạp sớm lúc sảnh còn ẩn (cỡ 0) nên đo lại mỗi khi hiện
@@ -427,7 +428,9 @@ function khoi(){
 
   // ---- bấm xuống sân để đi; kéo để xoay camera
   let bam=null,dang=null;   // dang: cảnh đang vẽ
-  r.domElement.addEventListener('pointerdown',e=>{bam={x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId}});
+  // chuột phải, hay ngón thứ hai chạm xuống (xoay, chụm): không tính là bấm để đi
+  r.domElement.addEventListener('pointerdown',e=>{bam=(bam&&e.pointerType==='touch')||e.button?false:{x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId}});
+  r.domElement.addEventListener('pointercancel',()=>{bam=null});
   r.domElement.addEventListener('pointerup',e=>{const b=bam;bam=null;if(!b||b.id!==e.pointerId||Math.hypot(e.clientX-b.x,e.clientY-b.y)>7||performance.now()-b.t>600||!dang)return;
    const ls=hall.querySelector('.hall-list.open');if(ls){ls.classList.remove('open');hall.classList.remove('list-open');return}
    const d=DL[dang],rc=r.domElement.getBoundingClientRect(),ndc=new THREE.Vector2((e.clientX-rc.left)/rc.width*2-1,-(e.clientY-rc.top)/rc.height*2+1);ray.setFromCamera(ndc,cam);
@@ -436,10 +439,14 @@ function khoi(){
 
   // ---- camera: đi theo "Bạn", người dùng kéo để xoay
   let theo=null,daDat=false;
-  // free cam: người xem kéo xoay / thu nhỏ để nhìn đường đi; thả tay VE_SAU ms thì camera lướt về góc mặc định
-  const VE_SAU=4000,huongMD=new V3();let raT=0,keo=false;const cham=()=>{raT=performance.now()};
-  dk.addEventListener('start',()=>{keo=true;cham()});dk.addEventListener('end',()=>{keo=false;cham()});
-  hall.addEventListener('wheel',cham,{passive:true});hall.addEventListener('touchmove',cham,{passive:true});hall.addEventListener('click',e=>{if(e.target.closest('.zm'))cham()});
+  // camera xoay vòng: kéo (chuột trái, chuột phải, Alt + chuột trái, hai ngón) hoặc giữ Q / E để xoay quanh "Bạn"; góc người xem chọn được giữ
+  // tới khi bấm nút "Về góc mặc định" (js/16, chỉ hiện khi đã xoay) hoặc phím R. Sang cảnh khác thì về góc mặc định như cũ
+  const huongMD=new V3(),lechV=new V3(),TRUC_Y=new V3(0,1,0),PHIM_Q={KeyQ:1,KeyE:-1};let quayP=0,quayV=0,veGoc=false,nutVe=null;
+  const boQua=e=>e.ctrlKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)||e.target.isContentEditable||!hall.classList.contains('w3d-on');
+  addEventListener('keydown',e=>{if(boQua(e))return;if(e.code in PHIM_Q){quayP=PHIM_Q[e.code];veGoc=false}else if(e.code==='KeyR'&&!e.repeat)window.ss3dVeGoc()});
+  addEventListener('keyup',e=>{if(PHIM_Q[e.code]===quayP)quayP=0});addEventListener('blur',()=>{quayP=0});
+  dk.addEventListener('start',()=>{veGoc=false});
+  window.ss3dVeGoc=()=>{veGoc=true;window.ssZoomVe&&ssZoomVe()};
   // mở cùng hướng nhìn với ảnh iso cũ (từ tây nam nhìn lên) cho người quen đường không bị lạc;
   // nghiêng 55° (cao hơn ảnh cũ 42°) để mái cổng không che người vừa vào sân
   function datCamQuanh(t){const n=(dang&&CANH[dang].nghieng||55)*Math.PI/180,h=Math.hypot(DIR.x,DIR.y);cam.position.copy(t).addScaledVector(B(DIR.x/h*Math.cos(n),DIR.y/h*Math.cos(n),Math.sin(n)),xa());dk.target.copy(t)}
@@ -497,11 +504,13 @@ function khoi(){
    if(theo){tam2.set(theo.x,theo.y+1,theo.z);   // theo.y = độ cao mặt đứng
     if(!daDat){datCamQuanh(tam2);daDat=true}   // vào cảnh: đặt lại camera quanh "Bạn" (trước đây dòng này lỡ nằm trong chú thích nên camera giữ góc của cảnh trước)
     const k=GIAM?1:1-Math.exp(-dt*3),dv=tam2.clone().sub(dk.target).multiplyScalar(k);dk.target.add(dv);cam.position.add(dv)}
-   if(raT&&!keo&&t-raT>VE_SAU){   // về góc mặc định (cùng hướng datCamQuanh) và độ xa mặc định nếu đang thu nhỏ
-    if(window.ssZoomVe&&raT>0){ssZoomVe();raT=-raT}
-    const n=(dang&&CANH[dang].nghieng||55)*Math.PI/180,h=Math.hypot(DIR.x,DIR.y);huongMD.copy(B(DIR.x/h*Math.cos(n),DIR.y/h*Math.cos(n),Math.sin(n))).normalize();
-    const v0=cam.position.clone().sub(dk.target),R0=v0.length();v0.divideScalar(R0);
-    if(v0.angleTo(huongMD)<.003)raT=0;else cam.position.copy(dk.target).addScaledVector(v0.lerp(huongMD,GIAM?1:Math.min(1,dt*2.2)).normalize(),R0)}
+   // Q / E: tăng tốc và hãm dần như kéo chuột; giới hạn góc (cảnh trong nhà, độ nghiêng) do dk.update() bên dưới giữ
+   quayV=GIAM?quayP*1.6:quayV+(quayP*1.6-quayV)*Math.min(1,dt*6);
+   if(Math.abs(quayV)>1e-3){lechV.copy(cam.position).sub(dk.target).applyAxisAngle(TRUC_Y,quayV*dt);cam.position.copy(dk.target).add(lechV)}
+   if(daDat){const n=(dang&&CANH[dang].nghieng||55)*Math.PI/180,h=Math.hypot(DIR.x,DIR.y);huongMD.copy(B(DIR.x/h*Math.cos(n),DIR.y/h*Math.cos(n),Math.sin(n))).normalize();   // cùng hướng datCamQuanh
+    const v0=cam.position.clone().sub(dk.target),R0=v0.length();v0.divideScalar(R0);const lech=v0.angleTo(huongMD);
+    if(veGoc){if(lech<.003)veGoc=false;else cam.position.copy(dk.target).addScaledVector(v0.lerp(huongMD,GIAM?1:Math.min(1,dt*2.2)).normalize(),R0)}   // lướt về góc mặc định
+    nutVe=nutVe||hall.querySelector('.zm [data-z="ve"]');if(nutVe&&nutVe.hidden!==(lech<.07||veGoc))nutVe.hidden=!nutVe.hidden}   // nút "Về góc mặc định" chỉ hiện khi đã xoay quá 4°
    const v=cam.position.clone().sub(dk.target),R=v.length(),Rm=xa();if(Math.abs(R-Rm)>.01)cam.position.copy(dk.target).addScaledVector(v,(R+(Rm-R)*(GIAM?1:Math.min(1,dt*6)))/R);
    d.canh.fog.near=Rm+8;d.canh.fog.far=Rm+75;   // sương lùi theo khoảng cách camera; bắt đầu sát sau người cho cảnh xa mờ dần
    DOM.position.set(dk.target.x,dk.target.y-2,dk.target.z);bayDom(dt,t);troiBuoc(d,dt,t,Rm);
@@ -563,7 +572,7 @@ function khoi(){
      if(n<it){it=n;K=k}if(!n)break}
     r.setRenderTarget(null);r.setClearColor(mx0,1);d.canh.overrideMaterial=null;d.canh.background=nen0;q.rig.visible=q.bo.visible=true;RT.dispose();MD.dispose()}
    function xongPhim(){boNguoi(q);for(const id in nguoi){const x=nguoi[id].q;if(x)x.rig.visible=x.bo.visible=true}
-    box.appendChild(r.domElement);r.domElement.style.opacity='';cw=-1;anDi=true;phim=null;daDat=false;raT=0;xong();/* máy quay của phim (thấp, sát người) không được ở lại: đặt lại góc chuẩn quanh "Bạn" dù cảnh đã đổi trước khi phim chạy */setTimeout(()=>tr.classList.remove('pu-chay','pu-dong'),1000)}
+    box.appendChild(r.domElement);r.domElement.style.opacity='';cw=-1;anDi=true;phim=null;daDat=false;xong();/* máy quay của phim (thấp, sát người) không được ở lại: đặt lại góc chuẩn quanh "Bạn" dù cảnh đã đổi trước khi phim chạy */setTimeout(()=>tr.classList.remove('pu-chay','pu-dong'),1000)}
    phim={buoc(){const now=performance.now(),dt=Math.min(.05,(now-t0)/1000);t0=now;t+=dt;
     if(!daTen){daTen=true;const ten=((tr.querySelector('span')||{}).textContent||'').replace(/…$/,''),b=ui.querySelector('.pu-ten');b.textContent='';   // 04-01 đặt chữ sau khi phim nhận chiếu
      [...ten].forEach((ch,i)=>{const e=document.createElement('i');e.textContent=ch;e.style.setProperty('--i',i);b.appendChild(e)});ui.querySelector('.pu-nho').textContent=ten}
