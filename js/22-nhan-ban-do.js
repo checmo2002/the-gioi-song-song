@@ -1,7 +1,7 @@
 /* Nhãn trên bản đồ: ưu tiên nhãn chính, ẩn nhãn chồng chéo hoặc nằm dưới HUD; tên người chỉ hiện quanh nhân vật */
 (function(){
  var hall=document.getElementById('hall');if(!hall)return;
- var HUD=['.hall-ttl','.hall-act','#hallOnline','.wx-pill','.hall-emo','.zm','.w-bar','.ho-ban','#mainNav','.sanh-tip','.cd-nut'];
+ var HUD=['.hall-ttl','.hall-act','#hallOnline','.wx-pill','.hall-emo','.zm','.w-bar','.ho-ban','#mainNav','.sanh-tip','.cd-nut','#calBtn','.nav-auth','.nav-user'];   // #110: nút ngày và nút tài khoản ở thanh trên
  function rank(el){var w=el.dataset.w||'';if(el.classList.contains('main'))return 4;if(el.classList.contains('zn'))return 3;if(w.indexOf('p:')===0)return 1;return 2}
  function hit(a,b,pad){return a.left<b.right+pad&&a.right>b.left-pad&&a.top<b.bottom+pad&&a.bottom>b.top-pad}
  function run(){if(hall.hidden||!hall.classList.contains('world-on'))return;

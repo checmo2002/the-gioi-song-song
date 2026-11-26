@@ -312,8 +312,10 @@ function khoi(){
    const mot=a===q.act.Bow||a===q.act.Kneel;a.setLoop(mot?THREE.LoopOnce:THREE.LoopRepeat);a.clampWhenFinished=a===q.act.Kneel;
    if(GIAM){q.mx.update(.6);}}   // giảm chuyển động: đứng yên ở một tư thế
   function boNguoi(q){q.canh.remove(q.rig,q.bo);q.mx.stopAllAction();if(q.ms&&q.ms.length){for(let i=NVM.length;i--;)if(q.ms.includes(NVM[i]))NVM.splice(i,1)}}
-  const NPC=['SuThay','PhuNuTim','HocSinh'];
-  function mauCua(id,p){if(id.indexOf('npc-')===0)return NPC[(+id.split('-').pop()||0)%NPC.length];if(p.tc&&TC&&TC.doc(p.tc))return 'TuyChinh|'+p.tc;return p.k===1?'ThanhNien':'ChiBaBa'}
+  // NPC theo nơi (bảng chủ dự án duyệt ở #11): nhà thờ không có sư thầy (#111); chưa có hình nữ tu
+  const NPC={chan:['SuThay','BaCu','ChiBaBa','OngAoNau','CoAoDai','PhuNuTim'],dien:['OngAoNau','CoAoDai','SuThay','BaCu','PhuNuTim','ChiBaBa'],
+   tho:['CoAoDai','ThanhNien','PhuNuTim','BaCu'],lang:['CuuChienBinh','HocSinh','BaCu','ChiBaBa'],sanh:['ThanhNien','HocSinh','PhuNuTim','CuuChienBinh','CoAoDai']};
+  function mauCua(id,p){if(id.indexOf('npc-')===0){const a=id.split('-'),l=NPC[a[1]]||NPC.lang;return l[(+a[2]||0)%l.length]}if(p.tc&&TC&&TC.doc(p.tc))return 'TuyChinh|'+p.tc;return p.k===1?'ThanhNien':'ChiBaBa'}
   // xem trước trong màn tạo nhân vật (js/31): bộ vẽ riêng trên canvas của màn đó, người đứng nghỉ, kéo để xoay
   window.ss3dNV=function(cv){const rr=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});rr.setPixelRatio(Math.min(2,devicePixelRatio));rr.outputColorSpace=THREE.SRGBColorSpace;
    const sc=new THREE.Scene(),cm=new THREE.PerspectiveCamera(30,1,.1,50),den=new THREE.DirectionalLight(0xfff1e0,2.6);den.position.set(2,4,5);sc.add(den,new THREE.HemisphereLight(0xfff6ea,0xd9c6a8,2.4));
@@ -583,7 +585,7 @@ function khoi(){
   window.ss3dCanh={cam,dk,B,get canh(){return dang&&DL[dang].canh},get raAnh(){return dang&&DL[dang].raAnh},get tuAnh(){return dang&&DL[dang].tuAnh},get cao(){return dang&&((u,v)=>caoTai(dang,u,v))},get nguoi(){return nguoi},get d(){return dang&&DL[dang]}};   // để thử nghiệm
 
   // ---- nạp mọi cảnh + đủ 9 nhân vật, rồi dựng sẵn shader một lần để lúc đi và lúc NPC xuất hiện không bị khựng
-  const ds=await Promise.all(['ThanhNien','ChiBaBa','TuyChinh',...NPC,...new Set(Object.values(CANH).flatMap(c=>c.le.map(x=>x[0])))].map(t=>mau(t).catch(()=>null)));
+  const ds=await Promise.all([...new Set(['ThanhNien','ChiBaBa','TuyChinh',...Object.values(NPC).flat(),...Object.values(CANH).flatMap(c=>c.le.map(x=>x[0]))])].map(t=>mau(t).catch(()=>null)));
   // cảnh đầu trước; sau đó lần lượt: ưu tiên cảnh người dùng đang đứng chờ, rồi theo thứ tự trong CANH
   let dau=true;
   for(;;){const s=canhNay(),ten=s&&!san[s]&&!DL[s]?s:dau?DAU:Object.keys(CANH).find(k=>!DL[k]);if(!ten)break;
