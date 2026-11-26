@@ -14,7 +14,7 @@
  function buoc(){var W=window.ssWorld,h=document.getElementById('hall');if(!W||!h||h.hidden||!W.on())return;
   var s=W.scene(),le=LE[s]&&W.pray(),doi=false,now=Date.now();
   lay(W,s).forEach(function(q){if(now<q.hen)return;doi=true;var p;
-   if(q.a==='dung'&&le&&Math.random()<.55){p=diem(W,s,le,.24);q.a=Math.random()<.5?'chap':(s==='tho'&&Math.random()<.4?'ngoi':'lay');q.hen=now+8000+Math.random()*9000}
+   if(q.a==='dung'&&le&&Math.random()<.55){p=diem(W,s,le,.24);q.a=Math.random()<.5?'chap':(s==='tho'?'ngoi':'lay');q.hen=now+8000+Math.random()*9000}
    else if(q.a==='dung'&&Math.random()<.2){p=[q.tx,q.ty];q.a='ngoi';q.hen=now+6000+Math.random()*8000}
    else{p=diem(W,s);q.a='dung';q.hen=now+5000+Math.random()*7000}
    q.tx=p[0];q.ty=p[1]});
