@@ -221,6 +221,24 @@ async function xuLy(env, req, duong, toi) {
     const { results } = await env.DB.prepare('SELECT l.phien_ban, l.luc, n.ten boi, l.cay FROM lich_su l LEFT JOIN nguoi_dung n ON n.id = l.boi WHERE l.dong_ho_id = ? ORDER BY l.phien_ban DESC LIMIT 30').bind(id).all();
     return json({ lich_su: results.map(r => ({ phien_ban: r.phien_ban, luc: r.luc, boi: r.boi, so_nguoi: JSON.parse(r.cay).members.length })) });
   }
+  // "đây là tôi": thành viên tự gắn tài khoản mình với một người còn sống chưa ai nhận (không cần duyệt, mỗi tài khoản một người); trưởng họ bỏ gắn được
+  if (b === 'gan' && M === 'POST') {
+    const d = await dongHoCua(env, id), tim = k => d.cay.members.find(m => m.id === k);
+    if (body.bo != null) {
+      if (vai !== 'truong') return loi(403, 'Chỉ trưởng họ bỏ gắn được người khác.');
+      const m = typeof body.bo === 'string' && tim(body.bo); if (!m) return loi(404, 'Không thấy người này trong gia phả.');
+      delete m.tk;
+    } else {
+      const m = body.nguoi == null ? null : typeof body.nguoi === 'string' && tim(body.nguoi);
+      if (m === false || m === undefined) return loi(404, 'Không thấy người này trong gia phả.');
+      if (m && m.tk && m.tk !== toi.id) return loi(409, 'Người này đã có tài khoản khác nhận.');
+      if (m && (m.d || m.ls)) return loi(400, 'Chỉ gắn được với người còn sống.');
+      for (const x of d.cay.members) if (x.tk === toi.id) delete x.tk;
+      if (m) m.tk = toi.id;
+    }
+    const [, , r] = await env.DB.batch([...luuCu(env, id, toi), env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(JSON.stringify(d.cay), id, d.phien_ban)]);
+    return r.meta.changes ? json({ phien_ban: d.phien_ban + 1, cay: d.cay }) : loi(409, 'Gia phả vừa được người khác sửa. Hãy thử lại.');
+  }
   if (b === 'khoi-phuc' && M === 'POST') {
     if (vai !== 'truong') return loi(403, 'Chỉ trưởng họ khôi phục được bản cũ.');
     if (!Number.isInteger(body.ve) || !Number.isInteger(body.phien_ban)) return loi(400, 'Thiếu phiên bản.');

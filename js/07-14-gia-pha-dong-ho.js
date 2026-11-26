@@ -26,6 +26,17 @@
     if(r.st===200){dh.phien_ban=r.d.phien_ban;luu();ve();return}
     if(r.st===409){dh.phien_ban=r.d.phien_ban;cayVao(r.d.cay);luu();ve();toast(r.d.loi);return}
     toast(r.d.loi||'Chưa lưu được lên máy chủ.')}
+  // "đây là tôi" ở bảng bên cạnh cây (js/07-12 gọi ssDHGan): gắn / bỏ gắn ngay trên máy chủ, trên máy chỉ đổi trường tk, không đụng thay đổi chưa gửi
+  window.ssDHGan=m=>{if(!dh||!toi||!m)return'';
+    if(m.tk===toi.id)return '<button type="button" data-dh-gan="">Bỏ «đây là tôi»</button>';
+    if(!m.tk&&!m.d&&!m.ls)return `<button type="button" data-dh-gan="${esc(m.id)}">Đây là tôi</button>`;
+    if(m.tk&&dh.vai==='truong')return `<button type="button" class="del" data-dh-bo="${esc(m.id)}">Bỏ gắn tài khoản</button>`;
+    return m.tk?'<span class="dh-nhan">Đã có người trong họ nhận</span>':''};
+  document.addEventListener('click',async e=>{const b=e.target.closest('[data-dh-gan],[data-dh-bo]');if(!b||!dh||!toi)return;const bo='dhBo' in b.dataset;
+    const r=await api('POST','dong-ho/'+dh.id+'/gan',bo?{bo:b.dataset.dhBo}:{nguoi:b.dataset.dhGan||null});
+    if(r.st!==200){toast(r.d.loi||'Chưa gắn được.');return}
+    const tk={};r.d.cay.members.forEach(x=>{if(x.tk)tk[x.id]=x.tk});ME().members.forEach(m=>{if(tk[m.id])m.tk=tk[m.id];else delete m.tk;m.self=m.tk===toi.id});
+    dh.phien_ban=r.d.phien_ban;luu();ssMe.save();ssMe.ve();toast(bo?'Đã bỏ gắn tài khoản.':b.dataset.dhGan?'Đã gắn: đây là bạn.':'Đã bỏ «đây là tôi».')});
   addEventListener('ss-gp-doi',()=>{if(!dh||!toi)return;if(dh.vai==='thanh-vien'){nhap=true;luu();ve()}else ghi()});
 
   // nút đăng nhập: chỉ các bên máy chủ đang bật (cach từ /api/toi). Chữ G nhiều màu là nhận diện Google bắt buộc trên nút

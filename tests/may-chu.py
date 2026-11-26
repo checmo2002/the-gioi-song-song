@@ -238,6 +238,23 @@ if st == 201: H.goi('POST', f'/api/dong-ho/{DH9}/de-xuat/{r["id"]}/duyet', {})
 if H.goi('GET', f'/api/dong-ho/{DH9}')[1]['cay']['members'][0].get('tk') != idH: loi.append('thành viên đè được tk của người khác bằng mã của mình (trưởng họ duyệt mà không thấy)')
 else: print('  ✓ không đè được tk đã gắn với người khác')
 
+# ---------- "đây là tôi": thành viên tự gắn mình (POST /gan), không cần duyệt ----------
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/de-xuat', {'cay': {'members': [{'id': 'u1', 'name': 'H', 'g': 'm', 'tk': idH}, {'id': 'u2', 'name': 'K', 'g': 'm', 'parent': 'u1'},
+    {'id': 'u3', 'name': 'Cụ', 'g': 'm', 'b': 1900, 'd': 1970}, {'id': 'u4', 'name': 'L', 'g': 'f', 'parent': 'u1'}], 'seq': 5}, 'phien_ban': H.goi('GET', f'/api/dong-ho/{DH9}')[1]['phien_ban']})
+H.goi('POST', f'/api/dong-ho/{DH9}/de-xuat/{r.get("id")}/duyet', {})
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u1'}); ky('không nhận người đã có tài khoản khác', r, st, 409)
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u3'}); ky('không nhận người đã khuất', r, st, 400)
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'khong-co'}); ky('không nhận người không có trong cây', r, st, 404)
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u2'}); ky('thành viên tự nhận "đây là tôi"', r, st, 200)
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u4'}); ky('nhận người khác thì bỏ người cũ', r, st, 200)
+tk = {m['id']: m.get('tk') for m in H.goi('GET', f'/api/dong-ho/{DH9}')[1]['cay']['members']}
+if tk.get('u4') != idK or tk.get('u2') is not None or tk.get('u1') != idH: loi.append(f'mỗi tài khoản chỉ gắn một người, không đụng người khác: {tk}')
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'bo': 'u1'}); ky('thành viên không bỏ gắn được người khác', r, st, 403)
+st, r = H.goi('POST', f'/api/dong-ho/{DH9}/gan', {'bo': 'u4'}); ky('trưởng họ bỏ gắn được người nhận nhầm', r, st, 200)
+if any(m.get('tk') == idK for m in H.goi('GET', f'/api/dong-ho/{DH9}')[1]['cay']['members']): loi.append('trưởng họ bỏ gắn mà tk vẫn còn')
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u2'}); st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': None}); ky('tự bỏ "đây là tôi"', r, st, 200)
+st, r = C.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u2'}); ky('người ngoài dòng họ không gắn được', r, st, 404)
+
 # ---------- đăng xuất ----------
 st, r = A.goi('POST', '/api/dang-xuat', {}); ky('đăng xuất', r, st, 200)
 st, r = A.goi('GET', '/api/toi')
