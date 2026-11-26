@@ -295,7 +295,8 @@ function khoi(){
   const MUON={Bow:'ThanhNien',Kneel:'OngAoNau'};
   function hong(g){let h=null;g.scene.traverse(o=>{if(!h&&o.isBone&&o.name==='Hips')h=o});return h}
   function muon(c,tu,toi){const a=hong(tu),b=hong(toi),k=c.clone(),s=a&&b&&a.position.length()?b.position.length()/a.position.length():1;
-   k.tracks=k.tracks.filter(t=>t.name.endsWith('.quaternion')||t.name==='Hips.position');for(const t of k.tracks)if(t.name==='Hips.position')t.values=t.values.map(v=>v*s);return k}
+   const o=toi.scene.getObjectByName('o_tan');   // người cầm ô: vai, tay phải giữ cán ô, không mượn
+   k.tracks=k.tracks.filter(t=>(t.name.endsWith('.quaternion')||t.name==='Hips.position')&&!(o&&/^Right(Shoulder|Arm|ForeArm|Hand)\./.test(t.name)));for(const t of k.tracks)if(t.name==='Hips.position')t.values=t.values.map(v=>v*s);return k}
   function mau(ten){ten=ten.split('|')[0];return MAU[ten]||(MAU[ten]=mau0(ten).then(async gl=>{for(const k in MUON)if(!gl.animations.some(a=>a.name===k)){const tu=await mau0(MUON[k]).catch(()=>null),c=tu&&tu.animations.find(a=>a.name===k);if(c)gl.animations.push(muon(c,tu,gl))}return gl}))}
   const BONG=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),gr=x.createRadialGradient(64,64,0,64,64,64);
    gr.addColorStop(0,'rgba(70,45,25,.75)');gr.addColorStop(.45,'rgba(70,45,25,.35)');gr.addColorStop(1,'rgba(70,45,25,0)');x.fillStyle=gr;x.fillRect(0,0,128,128);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t})();
@@ -314,8 +315,8 @@ function khoi(){
    if(GIAM){q.mx.update(.6);}}   // giảm chuyển động: đứng yên ở một tư thế
   function boNguoi(q){q.canh.remove(q.rig,q.bo);q.mx.stopAllAction();if(q.ms&&q.ms.length){for(let i=NVM.length;i--;)if(q.ms.includes(NVM[i]))NVM.splice(i,1)}}
   // NPC theo nơi (bảng chủ dự án duyệt ở #11): nhà thờ không có sư thầy (#111); chưa có hình nữ tu
-  const NPC={chan:['SuThay','BaCu','ChiBaBa','OngAoNau','CoAoDai','PhuNuTim'],dien:['OngAoNau','CoAoDai','SuThay','BaCu','PhuNuTim','ChiBaBa'],
-   tho:['CoAoDai','ThanhNien','PhuNuTim','BaCu'],lang:['CuuChienBinh','HocSinh','BaCu','ChiBaBa'],sanh:['ThanhNien','HocSinh','PhuNuTim','CuuChienBinh','CoAoDai']};
+  const NPC={chan:['SuThay','BaCu','ChiBaBa','OngAoNau','CoAoDai','PhuNuTim','CuOngTocBac','NguoiCamO'],dien:['OngAoNau','CoAoDai','SuThay','BaCu','PhuNuTim','ChiBaBa','CuOngTocBac'],
+   tho:['CoAoDai','ThanhNien','PhuNuTim','BaCu','ThanhNienSoMi','CuOngTocBac'],lang:['CuuChienBinh','HocSinh','BaCu','ChiBaBa','TreEm','CuOngTocBac','NguoiCamO'],sanh:['ThanhNien','HocSinh','PhuNuTim','CuuChienBinh','CoAoDai','ThanhNienSoMi','TreEm']};
   function mauCua(id,p){if(id.indexOf('npc-')===0){const a=id.split('-'),l=NPC[a[1]]||NPC.lang;return l[(+a[2]||0)%l.length]}if(p.tc&&TC&&TC.doc(p.tc))return 'TuyChinh|'+p.tc;return p.k===1?'ThanhNien':'ChiBaBa'}
   // xem trước trong màn tạo nhân vật (js/31): bộ vẽ riêng trên canvas của màn đó, người đứng nghỉ, kéo để xoay
   window.ss3dNV=function(cv){const rr=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});rr.setPixelRatio(Math.min(2,devicePixelRatio));rr.outputColorSpace=THREE.SRGBColorSpace;
