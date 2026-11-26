@@ -1,6 +1,6 @@
 // Nhận báo lỗi và tốc độ tải từ js/00-theo-doi.js, lưu vào D1 (bảng theo_doi, docs/theo-doi.md). Không dùng dịch vụ ngoài.
 // Route cụ thể này được Cloudflare Pages ưu tiên hơn functions/api/[[duong]].js. Không lưu IP: chỉ giữ HMAC theo ngày để giới hạn tần suất.
-const NGAY = 864e5, TOI_DA = 30, GIU = 30 * NGAY, MAX = 4096, enc = new TextEncoder();
+const NGAY = 864e5, TOI_DA = 30, TRAN = 2000, GIU = 14 * NGAY, MAX = 4096, enc = new TextEncoder();
 
 const xong = (st, h = {}) => new Response(null, { status: st, headers: { 'Cache-Control': 'no-store', ...h } });
 const LA = /[\u0000-\u0009\u000b-\u001f\u007f-\u009f​-‏‪-‮⁦-⁩]/g;   // ký tự điều khiển, đảo chiều chữ (giữ xuống dòng của stack)
@@ -11,6 +11,15 @@ const TRUONG = {
   loi: { m: chu(300), f: chu(200), d: so, c: so, s: chu(600), trang: chu(60) },
   'toc-do': { ttfb: so, dom: so, tai: so, lcp: so, d3: so, mang: chu(8) },
 };
+
+// IPv6: cả dải /64 thường là của một nhà (nhà mạng cấp cả dải), kẻ xấu đổi địa chỉ trong dải được, nên tính chung một máy
+export function dai(ip) {
+  if (!ip.includes(':')) return ip;
+  if (ip.includes('.')) return ip.slice(ip.lastIndexOf(':') + 1);   // ::ffff:1.2.3.4
+  const [a, b] = ip.split('::'), x = a ? a.split(':') : [], y = b ? b.split(':') : [];
+  const g = b === undefined ? x : [...x, ...Array(Math.max(0, 8 - x.length - y.length)).fill('0'), ...y];
+  return g.slice(0, 4).map(h => (parseInt(h, 16) || 0).toString(16)).join(':') + '::/64';
+}
 
 // đọc thân yêu cầu, dừng ngay khi quá MAX byte (kể cả khi gửi không kèm Content-Length)
 async function doc(req) {
@@ -37,12 +46,18 @@ export async function onRequest({ request: req, env, waitUntil }) {
     if (o.may === 'dt' || o.may === 'mt') du.may = o.may;
     const now = Date.now(), ngay = new Date(now).toISOString().slice(0, 10);
     const k = await crypto.subtle.importKey('raw', enc.encode(env.TK_KHOA), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-    const sig = await crypto.subtle.sign('HMAC', k, enc.encode('td:' + ngay + ':' + (req.headers.get('CF-Connecting-IP') || '')));
+    const sig = await crypto.subtle.sign('HMAC', k, enc.encode('td:' + ngay + ':' + dai(req.headers.get('CF-Connecting-IP') || '')));
     const may = [...new Uint8Array(sig, 0, 8)].map(x => x.toString(16).padStart(2, '0')).join('');
-    // may đổi mỗi ngày nên đếm theo may là đếm trong ngày; một câu lệnh để hai yêu cầu cùng lúc không cùng lọt qua
+    // may đổi mỗi ngày nên đếm theo may là đếm trong ngày. Máy đã đủ thì dừng trước, không ăn vào trần chung
+    if (await env.DB.prepare('SELECT COUNT(*) AS n FROM theo_doi WHERE may = ?').bind(may).first('n') >= TOI_DA) return xong(204);
+    // trần chung cả bảng mỗi ngày (kẻ xấu đổi nhiều IP không làm cạn hạn mức ghi D1 dùng chung với gia phả): bảng đếm, không đếm cả bảng
+    const dem = await env.DB.prepare('INSERT INTO theo_doi_ngay (ngay, n) VALUES (?, 1) ON CONFLICT(ngay) DO UPDATE SET n = n + 1 WHERE n < ?').bind(ngay, TRAN).run();
+    if (!dem.meta.changes) return xong(204);
+    // lại kiểm theo may trong cùng câu lệnh thêm, để hai yêu cầu cùng lúc của một máy không cùng lọt qua
     await env.DB.prepare('INSERT INTO theo_doi (luc, loai, may, du_lieu) SELECT ?, ?, ?, ? WHERE (SELECT COUNT(*) FROM theo_doi WHERE may = ?) < ?')
       .bind(now, o.t, may, JSON.stringify(du), may, TOI_DA).run();
-    if (Math.random() < 0.01) waitUntil(env.DB.prepare('DELETE FROM theo_doi WHERE luc < ?').bind(now - GIU).run().catch(() => { }));
+    if (Math.random() < 0.01) waitUntil(env.DB.batch([env.DB.prepare('DELETE FROM theo_doi WHERE luc < ?').bind(now - GIU),
+      env.DB.prepare('DELETE FROM theo_doi_ngay WHERE ngay < ?').bind(new Date(now - GIU).toISOString().slice(0, 10))]).catch(() => { }));
     return xong(204);
   } catch (e) {
     console.error(e);

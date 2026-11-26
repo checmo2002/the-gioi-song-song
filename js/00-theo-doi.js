@@ -2,8 +2,8 @@
 // Không gửi tên, tài khoản, nội dung người dùng nhập; đường dẫn bỏ phần sau ? và #. Chỉ chạy trên https (bản chạy thật), máy thử http không gửi.
 (function(){if(location.protocol!=='https:'||!navigator.sendBeacon)return;
   var da={},so=0,goc=location.origin,
-    // chữ trong ngoặc kép (ví dụ lỗi JSON.parse trích dữ liệu đã lưu) có thể là chữ người dùng nhập: thay bằng "…"
-    gon=function(s,n){return String(s==null?'':s).split(goc).join('').replace(/[?#][^\s)]*/g,'').replace(/"[^"\n]*"/g,'"…"').slice(0,n)},
+    // chữ trong ngoặc ("…", '…' từ 2 ký tự, «…») có thể là chữ người dùng nhập (JSON.parse, querySelector trích lại dữ liệu): thay bằng …
+    gon=function(s,n){return String(s==null?'':s).split(goc).join('').replace(/[?#][^\s)]*/g,'').replace(/"[^"\n]*"/g,'"…"').replace(/'[^'\n]{2,}'/g,"'…'").replace(/«[^»\n]*»/g,'«…»').slice(0,n)},
     may=function(){return innerWidth<700?'dt':'mt'},
     gui=function(o){try{o.may=may();navigator.sendBeacon('/api/bao-loi',new Blob([JSON.stringify(o)],{type:'application/json'}))}catch(e){}};
   function loi(m,f,d,c,s){if(so>=5)return;   // mỗi lần mở trang gửi tối đa 5 lỗi, lỗi trùng chỉ gửi một lần
@@ -12,7 +12,9 @@
     // trang: đường dẫn + #màn (mã phần tử như #ca-nhan), không qua gon vì gon cắt mất phần #
     gui({t:'loi',m:gon(m,300),f:gon(f,200),d:+d||0,c:+c||0,s:gon(s,600),trang:(location.pathname+location.hash.split('?')[0]).replace(/[^\w\/#.-]/g,'').slice(0,60)})}
   addEventListener('error',function(e){if(e.message==='Script error.')return;loi(e.message,e.filename,e.lineno,e.colno,e.error&&e.error.stack)});
-  addEventListener('unhandledrejection',function(e){var r=e.reason||{};loi('Promise: '+(r.message||r),(String(r.stack||'').match(/https?:\/\/[^\s)]+?\.js/)||[goc])[0],0,0,r.stack)});
+  // lý do không phải Error (chuỗi, đối tượng…) có thể chứa dữ liệu người dùng: chỉ gửi kiểu dữ liệu
+  addEventListener('unhandledrejection',function(e){var r=e.reason;if(!(r instanceof Error))return loi('Promise: '+typeof r,goc,0,0,'');
+    loi('Promise: '+r.message,(String(r.stack||'').match(/https?:\/\/[^\s)]+?\.js/)||[goc])[0],0,0,r.stack)});
   // tốc độ: một lần mỗi lần mở trang, khi chân núi 3D nạp xong (js/26 đặt ss3dXong) hoặc tối đa 2 phút.
   // d3 = -1 khi quá 2 phút hoặc máy không có WebGL2 (js/26 chỉ đặt ss3dCPU khi có WebGL2, lúc đó ss3dXong=true ngay mà không nạp gì)
   var lcp=0,t0=Date.now(),xong=false;

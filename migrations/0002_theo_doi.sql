@@ -1,5 +1,5 @@
--- Theo dõi lỗi và tốc độ tải trang (docs/theo-doi.md). Giữ 30 ngày.
--- Không lưu IP: may = HMAC(TK_KHOA, ngày + IP) cắt 16 ký tự, đổi mỗi ngày, chỉ dùng để giới hạn 30 bản ghi mỗi máy mỗi ngày.
+-- Theo dõi lỗi và tốc độ tải trang (docs/theo-doi.md). Giữ 14 ngày.
+-- Không lưu IP: may = HMAC(TK_KHOA, ngày + IP, IPv6 tính theo dải /64) cắt 16 ký tự, đổi mỗi ngày, chỉ dùng để giới hạn 30 bản ghi mỗi máy mỗi ngày.
 CREATE TABLE theo_doi (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   luc INTEGER NOT NULL,                                   -- mili giây (Date.now())
@@ -9,3 +9,7 @@ CREATE TABLE theo_doi (
 );
 CREATE INDEX theo_doi_may ON theo_doi(may, luc);
 CREATE INDEX theo_doi_luc ON theo_doi(luc);
+CREATE TABLE theo_doi_ngay (                              -- số bản ghi đã nhận mỗi ngày (UTC), trần chung 2000
+  ngay TEXT PRIMARY KEY,                                  -- 'YYYY-MM-DD'
+  n INTEGER NOT NULL
+);

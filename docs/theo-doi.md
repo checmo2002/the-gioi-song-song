@@ -4,11 +4,11 @@ Song Song tự ghi lỗi và tốc độ tải của trang vào cơ sở dữ li
 
 - Trình duyệt: `js/00-theo-doi.js`, nạp đầu tiên (trước màn chờ) để bắt được cả lỗi lúc mở trang. Chỉ gửi khi trang chạy trên **https**; máy thử `http://localhost` không gửi gì.
 - Máy chủ: `functions/api/bao-loi.js` nhận `POST /api/bao-loi`, lọc rồi lưu vào bảng `theo_doi` (`migrations/0002_theo_doi.sql`).
-- Giữ **30 ngày**. Máy chủ thỉnh thoảng (khoảng 1% số lần gọi) tự xoá bản ghi cũ hơn.
+- Giữ **14 ngày**. Máy chủ thỉnh thoảng (khoảng 1% số lần gọi) tự xoá bản ghi cũ hơn.
 
 ## Gửi những gì
 
-**Lỗi** (`loai = 'loi'`), mỗi lần mở trang tối đa 5 lỗi, lỗi trùng chỉ gửi một lần:
+**Lỗi** (`loai = 'loi'`), mỗi lần mở trang tối đa 5 lỗi, lỗi trùng chỉ gửi một lần. Promise bị từ chối mà lý do không phải `Error` (chuỗi, đối tượng…) thì chỉ gửi kiểu dữ liệu, ví dụ `Promise: string`:
 
 | Trường | Nội dung |
 |---|---|
@@ -31,11 +31,15 @@ Song Song tự ghi lỗi và tốc độ tải của trang vào cơ sở dữ li
 | `may` | `dt` hoặc `mt` |
 
 **Không gửi:** tên, tài khoản, mã đăng nhập, cookie, nội dung người dùng nhập (tên người thân, lời nhắn, gia phả…), phần sau `?` của đường dẫn.
-Chữ nằm trong ngoặc kép trong lời báo lỗi bị thay bằng `"…"`, vì có lỗi (ví dụ `JSON.parse`) trích lại một đoạn dữ liệu đã lưu.
+Chữ nằm trong ngoặc trong lời báo lỗi (`"…"`, `'…'` từ 2 ký tự, `«…»`) bị thay bằng `…`, vì có lỗi (ví dụ `JSON.parse`, `querySelector`) trích lại một đoạn dữ liệu đã lưu.
+Chữ người dùng không nằm trong ngoặc thì vẫn có thể lọt vào lời báo lỗi, nên coi bảng này là dữ liệu nhạy cảm.
 Lỗi đến từ tệp của trang khác hay của tiện ích trình duyệt bị bỏ.
 
 **Không lưu IP.** Để chặn một máy gửi dồn dập, máy chủ tính `may = HMAC(TK_KHOA, 'td:' + ngày + ':' + IP)`, giữ 16 ký tự đầu.
-Mã này đổi mỗi ngày và không đảo ngược ra IP được. Mỗi mã tối đa 30 bản ghi mỗi ngày, quá thì máy chủ vẫn trả 204 nhưng không lưu.
+IPv6 tính theo dải /64 (nhà mạng cấp cả dải cho một nhà, đổi địa chỉ trong dải không tính là máy mới).
+Đây là dữ liệu **bí danh hoá**, không phải ẩn danh: ai có `TK_KHOA` thì thử hết các IPv4 của một ngày là tìm lại được IP. Vì vậy chỉ giữ 14 ngày, và không đưa `TK_KHOA` cho ai.
+Mỗi mã tối đa 30 bản ghi mỗi ngày. Cả bảng tối đa 2000 bản ghi mỗi ngày (giờ UTC), đếm trong bảng `theo_doi_ngay`, để kẻ đổi nhiều IP không làm cạn hạn mức ghi D1 dùng chung với gia phả.
+Quá giới hạn thì máy chủ vẫn trả 204 nhưng không lưu.
 
 Máy chủ chỉ nhận yêu cầu từ chính trang Song Song (Origin cùng tên miền), kiểu `application/json`, thân tối đa 4 KB.
 Trường lạ bị bỏ, sai kiểu bị bỏ, chữ dài bị cắt. Chữ được lưu nguyên dạng chữ thuần trong JSON, không bao giờ được đưa vào trang.
@@ -88,6 +92,15 @@ SELECT datetime(luc / 1000, 'unixepoch', '+7 hours') AS luc, du_lieu FROM theo_d
 WHERE loai = 'loi' AND json_extract(du_lieu, '$.m') LIKE '%chữ trong lời báo lỗi%'
 ORDER BY luc DESC LIMIT 10;
 ```
+
+**Số bản ghi mỗi ngày:** `SELECT * FROM theo_doi_ngay ORDER BY ngay DESC;`. Ngày nào có `n` chạm 2000 thì có thể đã bị gửi dồn, số liệu ngày đó không đủ.
+
+## Làm trang xem dữ liệu sau này
+
+Mọi trường trong `du_lieu` là chữ do trình duyệt bất kỳ gửi lên, có thể chứa mã độc (ví dụ `<script>`). Nếu sau này làm trang xem:
+
+- chỉ đưa dữ liệu vào trang bằng `textContent`, không dùng `innerHTML`;
+- khi xuất CSV (mở bằng Excel, Google Sheets): ô nào bắt đầu bằng `=`, `+`, `-`, `@` (kể cả sau dấu cách, tab) thì thêm dấu `'` ở đầu, để bảng tính không chạy nó như công thức.
 
 ## Áp migration lên D1 thật
 
