@@ -5,7 +5,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 ## Luồng chính
 
 1. **Màn chờ** → **sảnh chọn lối** (`#gate`): nhân vật đi tới cổng Phật giáo hoặc Công giáo.
-2. **Phi thăng** (hiệu ứng chuyển cảnh) → **Đại sảnh** (`#hall`) với thế giới 3D (bản 2D đã bỏ).
+2. **Mở cửa** (hoạt cảnh ~2,4 giây, `js/12` + `css/27-06`): cửa chùa hoặc cửa nhà thờ mở ra, ánh sáng hắt ra, camera tiến vào; cảnh 3D đổi ngay bên dưới từ giây 0,7. Máy bật giảm chuyển động thì chỉ mờ dần → **Đại sảnh** (`#hall`) với thế giới 3D (bản 2D đã bỏ).
 3. Từ đại sảnh: **thế giới núi** (`#world`, chân núi → lên núi → chính điện / nhà thờ), làng tưởng niệm, làng riêng của gia đình, đài liệt sĩ.
 4. Các **trang mục** mở riêng, xếp theo 3 nơi: Chùa · Người thân · Gia đình.
 
@@ -56,9 +56,9 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | `09-trang-nguoi-than.js` | Trang Người thân |
 | `10-thap-nhang.js` | Thắp nhang chỉ ở một nơi: chính điện / nhà thờ |
 | `11-lang-tuong-niem.js` | Làng tưởng niệm: chọn khu (Liệt sĩ, Thiên thần nhỏ) → chọn người → vào gian thờ |
-| `12-chon-loi.js` | Sảnh chọn lối, đi tới cổng để chọn |
+| `12-chon-loi.js` | Sảnh chọn lối, đi tới cổng để chọn; hoạt cảnh mở cửa khi chọn (`.mo-cua`, CSS ở `27-06`) |
 | `13-hud.js` | HUD bằng biểu tượng |
-| `14-phi-thang.js` | Hiệu ứng phi thăng chuyển cảnh |
+| `14-phi-thang.js` | Hiệu ứng phi thăng chuyển cảnh (từ mục 13, chọn lối dùng hoạt cảnh mở cửa thay cho phi thăng) |
 | `15-go-mo.js` | Gõ mõ tích công đức, 108 tiếng, 9 phẩm sen |
 | `29-cong-duc.js` | Trò nhỏ trên chùa: Thắp nhang, Thỉnh chuông, Vái lạy, Tĩnh tâm; cộng chung công đức Gõ mõ, Bảng công đức (`css/32`) |
 | `31-tao-nhan-vat.js` | Tạo nhân vật (`css/34`): dáng nam/nữ, 7 kiểu tóc + màu, 4 khuôn mặt + màu da, 5 kiểu áo + màu, quần/váy + màu; xem trước 3D xoay được (`ss3dNV` trong `js/26`). Mở bắt buộc sau khi đăng ký (lần đầu vào Song Song, `js/02`), mở lại bằng nút **Nhân vật** trên thanh hành động. Lưu `ss-nv-tc`, gửi kèm vị trí để người khác thấy (`js/04-01`) |
