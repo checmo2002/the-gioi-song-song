@@ -119,6 +119,37 @@ async def main():
     goi(C, '/api/dang-xuat', 'POST', {})
     ky('đăng xuất thì kết nối đang mở bị đóng', await bi_dong(wc))
     ky('đăng xuất rồi không vào lại được', await bi_chan(C))
+    # ---------- mã ẩn danh u, báo cáo (mục 8) ----------
+    D = dang_nhap('Người Bị Báo'); wd = await ket(D); await nhan(wd, 'chao'); await wd.send(json.dumps({'p': {'x': .4, 'u': 'giamao0000000000'}}))
+    m = await nhan(wb, 'p')
+    while m.get('peer') is None or m['p'].get('n') != 'Báo': m = await nhan(wb, 'p')
+    u = m['p'].get('u') or ''
+    ky('máy chủ gắn mã ẩn danh u (không lấy u trang gửi lên)', len(u) == 16 and u != 'giamao0000000000')
+    id_d = json.loads(goi(D, '/api/toi').read())['nguoi']['id']
+    ky('u không phải mã tài khoản', u not in id_d)
+    await wd.close(); wd = await ket(D); await nhan(wd, 'chao'); await wd.send(json.dumps({'p': {'x': .5}}))
+    m = await nhan(wb, 'p')
+    while m['p'].get('n') != 'Báo': m = await nhan(wb, 'p')
+    ky('vào lại vẫn cùng mã u (ẩn đúng người)', m['p'].get('u') == u)
+    await wd.send(json.dumps({'t': 'bao', 'u': u}))   # tự báo cáo mình: bỏ qua
+    nguoi_bao = []
+    for i in range(3):
+        X = dang_nhap(f'Người báo {i}'); wx = await ket(X); await nhan(wx, 'chao'); nguoi_bao.append(wx)
+        await wx.send(json.dumps({'t': 'bao', 'u': u}))
+    try:
+        while True:
+            m = await nhan(wb, 'di', 5)
+            if m.get('peer'): break
+        bi_an = True
+    except Exception: bi_an = False
+    ky('3 tài khoản khác nhau báo cáo: người đó bị ẩn với mọi người', bi_an)
+    E = dang_nhap('Người vào sau'); we = await ket(E); ce = await nhan(we, 'chao')
+    ky('người vào sau không thấy người đang bị ẩn', all((x.get('p') or {}).get('u') != u for x in ce['ds']))
+    await wd.send(json.dumps({'p': {'x': .6}}))
+    try: m = await nhan(we, 'p', 2); lo = m['p'].get('u') == u
+    except Exception: lo = False
+    ky('người bị ẩn đi lại cũng không ai thấy', not lo)
+    for w in nguoi_bao + [wd, we]: await w.close()
     await wb.close()
 
 asyncio.run(main())
