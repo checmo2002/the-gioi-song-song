@@ -217,7 +217,7 @@ if not ls or ls[0]['phien_ban'] != pb or not ls[0]['so_nguoi']: loi.append(f'l�
 st, r = A.goi('POST', f'/api/dong-ho/{DH}/khoi-phuc', {'ve': pb, 'phien_ban': pb + 1}); ky('khôi phục bản cũ', r, st, 200)
 st, r = A.goi('GET', f'/api/dong-ho/{DH}')
 if len(r['cay']['members']) != len(ms): loi.append('khôi phục xong cây chưa về như cũ')
-if {m['id']: m.get('tk') for m in r['cay']['members']}.get('u3') != idA: loi.append('khôi phục sau khi xoá sạch làm mất "đây là tôi"')
+if {m['id']: m.get('tk') for m in r['cay']['members']}.get('u3') is not None: loi.append('khôi phục bản cũ tự gắn lại tk (người đó phải tự bấm "Đây là tôi" lại)')
 st, r = C.goi('GET', f'/api/dong-ho/{DH}/lich-su'); ky('người ngoài không xem lịch sử', r, st, 404)
 
 st, r = A.goi('PUT', '/api/toi', {'ten': 'Trưởng\u200b họ\u2028 Phạm\ufeff'})

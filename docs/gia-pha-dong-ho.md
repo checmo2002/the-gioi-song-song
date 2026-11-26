@@ -56,7 +56,7 @@ Các bảng D1 (`migrations/0001_gia_pha.sql`):
 | `GET /api/google/ve` | Google chuyển về đây kèm `code`. Máy chủ đổi `code` lấy mã truy cập, hỏi Google mã và tên người dùng, tạo phiên rồi chuyển về `/?dang-nhap=ok#ca-nhan` (trang vào luôn tài khoản trên máy, `js/07-07`). |
 | `POST /api/dang-xuat` | Xoá phiên |
 | `GET /api/toi` | Tài khoản (`null` nếu chưa đăng nhập), các dòng họ đang tham gia, `cach`: các bên đăng nhập đang bật (trang chỉ hiện nút của các bên này) |
-| `POST /api/dong-ho/:id/gan` | "Đây là tôi": `{nguoi}` gắn tài khoản mình với một người **còn sống, chưa ai nhận** (không cần duyệt, mỗi tài khoản một người, gắn người khác thì tự bỏ người cũ); `{nguoi: null}` bỏ gắn; `{bo}` trưởng họ bỏ gắn người nhận nhầm. Lưu bản cũ vào lịch sử như mọi lần sửa cây |
+| `POST /api/dong-ho/:id/gan` | "Đây là tôi": `{nguoi}` gắn tài khoản mình với một người **còn sống, chưa ai nhận** (không cần duyệt, mỗi tài khoản một người, gắn người khác thì tự bỏ người cũ); `{nguoi: null}` bỏ gắn; `{bo}` trưởng họ bỏ gắn người nhận nhầm. Chỉ đổi trường `tk`: không tăng phiên bản, không ghi lịch sử, đề xuất đang chờ vẫn duyệt được. Sửa cây, đề xuất, duyệt và khôi phục không tạo hay gỡ được `tk` (luôn lấy theo bản đang lưu); mời ra khỏi họ thì bỏ `tk` của người đó |
 | `PUT /api/toi` | Đổi tên hiển thị: `{ten}` |
 | `POST /api/dong-ho` | Lập dòng họ từ cây trên máy: `{ten, cay}` |
 | `GET /api/dong-ho/:id` | Cây, phiên bản, vai của mình |
