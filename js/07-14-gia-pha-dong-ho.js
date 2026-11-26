@@ -36,7 +36,7 @@
     const r=await api('POST','dong-ho/'+dh.id+'/gan',bo?{bo:b.dataset.dhBo}:{nguoi:b.dataset.dhGan||null});
     if(r.st!==200){toast(r.d.loi||'Chưa gắn được.');return}
     const tk={};r.d.cay.members.forEach(x=>{if(x.tk)tk[x.id]=x.tk});ME().members.forEach(m=>{if(tk[m.id])m.tk=tk[m.id];else delete m.tk;m.self=m.tk===toi.id});
-    dh.phien_ban=r.d.phien_ban;luu();ssMe.save();ssMe.ve();toast(bo?'Đã bỏ gắn tài khoản.':b.dataset.dhGan?'Đã gắn: đây là bạn.':'Đã bỏ «đây là tôi».')});
+    ssMe.save();ssMe.ve();toast(bo?'Đã bỏ gắn tài khoản.':b.dataset.dhGan?'Đã gắn: đây là bạn.':'Đã bỏ «đây là tôi».')});
   addEventListener('ss-gp-doi',()=>{if(!dh||!toi)return;if(dh.vai==='thanh-vien'){nhap=true;luu();ve()}else ghi()});
 
   // nút đăng nhập: chỉ các bên máy chủ đang bật (cach từ /api/toi). Chữ G nhiều màu là nhận diện Google bắt buộc trên nút
