@@ -108,16 +108,32 @@ export function tenGoi(ten) {
 }
 const dongPhong = (env, id) => env.PHONG ? env.PHONG.get(env.PHONG.idFromName('chung')).fetch('https://phong/dong', { method: 'POST', headers: { 'X-Id': id } }).catch(() => { }) : null;
 
-// trường tk (người trong cây là tài khoản nào): chỉ được gắn với chính mình, tk của người khác giữ nguyên như bản đang lưu
-function giuTk(cay, cu, minh) { const C = new Map((cu ? cu.members : []).map(m => [m.id, m.tk]));
-  for (const m of cay.members) { const c = C.get(m.id) || null; if (c && c !== minh) m.tk = c; else if (m.tk != null && m.tk !== minh) m.tk = c } return cay }   // người đã gắn với người khác: không ai đè được
-// lưu bản cũ trước khi thay cây, giữ 30 bản gần nhất để trưởng họ khôi phục
-const luuCu = (env, id, toi) => [env.DB.prepare('INSERT OR IGNORE INTO lich_su (dong_ho_id, phien_ban, cay, luc, boi) SELECT id, phien_ban, cay, ?, ? FROM dong_ho WHERE id = ?').bind(Date.now(), toi.id, id),
-  env.DB.prepare('DELETE FROM lich_su WHERE dong_ho_id = ? AND phien_ban <= (SELECT MAX(phien_ban) - 30 FROM lich_su WHERE dong_ho_id = ?)').bind(id, id)];
+// trường tk (người trong cây là tài khoản nào) chỉ đổi qua /gan, /xoa-thanh-vien và lúc lập dòng họ (người lập tự gắn một người còn sống).
+// Sửa cây, đề xuất, duyệt, khôi phục: tk luôn lấy theo bản đang lưu, gửi gì lên cũng bỏ
+function giuTk(cay, cu, minh) {
+  const C = new Map((cu ? cu.members : []).map(m => [m.id, m.tk])); let mot = !cu;
+  for (const m of cay.members) { const c = cu ? C.get(m.id) : (mot && m.tk === minh && !m.d && !m.ls && minh); if (c) { m.tk = c; mot = false } else delete m.tk }
+  return cay }
+// chỉ đổi tk: không tăng phiên bản (đề xuất đang chờ vẫn duyệt được), không lưu lịch sử; ghi khi cây chưa bị ai đổi từ lúc đọc
+const ghiTk = (env, d) => env.DB.prepare('UPDATE dong_ho SET cay = ? WHERE id = ? AND cay = ?').bind(JSON.stringify(d.cay), d.id, d.goc).run();
+// thay cả cây khi phiên bản vẫn là pb: lam(hien) trả cây mới (đã giuTk theo bản đang lưu). "Đây là tôi" (/gan) chỉ đổi tk, không tăng phiên bản:
+// nếu nó chen vào giữa lúc đọc và lúc ghi thì đọc lại và làm lại (tối đa 3 lần), không bắt người sửa làm lại từ đầu.
+// Bản cũ chỉ vào lịch sử khi ghi được (changes() của lệnh UPDATE ngay trước), giữ 30 bản gần nhất để trưởng họ khôi phục
+async function thayCay(env, id, toi, pb, lam) {
+  for (let i = 0; i < 3; i++) {
+    const hien = await dongHoCua(env, id); if (hien.phien_ban !== pb) return false;
+    const [r] = await env.DB.batch([
+      env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ? AND cay = ?').bind(JSON.stringify(lam(hien)), id, pb, hien.goc),
+      env.DB.prepare('INSERT OR IGNORE INTO lich_su (dong_ho_id, phien_ban, cay, luc, boi) SELECT ?, ?, ?, ?, ? WHERE changes() > 0').bind(id, pb, hien.goc, Date.now(), toi.id),
+      env.DB.prepare('DELETE FROM lich_su WHERE dong_ho_id = ? AND phien_ban <= (SELECT MAX(phien_ban) - 30 FROM lich_su WHERE dong_ho_id = ?)').bind(id, id)]);
+    if (r.meta.changes) return true;
+  }
+  return false;
+}
 const vaiCua = (env, dh, nguoi) => env.DB.prepare('SELECT vai FROM thanh_vien WHERE dong_ho_id = ? AND nguoi_id = ?').bind(dh, nguoi).first('vai');
 
 // ---------- các lệnh ----------
-async function dongHoCua(env, id) { const r = await env.DB.prepare('SELECT id, ten, cay, phien_ban FROM dong_ho WHERE id = ?').bind(id).first(); if (r) r.cay = JSON.parse(r.cay); return r }
+async function dongHoCua(env, id) { const r = await env.DB.prepare('SELECT id, ten, cay, phien_ban FROM dong_ho WHERE id = ?').bind(id).first(); if (r) { r.goc = r.cay; r.cay = JSON.parse(r.cay) } return r }
 
 async function xuLy(env, req, duong, toi) {
   const [a, id, b, dx, c] = duong, M = req.method;
@@ -177,9 +193,7 @@ async function xuLy(env, req, duong, toi) {
     if (!duyet) return loi(403, 'Chỉ trưởng họ hoặc người được giao duyệt mới sửa thẳng. Hãy gửi đề xuất.');
     let cay; try { cay = kiemCay(body.cay) } catch { return loi(400, 'Gia phả chưa hợp lệ.') }
     if (!Number.isInteger(body.phien_ban)) return loi(400, 'Thiếu phiên bản gia phả.');
-    giuTk(cay, (await dongHoCua(env, id)).cay, toi.id);
-    const [, , r] = await env.DB.batch([...luuCu(env, id, toi), env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(JSON.stringify(cay), id, body.phien_ban)]);
-    if (!r.meta.changes) { const d = await dongHoCua(env, id); return json({ loi: 'Gia phả vừa được người khác sửa. Hãy xem bản mới rồi sửa lại.', ...d }, 409) }
+    if (!await thayCay(env, id, toi, body.phien_ban, h => giuTk(cay, h.cay, toi.id))) { const d = await dongHoCua(env, id); return json({ loi: 'Gia phả vừa được người khác sửa. Hãy xem bản mới rồi sửa lại.', ...d }, 409) }
     return json({ phien_ban: body.phien_ban + 1 });
   }
   if (b === 'de-xuat' && !dx && M === 'POST') {
@@ -206,8 +220,7 @@ async function xuLy(env, req, duong, toi) {
     const now = Date.now(), xong = (tt, ld) => env.DB.prepare("UPDATE de_xuat SET trang_thai = ?, ly_do = ?, cay = '', xu_ly_boi = ?, xu_ly_luc = ? WHERE id = ? AND trang_thai = 'cho'").bind(tt, ld, toi.id, now, dx);
     if (c === 'tu-choi') { let ld; try { ld = chu(body.ly_do, 200) } catch { return loi(400, 'Lý do tối đa 200 ký tự.') } await xong('tu-choi', ld).run(); return json({ ok: true }) }
     if (!(await xong('duyet', null).run()).meta.changes) return loi(404, 'Đề xuất không còn chờ duyệt.');   // hai người bấm duyệt cùng lúc: chỉ một người được
-    const [, , r] = await env.DB.batch([...luuCu(env, id, toi), env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(x.cay, id, x.phien_ban_goc)]);
-    if (!r.meta.changes) { await env.DB.prepare("UPDATE de_xuat SET trang_thai = 'tu-choi', ly_do = ? WHERE id = ?").bind('Gia phả đã đổi sau khi đề xuất được gửi. Cần gửi lại trên bản mới.', dx).run(); return loi(409, 'Gia phả đã đổi từ lúc đề xuất được gửi, nên đề xuất đã bị từ chối. Người gửi cần gửi lại.') }
+    if (!await thayCay(env, id, toi, x.phien_ban_goc, h => giuTk(JSON.parse(x.cay), h.cay, toi.id))) { await env.DB.prepare("UPDATE de_xuat SET trang_thai = 'tu-choi', ly_do = ? WHERE id = ?").bind('Gia phả đã đổi sau khi đề xuất được gửi. Cần gửi lại trên bản mới.', dx).run(); return loi(409, 'Gia phả đã đổi từ lúc đề xuất được gửi, nên đề xuất đã bị từ chối. Người gửi cần gửi lại.') }
     return json({ phien_ban: x.phien_ban_goc + 1 });
   }
   if (b === 'loi-moi' && M === 'POST') {
@@ -221,13 +234,32 @@ async function xuLy(env, req, duong, toi) {
     const { results } = await env.DB.prepare('SELECT l.phien_ban, l.luc, n.ten boi, l.cay FROM lich_su l LEFT JOIN nguoi_dung n ON n.id = l.boi WHERE l.dong_ho_id = ? ORDER BY l.phien_ban DESC LIMIT 30').bind(id).all();
     return json({ lich_su: results.map(r => ({ phien_ban: r.phien_ban, luc: r.luc, boi: r.boi, so_nguoi: JSON.parse(r.cay).members.length })) });
   }
+  // "đây là tôi": thành viên tự gắn tài khoản mình với một người còn sống chưa ai nhận (không cần duyệt, mỗi tài khoản một người); trưởng họ bỏ gắn được
+  if (b === 'gan' && M === 'POST') {
+    const d = await dongHoCua(env, id), tim = k => d.cay.members.find(m => m.id === k);
+    if (body.bo != null) {
+      if (vai !== 'truong') return loi(403, 'Chỉ trưởng họ bỏ gắn được người khác.');
+      const m = typeof body.bo === 'string' && tim(body.bo); if (!m) return loi(404, 'Không thấy người này trong gia phả.');
+      delete m.tk;
+    } else {
+      const m = body.nguoi == null ? null : typeof body.nguoi === 'string' && tim(body.nguoi);
+      if (m === false || m === undefined) return loi(404, 'Không thấy người này trong gia phả.');
+      if (m && m.tk && m.tk !== toi.id) return loi(409, 'Người này đã có tài khoản khác nhận.');
+      if (m && (m.d || m.ls)) return loi(400, 'Chỉ gắn được với người còn sống.');
+      for (const x of d.cay.members) if (x.tk === toi.id) delete x.tk;
+      if (m) m.tk = toi.id;
+    }
+    if (JSON.stringify(d.cay) === d.goc) return json({ cay: d.cay });   // không đổi gì thì không ghi
+    const r = await env.DB.prepare('UPDATE dong_ho SET cay = ? WHERE id = ? AND cay = ? AND EXISTS (SELECT 1 FROM thanh_vien WHERE dong_ho_id = ? AND nguoi_id = ?)').bind(JSON.stringify(d.cay), id, d.goc, id, toi.id).run();   // vừa bị mời ra thì không gắn
+    return r.meta.changes ? json({ cay: d.cay }) : loi(409, 'Gia phả vừa được người khác sửa. Hãy thử lại.');
+  }
   if (b === 'khoi-phuc' && M === 'POST') {
     if (vai !== 'truong') return loi(403, 'Chỉ trưởng họ khôi phục được bản cũ.');
     if (!Number.isInteger(body.ve) || !Number.isInteger(body.phien_ban)) return loi(400, 'Thiếu phiên bản.');
     const cu = await env.DB.prepare('SELECT cay FROM lich_su WHERE dong_ho_id = ? AND phien_ban = ?').bind(id, body.ve).first('cay');
     if (!cu) return loi(404, 'Không còn bản này.');
-    const [, , r] = await env.DB.batch([...luuCu(env, id, toi), env.DB.prepare('UPDATE dong_ho SET cay = ?, phien_ban = phien_ban + 1 WHERE id = ? AND phien_ban = ?').bind(cu, id, body.phien_ban)]);
-    return r.meta.changes ? json({ phien_ban: body.phien_ban + 1 }) : loi(409, 'Gia phả vừa được người khác sửa. Hãy tải lại rồi thử lại.');
+    // tk theo bản đang lưu: người đã bị xoá khỏi cây rồi khôi phục lại thì tự bấm "Đây là tôi" lại (không gắn lại thay họ)
+    return await thayCay(env, id, toi, body.phien_ban, h => giuTk(JSON.parse(cu), h.cay, toi.id)) ? json({ phien_ban: body.phien_ban + 1 }) : loi(409, 'Gia phả vừa được người khác sửa. Hãy tải lại rồi thử lại.');
   }
   if (b === 'loi-moi' && M === 'DELETE') {
     if (!duyet) return loi(403, 'Chỉ trưởng họ hoặc người được giao mới thu hồi mã mời.');
@@ -246,6 +278,10 @@ async function xuLy(env, req, duong, toi) {
       : env.DB.prepare('DELETE FROM thanh_vien WHERE dong_ho_id = ? AND nguoi_id = ?').bind(id, body.nguoi_id)).run();
     if (!r.meta.changes) return loi(404, 'Người này không ở trong dòng họ.');
     if (b === 'xoa-thanh-vien' || body.vai === 'thanh-vien') await env.DB.prepare('DELETE FROM loi_moi WHERE dong_ho_id = ? AND tao_boi = ?').bind(id, body.nguoi_id).run();   // mã người đó tạo hết hiệu lực
+    if (b === 'xoa-thanh-vien') for (let i = 0; i < 3; i++) {   // người rời họ không còn "đây là tôi" trong cây
+      const d = await dongHoCua(env, id); let doi = false;
+      for (const m of d.cay.members) if (m.tk === body.nguoi_id) { delete m.tk; doi = true }
+      if (!doi || (await ghiTk(env, d)).meta.changes) break }
     if (b === 'xoa-thanh-vien') await env.DB.batch([   // không vào lại bằng mã cũ; đề xuất đang chờ của người đó bỏ đi
       env.DB.prepare('INSERT OR IGNORE INTO chan (dong_ho_id, nguoi_id, luc) VALUES (?, ?, ?)').bind(id, body.nguoi_id, Date.now()),
       env.DB.prepare("UPDATE de_xuat SET trang_thai = 'tu-choi', ly_do = 'Người gửi đã rời dòng họ.', cay = '' WHERE dong_ho_id = ? AND nguoi_id = ? AND trang_thai = 'cho'").bind(id, body.nguoi_id)]);

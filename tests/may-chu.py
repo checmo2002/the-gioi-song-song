@@ -198,13 +198,15 @@ st, r = B.goi('GET', f'/api/dong-ho/{DH}'); ky('B đã ra không xem được n�
 st, r = A.goi('POST', f'/api/dong-ho/{DH}/loi-moi', {}); MA3 = r.get('ma')
 st, r = B.goi('POST', '/api/tham-gia', {'ma': MA3}); ky('người bị mời ra không vào lại bằng mã mới', r, st, 404)
 
-# ---------- gắn tài khoản (tk): chỉ gắn với chính mình ----------
+# ---------- gắn tài khoản (tk): sửa cây không gắn được, chỉ /gan (gắn chính mình) ----------
 st, r = A.goi('GET', f'/api/dong-ho/{DH}'); pb = r['phien_ban']; cay = r['cay']
-cay['members'][1]['tk'] = 'uid-nguoi-khac'; cay['members'][0]['tk'] = idA
+cay['members'][1]['tk'] = 'uid-nguoi-khac'; cay['members'][2]['tk'] = idA
 st, r = A.goi('PUT', f'/api/dong-ho/{DH}/cay', {'cay': cay, 'phien_ban': pb}); ky('A lưu cây có tk', r, st, 200)
 st, r = A.goi('GET', f'/api/dong-ho/{DH}'); ms = r['cay']['members']
-if ms[1].get('tk') is not None: loi.append('gắn được người trong cây với tài khoản người khác')
-if ms[0].get('tk') != idA: loi.append('không tự gắn được người trong cây với chính mình')
+if ms[1].get('tk') is not None or ms[2].get('tk') is not None: loi.append('sửa cây mà gắn được tk (chỉ /gan mới được)')
+st, r = A.goi('POST', f'/api/dong-ho/{DH}/gan', {'nguoi': 'u3'}); ky('A tự gắn mình qua /gan', r, st, 200)
+st, r = A.goi('GET', f'/api/dong-ho/{DH}'); ms = r['cay']['members']
+if ms[2].get('tk') != idA: loi.append('không tự gắn được người trong cây với chính mình')
 
 # ---------- lịch sử, khôi phục sau khi cây bị xoá sạch ----------
 pb = r['phien_ban']
@@ -215,6 +217,7 @@ if not ls or ls[0]['phien_ban'] != pb or not ls[0]['so_nguoi']: loi.append(f'l�
 st, r = A.goi('POST', f'/api/dong-ho/{DH}/khoi-phuc', {'ve': pb, 'phien_ban': pb + 1}); ky('khôi phục bản cũ', r, st, 200)
 st, r = A.goi('GET', f'/api/dong-ho/{DH}')
 if len(r['cay']['members']) != len(ms): loi.append('khôi phục xong cây chưa về như cũ')
+if {m['id']: m.get('tk') for m in r['cay']['members']}.get('u3') is not None: loi.append('khôi phục bản cũ tự gắn lại tk (người đó phải tự bấm "Đây là tôi" lại)')
 st, r = C.goi('GET', f'/api/dong-ho/{DH}/lich-su'); ky('người ngoài không xem lịch sử', r, st, 404)
 
 st, r = A.goi('PUT', '/api/toi', {'ten': 'Trưởng\u200b họ\u2028 Phạm\ufeff'})
@@ -237,6 +240,46 @@ st, r = K.goi('POST', f'/api/dong-ho/{DH9}/de-xuat', {'cay': {'members': [{'id':
 if st == 201: H.goi('POST', f'/api/dong-ho/{DH9}/de-xuat/{r["id"]}/duyet', {})
 if H.goi('GET', f'/api/dong-ho/{DH9}')[1]['cay']['members'][0].get('tk') != idH: loi.append('thành viên đè được tk của người khác bằng mã của mình (trưởng họ duyệt mà không thấy)')
 else: print('  ✓ không đè được tk đã gắn với người khác')
+
+# ---------- "đây là tôi": thành viên tự gắn mình (POST /gan), không cần duyệt ----------
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/de-xuat', {'cay': {'members': [{'id': 'u1', 'name': 'H', 'g': 'm', 'tk': idH}, {'id': 'u2', 'name': 'K', 'g': 'm', 'parent': 'u1'},
+    {'id': 'u3', 'name': 'Cụ', 'g': 'm', 'b': 1900, 'd': 1970}, {'id': 'u4', 'name': 'L', 'g': 'f', 'parent': 'u1'}], 'seq': 5}, 'phien_ban': H.goi('GET', f'/api/dong-ho/{DH9}')[1]['phien_ban']})
+H.goi('POST', f'/api/dong-ho/{DH9}/de-xuat/{r.get("id")}/duyet', {})
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u1'}); ky('không nhận người đã có tài khoản khác', r, st, 409)
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u3'}); ky('không nhận người đã khuất', r, st, 400)
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'khong-co'}); ky('không nhận người không có trong cây', r, st, 404)
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u2'}); ky('thành viên tự nhận "đây là tôi"', r, st, 200)
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u4'}); ky('nhận người khác thì bỏ người cũ', r, st, 200)
+tk = {m['id']: m.get('tk') for m in H.goi('GET', f'/api/dong-ho/{DH9}')[1]['cay']['members']}
+if tk.get('u4') != idK or tk.get('u2') is not None or tk.get('u1') != idH: loi.append(f'mỗi tài khoản chỉ gắn một người, không đụng người khác: {tk}')
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'bo': 'u1'}); ky('thành viên không bỏ gắn được người khác', r, st, 403)
+st, r = H.goi('POST', f'/api/dong-ho/{DH9}/gan', {'bo': 'u4'}); ky('trưởng họ bỏ gắn được người nhận nhầm', r, st, 200)
+if any(m.get('tk') == idK for m in H.goi('GET', f'/api/dong-ho/{DH9}')[1]['cay']['members']): loi.append('trưởng họ bỏ gắn mà tk vẫn còn')
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u2'}); st, r = K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': None}); ky('tự bỏ "đây là tôi"', r, st, 200)
+st, r = C.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u2'}); ky('người ngoài dòng họ không gắn được', r, st, 404)
+# rà PR #113: gắn không tăng phiên bản, không xoá lịch sử, không làm hỏng đề xuất đang chờ; sửa cây / đề xuất không tạo được tk; người rời họ hết tk
+dh = lambda: H.goi('GET', f'/api/dong-ho/{DH9}')[1]
+ls = lambda: len(H.goi('GET', f'/api/dong-ho/{DH9}/lich-su')[1]['lich_su'])
+c0 = dh(); pb, n0 = c0['phien_ban'], ls()
+st, r = K.goi('POST', f'/api/dong-ho/{DH9}/de-xuat', {'cay': dict(c0['cay'], members=c0['cay']['members'] + [{'id': 'u5', 'name': 'Mới', 'g': 'f', 'parent': 'u1'}]), 'phien_ban': pb}); dx = r.get('id')
+for _ in range(5): K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u2'}); K.goi('POST', f'/api/dong-ho/{DH9}/gan', {'nguoi': 'u2'})
+if dh()['phien_ban'] != pb or ls() != n0: loi.append(f'"đây là tôi" tăng phiên bản / ghi lịch sử (phiên bản {pb}→{dh()["phien_ban"]}, lịch sử {n0}→{ls()})')
+else: print('  ✓ "đây là tôi" không tăng phiên bản, không ghi lịch sử')
+st, r = H.goi('POST', f'/api/dong-ho/{DH9}/de-xuat/{dx}/duyet', {}); ky('đề xuất gửi trước khi gắn vẫn duyệt được', r, st, 200)
+tk = {m['id']: m.get('tk') for m in dh()['cay']['members']}
+if tk.get('u2') != idK or 'u5' not in tk: loi.append(f'duyệt đề xuất làm mất "đây là tôi" vừa gắn: {tk}')
+else: print('  ✓ duyệt đề xuất giữ "đây là tôi" gắn sau khi gửi')
+c1 = dh(); m1 = [dict(m) for m in c1['cay']['members']]
+for m in m1:
+    if m['id'] in ('u3', 'u4', 'u5'): m['tk'] = idH   # gắn mình vào người đã khuất và nhiều người cùng lúc
+    if m['id'] == 'u2': m.pop('tk', None)            # gỡ tk của người khác
+st, r = H.goi('PUT', f'/api/dong-ho/{DH9}/cay', {'cay': dict(c1['cay'], members=m1), 'phien_ban': c1['phien_ban']})
+tk = {m['id']: m.get('tk') for m in dh()['cay']['members']}
+if st != 200 or tk.get('u2') != idK or any(tk.get(k) for k in ('u3', 'u4', 'u5')): loi.append(f'sửa thẳng cây đổi được tk (chỉ /gan mới được): {st} {tk}')
+else: print('  ✓ sửa thẳng cây không tạo, không gỡ được tk')
+H.goi('POST', f'/api/dong-ho/{DH9}/xoa-thanh-vien', {'nguoi_id': idK})
+if any(m.get('tk') == idK for m in dh()['cay']['members']): loi.append('người bị mời ra khỏi họ vẫn còn gắn "đây là tôi" trong cây')
+else: print('  ✓ mời ra khỏi họ thì bỏ gắn tk của người đó')
 
 # ---------- đăng xuất ----------
 st, r = A.goi('POST', '/api/dang-xuat', {}); ky('đăng xuất', r, st, 200)
