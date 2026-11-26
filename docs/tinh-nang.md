@@ -30,6 +30,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 
 | File | Tính năng |
 |---|---|
+| `00-theo-doi.js` | Theo dõi lỗi và tốc độ tải trang (chỉ trên https), gửi về máy chủ của chính Song Song: `functions/api/bao-loi.js`, bảng D1 `theo_doi`. Không gửi tên, tài khoản, chữ người dùng nhập. Chi tiết và cách xem: `docs/theo-doi.md` |
 | `01-man-cho.js` | Màn chờ có thanh phần trăm; máy có 3D thì chờ cảnh 3D sắp vào nạp xong (tối đa 60 giây), cảnh khác nạp ngầm |
 | `02-am-lich.js` | Lịch âm Việt Nam (thuật toán Hồ Ngọc Đức, UTC+7), biến toàn cục `LV` |
 | `02-09-phong-chung.js` | Phòng chung trên máy chủ Song Song (`window.ssPhong`): chỉ người đã đăng nhập Google; cùng cách gọi với phòng của claude.ai để `03`, `04-01` vẽ người khác. Máy chủ: `phong/` (Durable Object), `docs/phong-chung.md` |
