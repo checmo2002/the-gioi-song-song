@@ -215,7 +215,11 @@ $('#lmUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f||!f
       people.filter(p=>p.mine).forEach(p=>{people.splice(people.indexOf(p),1);delete byId[p.id]});start()},
     login(contact){if(!ME.user&&!restore()){this.signup('Bạn',contact);return ME.user.name}start();return ME.user.name},
     logout(){document.body.classList.remove('signed')},save,refresh,ve(){if(sel&&!get(sel))sel=null;refresh();side()},
-    resume(){if(restore()){start();return ME.user.name}return null}};
+    resume(){if(restore()){start();return ME.user.name}return null},
+    // Thêm người thân (js/07-03): mở khung thêm người, điền sẵn tên, năm, liệt sĩ; người dùng chọn quan hệ rồi bấm "Thêm vào gia phả"
+    moThem(pre){if(!ME.user)return;tab('tree');const me=ME.members.find(m=>m.self);sel=null;side('add',me&&!me.parent?{rel:'parent',to:me.id}:null);
+      $('#nfName').value=pre.name||'';$('#nfB').value=pre.b||'';$('#nfD').value=pre.d||'';$('#nfLs').checked=!!pre.ls;
+      $('#treeSide').scrollIntoView({block:'nearest'});$('#nfName').focus({preventScroll:true})}};
   // shortcut: dữ liệu gia phả chỉ lưu trên trình duyệt này (localStorage); cần máy chủ và tài khoản thật khi làm sản phẩm
   // tự kiểm tra bố cục cây: con luôn nằm thấp hơn cha mẹ một đời
   console.assert((()=>{const bk=JSON.stringify(ME);ME.members=[{id:'a',name:'A',self:true},{id:'b',name:'B',parent:'a'},{id:'c',name:'C',parent:'b'}];const u=unitOf(ME.members[0]);const ok=width(u,new Set())>=NW&&kidsOf(u).length===1;Object.assign(ME,JSON.parse(bk));return ok})(),'tree layout');

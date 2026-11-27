@@ -730,15 +730,13 @@
         <div data-jp="1">
           <span class="pill ok">Miễn phí</span>
           <h3 style="margin-top:10px">Tưởng niệm một người thân</h3>
-          <p class="lede">Chỉ cần vài thông tin cơ bản. Tiểu sử, ảnh và câu chuyện có thể bổ sung dần.</p>
-          <form class="form" onsubmit="event.preventDefault();toast('Đã mở không gian tưởng niệm mẫu. Đây là bản trình diễn.')">
-            <label class="full">Họ và tên người đã mất<input id="f-name" value="Phạm Hữu Khiêm"></label>
-            <label>Năm sinh<input id="f-born" value="1951" inputmode="numeric"></label>
-            <label>Năm mất<input id="f-died" value="1972" inputmode="numeric"></label>
-            <label>Quê quán<input id="f-home" value="Ý Yên, Nam Định"></label>
-            <label>Loại hồ sơ<select id="f-type"><option>Liệt sĩ</option><option>Thương binh</option><option>Người thân</option></select></label>
-            <label class="full">Quan hệ của bạn với người đã mất<input id="f-rel" value="Cháu ruột"></label>
-            <div class="full"><button class="btn" type="submit">Tưởng niệm</button></div>
+          <p class="lede">Chỉ cần tên và năm. Bước sau, bạn chọn người này là ai trong gia phả. Ngày giỗ, tiểu sử, ảnh và câu chuyện có thể bổ sung dần.</p>
+          <form class="form" id="jForm" novalidate>
+            <label class="full">Họ và tên người đã mất<input id="f-name" maxlength="60" autocomplete="off" placeholder="Ví dụ: Phạm Hữu Khiêm"></label>
+            <label>Năm sinh<input id="f-born" inputmode="numeric" maxlength="4" placeholder="1951"></label>
+            <label>Năm mất<input id="f-died" inputmode="numeric" maxlength="4" placeholder="1972"></label>
+            <label class="full">Loại hồ sơ<select id="f-type"><option value="nt">Người thân</option><option value="ls">Liệt sĩ</option></select></label>
+            <div class="full"><button class="btn" type="submit">Tiếp tục: thêm vào gia phả</button></div>
           </form>
         </div>
         <div data-jp="2" hidden>

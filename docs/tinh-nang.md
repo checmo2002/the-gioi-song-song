@@ -20,7 +20,7 @@ Tách từ bản artifact "Thế Giới Song Song" ngày 04/11/2026. Hành vi gi
 | Mộ phần | `#ban-do` | Bản đồ Việt Nam, vị trí mộ và quê quán |
 | Nơi an nghỉ | `#ngoi-nha`, `#cong-vien` | Ngôi nhà tưởng niệm, làng |
 | Gửi thiệp | `#thiep` | Thiệp tưởng nhớ |
-| Thêm người thân | `#hanh-trinh` | 5 bước mở không gian tưởng niệm |
+| Thêm người thân | `#hanh-trinh` | 5 bước mở không gian tưởng niệm. Bước 1 nhập tên, năm, loại (người thân / liệt sĩ) rồi chuyển sang Gia đình → Gia phả, mở sẵn khung thêm người (`ssMe.moThem`) để chọn quan hệ. Chưa đăng nhập thì đăng ký xong đi tiếp |
 | Gia đình | `#ca-nhan` | Trang cá nhân, cây gia phả, làng dòng họ, ví nén |
 | Hỏi đáp | `#hoi-dap` | Câu hỏi thường gặp |
 | Cửa hàng & dịch vụ | `#cua-hang` | Vật phẩm số (tính bằng "nén"), đặt làm theo yêu cầu |
