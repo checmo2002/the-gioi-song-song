@@ -1223,6 +1223,12 @@ window.SS_LICHSU={
    }
   ],
   "bac": {
+   "nguon": [
+    {
+     "ten": "Tiểu sử Chủ tịch Hồ Chí Minh (1890 – 1969) – Cổng thông tin điện tử Chính phủ",
+     "url": "https://chinhphu.vn/chu-tich-ho-chi-minh-68380"
+    }
+   ],
    "ten": "Hồ Chí Minh",
    "tenKhac": [
     "Nguyễn Sinh Cung",
