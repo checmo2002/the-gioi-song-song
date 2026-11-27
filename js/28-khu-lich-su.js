@@ -18,7 +18,7 @@
       return '<li'+(v.cha?' class="con"':'')+'><b>'+esc(v.ten)+'</b>'+(v.hieu?' <em>'+esc(v.hieu)+'</em>':'')+'<span>'+esc(nam(v.nam))+(qh?' · '+esc(qh):'')+'</span>'+(v.ghiChu?'<small>'+esc(v.ghiChu)+'</small>':'')+'</li>'}).join('')+'</ol></div></div>'}).join('')+nguon(V.nguon)}
  function bac(){var T=L.tuong,b=T.bac;
   return dau('#9A3B2B','★','Chủ tịch Hồ Chí Minh','Tượng đài Bác giữa làng')+
-   '<div class="ls-bac"><b>Chủ tịch '+esc(b.ten)+'</b><span>'+esc(nam(b.nam))+(b.queQuan?' · '+esc(b.queQuan):'')+'</span>'+(b.tenKhac&&b.tenKhac.length?'<small>Tên khác: '+esc(b.tenKhac.join(', '))+'</small>':'')+'<p>'+esc(b.tomTat)+'</p></div>'+nguon(T.nguon)}
+   '<div class="ls-bac"><b>Chủ tịch '+esc(b.ten)+'</b><span>'+esc(nam(b.nam))+(b.queQuan?' · '+esc(b.queQuan):'')+'</span>'+(b.tenKhac&&b.tenKhac.length?'<small>Tên khác: '+esc(b.tenKhac.join(', '))+'</small>':'')+'<p>'+esc(b.tomTat)+'</p></div>'+nguon(b.nguon)}
  function tuong(){var T=L.tuong;
   return dau('#2F5D8A','✪','Các tướng','Tướng lĩnh, lãnh đạo tiêu biểu có công với cách mạng')+
    '<ul class="ls-tg">'+(T.nguoi||[]).map(function(p){
