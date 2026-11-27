@@ -60,3 +60,9 @@ $$('[data-tab]').forEach(a=>a.addEventListener('click',()=>showTab(a.dataset.tab
 
 /* ---------------- Hành trình ---------------- */
 $('#steps').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$$('#steps button').forEach(x=>x.setAttribute('aria-selected',x===b));$$('[data-jp]').forEach(d=>d.hidden=d.dataset.jp!==b.dataset.j)});
+// Bước 1 "Tưởng niệm một người thân": đưa sang Gia đình → Gia phả, mở sẵn khung thêm người với tên, năm vừa nhập; chọn quan hệ ở đó.
+// Chưa đăng nhập thì js/09 mở khung đăng ký trước; đăng ký xong (ss-auth-done) đi tiếp với thông tin đã nhập.
+function jTiep(){const v=id=>$(id).value.trim(),n=v('#f-name');if(!n){toast('Hãy nhập họ và tên người đã mất.');$('#f-name').focus();return}
+  const pre={name:n,b:v('#f-born'),d:v('#f-died'),ls:$('#f-type').value==='ls'};$('#jForm').reset();setView('app','ca-nhan',true);try{history.pushState(null,'','#ca-nhan')}catch(_){}window.ssMe&&ssMe.moThem(pre)}
+$('#jForm').addEventListener('submit',e=>{e.preventDefault();jTiep()});
+addEventListener('ss-auth-done',()=>{if(location.hash==='#hanh-trinh'&&$('#f-name').value.trim())setTimeout(jTiep,0)});
